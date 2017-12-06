@@ -16,11 +16,11 @@
 #define TIMEOUT_SECONDS 600
 #define TEXT_TO_LOOK_FOR @"Welcome to React Native!"
 
-@interface editorTests : XCTestCase
+@interface peerassets-walletTests : XCTestCase
 
 @end
 
-@implementation editorTests
+@implementation peerassets-walletTests
 
 - (BOOL)findSubviewInView:(UIView *)view matching:(BOOL(^)(UIView *view))test
 {

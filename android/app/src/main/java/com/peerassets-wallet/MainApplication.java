@@ -1,4 +1,4 @@
-package com.editor;
+package com.peerassets-wallet;
 
 import android.app.Application;
 
