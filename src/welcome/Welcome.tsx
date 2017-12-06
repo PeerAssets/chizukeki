@@ -1,6 +1,7 @@
 import * as React from 'react'; import { Component } from 'react';
 import {
   StyleSheet,
+  Dimensions,
   Text,
   View
 } from 'react-native';
@@ -49,8 +50,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'row',
-    width: '50%',
-    maxHeight: '50%',
+    //maxHeight: '50%',
+    //width: '50%',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'white',
