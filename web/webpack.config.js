@@ -1,8 +1,8 @@
-import * as webpack from "webpack";
-import * as path from "path";
+var webpack = require("webpack");
+var path = require("path");
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const config: webpack.Configuration  = {
+module.exports = {
 
   entry: [
     path.join(__dirname, '../index.web.ts')
@@ -18,7 +18,7 @@ const config: webpack.Configuration  = {
   devtool: "source-map",
 
   resolve: {
-    extensions: [".js", "jsx", ".ts", ".tsx"],
+    extensions: [ ".js", "jsx", ".ts", ".tsx", ".web.js", ".web.jsx" ],
     alias: {
       'react-native': 'react-native-web',
       'react-router-native': 'react-router',
@@ -38,18 +38,23 @@ const config: webpack.Configuration  = {
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
+        test: /.jsx?|\.tsx?$/,
         // Add every directory that needs to be compiled by Babel during the build
         include: [
           path.join(__dirname, '../index.web.ts'),
           path.resolve(__dirname, '../src'),
           path.resolve(__dirname, '../node_modules/react-native-uncompiled'),
-          /node_modules\/react-native-/,
+          path.resolve(__dirname, '../node_modules/react-native-elements'),
+          path.resolve(__dirname, '../node_modules/react-native-vector-icons'),
         ],
-        exclude: /node_modules\/react-native-web\//,
         use: {
           loader: 'awesome-typescript-loader',
           options: {
+            useWebpackText: true,
+            useTranspileModule: true,
+            doTypeCheck: true,
+            forkChecker: true,
+
             useBabel: true,
             useCache: true,
             babelOptions: {
@@ -58,7 +63,7 @@ const config: webpack.Configuration  = {
               // the modules needed by the app
               plugins: ['react-native-web/babel'],
               // The 'react-native' preset is recommended (or use your own .babelrc)
-              presets: ['react-native']
+              presets : [ 'react-native' ],
             }
           }
         }
@@ -99,5 +104,3 @@ const config: webpack.Configuration  = {
   }
 
 };
-
-export default config;

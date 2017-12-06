@@ -1,24 +1,23 @@
-import * as React from 'react';
+import * as React from 'react'; import { Component } from 'react';
 import {
   StyleSheet,
   Text,
   View
 } from 'react-native';
-import { Container } from 'native-base'
-
+import { Card, Button } from 'react-native-elements'
 
 
 class Welcome extends React.Component<{}> {
   render() {
     return (
-      <Container style={styles.container}>
+      <Card containerStyle={styles.container}>
         <Text style={styles.welcome}>
           Welcome
         </Text>
         <Text style={styles.instructions}>
           To get started, edit App.js
         </Text>
-      </Container>
+      </Card>
     );
   }
 }
