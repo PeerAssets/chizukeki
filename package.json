@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "web": "webpack-dev-server -d --config web/webpack.config.js --inline --hot --colors",
+    "build": "webpack -d --config web/webpack.config.js --colors",
     "test": "jest"
   },
   "dependencies": {

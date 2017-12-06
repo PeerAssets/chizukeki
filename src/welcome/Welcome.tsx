@@ -48,9 +48,14 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    flexDirection: 'row',
+    width: '50%',
+    maxHeight: '50%',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: 'white',
+    borderRadius: 3,
+    borderWidth: 0
   },
   welcome: {
     fontSize: 20,

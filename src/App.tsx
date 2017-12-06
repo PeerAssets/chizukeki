@@ -3,7 +3,8 @@ import {
   Platform,
   StyleSheet,
   Text,
-  View
+  View,
+  Image
 } from 'react-native';
 import Welcome from './welcome/Welcome'
 
@@ -17,6 +18,8 @@ export default class App extends React.Component<{}> {
   render() {
     return (
       <View style={styles.container}>
+        <Image source={require("./welcome/logomask.png")}
+               style={styles.background} />
         <Welcome/>
       </View>
     );
@@ -24,10 +27,18 @@ export default class App extends React.Component<{}> {
 }
 
 const styles = StyleSheet.create({
+  background: {
+    position: 'absolute',
+    height: 200,
+    width: 200,
+    bottom: 0,
+    left: 0,
+    zIndex: 0,
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: '#DADADA',
   },
 })
