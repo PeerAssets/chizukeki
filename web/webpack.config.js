@@ -46,6 +46,9 @@ module.exports = {
           path.resolve(__dirname, '../node_modules/react-native-uncompiled'),
           path.resolve(__dirname, '../node_modules/react-native-elements'),
           path.resolve(__dirname, '../node_modules/react-native-vector-icons'),
+          path.resolve(__dirname, '../node_modules/native-base'),
+          path.resolve(__dirname, '../node_modules/react-native-keyboard-aware-scroll-view'),
+          path.resolve(__dirname, '../node_modules/react-native-easy-grid'),
         ],
         use: {
           loader: 'awesome-typescript-loader',

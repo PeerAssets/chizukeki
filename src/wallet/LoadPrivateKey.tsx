@@ -9,6 +9,7 @@ import {
   Button,
   ButtonGroup
 } from 'react-native-elements'
+import { Badge, Icon } from 'native-base'
 
 import * as bitcore from '../bitcore'
 
@@ -49,6 +50,9 @@ class LoadPrivateKey extends React.Component<
     let { privateKey, format } = this.state
     return (
       <Card containerStyle={styles.container} >
+          <Badge primary>
+            <Icon name="star" style={{ fontSize: 15, color: "#fff", lineHeight: 20 }}/>
+          </Badge>
         <Text style={styles.welcome}> Import or generate key </Text>
         <SelectFormat
           selected={format}
