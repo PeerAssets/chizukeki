@@ -7,11 +7,16 @@ import { createHistory } from '../routing'
 
 import { logger } from './utils'
 
+import Wallet from '../wallet/redux'
+
 export const history = createHistory()
 
 /* Persist to either device or localStorage
  * */
-const reducer = persistCombineReducers({ key: 'root', storage }, { router })
+const reducer = persistCombineReducers({ key: 'root', storage }, {
+  router,
+  wallet: Wallet.reducer
+})
 
 export default function configureStore() {
   let store = createStore(

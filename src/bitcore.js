@@ -39,8 +39,7 @@ bitcore.Networks.defaultNetwork = bitcore.Networks.get('peercoin');
 // Overwrite transaction serialization to include peercoin's timestamp
 //
 
-var Input = Transaction.Input;
-var Output = Transaction.Output;
+var { Input, Output } = bitcore.Transaction
 
 bitcore.Transaction.prototype.toBufferWriter = function(writer) {
   writer.writeUInt32LE(this.version);

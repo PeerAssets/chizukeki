@@ -8,7 +8,7 @@ import { ConnectedRouter } from 'react-router-redux'
 import { Route } from './routing/router'
 import configureStore, { history } from "./store"
 
-import Welcome from './welcome/Welcome'
+import Welcome from './wallet/Container'
 
 let { store, persistor } = configureStore()
 
