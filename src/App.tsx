@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Platform, View, Image } from 'react-native';
+import { Text, View, Image } from 'react-native';
 import { Provider } from "react-redux"
 import { PersistGate } from 'redux-persist/es/integration/react'
 import EStyleSheet from 'react-native-extended-stylesheet';
@@ -16,7 +16,7 @@ export default class App extends React.Component<{}> {
   render() {
     return (
       <Provider store={store}>
-        <PersistGate persistor={persistor} loading={<div>loading</div>}>
+        <PersistGate persistor={persistor} loading={<Text>loading</Text>}>
           <ConnectedRouter history={history}>
             <View style={styles.container}>
               <Image source={require("./welcome/logomask.png")}

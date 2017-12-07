@@ -46,8 +46,8 @@ const styles = EStyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'row',
-    maxHeight: '50%',
-    width: '50%',
+    maxHeight: () => 0.5 * Dimensions.get('window').height,
+    width: () => 0.5 * Dimensions.get('window').width,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'white',
