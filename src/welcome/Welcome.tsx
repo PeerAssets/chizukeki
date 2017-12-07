@@ -1,10 +1,6 @@
 import * as React from 'react'; import { Component } from 'react';
-import {
-  StyleSheet,
-  Dimensions,
-  Text,
-  View
-} from 'react-native';
+import { Dimensions, Text, View } from 'react-native';
+import EStyleSheet from 'react-native-extended-stylesheet';
 import { Card, Button } from 'react-native-elements'
 
 function u(){
@@ -29,7 +25,7 @@ class Welcome extends React.Component<{}> {
   }
 }
 
-const styles = StyleSheet.create({
+const styles = EStyleSheet.create({
   primaryButton: {
     marginTop: 15,
     borderColor: 'blue',
@@ -50,8 +46,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'row',
-    //maxHeight: '50%',
-    //width: '50%',
+    maxHeight: '50%',
+    width: '50%',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'white',

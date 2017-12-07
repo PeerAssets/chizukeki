@@ -1,36 +1,41 @@
 import * as React from 'react';
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  View,
-  Image
-} from 'react-native';
+import { Platform, View, Image } from 'react-native';
+import { Provider } from "react-redux"
+import { PersistGate } from 'redux-persist/es/integration/react'
+import EStyleSheet from 'react-native-extended-stylesheet';
+import { ConnectedRouter } from 'react-router-redux'
+
+import { Route } from './routing/router'
+import configureStore, { history } from "./store"
+
 import Welcome from './welcome/Welcome'
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload, Cmd+D or shake for dev menu',
-  android: 'Double tap R on your keyboard to reload, Shake or press menu button for dev menu',
-  web: 'Save code changes to reload, ⌥⌘I for dev tools',
-});
+let { store, persistor } = configureStore()
 
 export default class App extends React.Component<{}> {
   render() {
     return (
-      <View style={styles.container}>
-        <Image source={require("./welcome/logomask.png")}
-               style={styles.background} />
-        <Welcome/>
-      </View>
-    );
+      <Provider store={store}>
+        <PersistGate persistor={persistor} loading={<div>loading</div>}>
+          <ConnectedRouter history={history}>
+            <View style={styles.container}>
+              <Image source={require("./welcome/logomask.png")}
+                style={styles.background} />
+              <Route path="/" exact component={Welcome} />
+            </View>
+          </ConnectedRouter>
+        </PersistGate>
+      </Provider>
+    )
   }
 }
 
-const styles = StyleSheet.create({
+
+const styles = EStyleSheet.create({
   background: {
     position: 'absolute',
-    height: 200,
-    width: 200,
+    height: 300,
+    width: 300,
     bottom: 0,
     left: 0,
     zIndex: 0,
@@ -42,3 +47,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#DADADA',
   },
 })
+
+// .build is required regardless of variables
+// here we theme, etc
+EStyleSheet.build({
+  $primary: '#2185d0'
+})
+
+
