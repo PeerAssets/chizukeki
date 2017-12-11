@@ -26,6 +26,9 @@ module.exports = {
   },
 
   plugins: [
+    new webpack.ProvidePlugin({
+      'regeneratorRuntime': 'regenerator-runtime/runtime'
+    }),
     new webpack.NamedModulesPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new HtmlWebpackPlugin({
@@ -61,7 +64,7 @@ module.exports = {
               babelrc: false,
               // This aliases 'react-native' to 'react-native-web' and includes only
               // the modules needed by the app
-              plugins: ['react-native-web/babel'],
+              plugins: ['react-native-web/babel', 'transform-regenerator'],
               // The 'react-native' preset is recommended (or use your own .babelrc)
               presets : [ 'react-native' ],
             }

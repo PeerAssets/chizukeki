@@ -10,7 +10,7 @@ import {
   ButtonGroup
 } from 'react-native-elements'
 
-import * as bitcore from '../bitcore'
+import bitcore from '../bitcore'
 
 namespace LoadPrivateKey {
   export type Data = { privateKey: string }
@@ -25,6 +25,7 @@ function SelectFormat({ selected, select, style }: { selected: Format, select: (
   const formats: Format[] = ['wif', 'raw'] as Format[]
   return (
     <ButtonGroup
+      selectedBackgroundColor='lightblue'
       onPress={(i: 0 | 1) => select(formats[i])}
       selectedIndex={formats.indexOf(selected)}
       buttons={formats.map(f => ({ element: buttons[f]}))}
@@ -48,18 +49,22 @@ class LoadPrivateKey extends React.Component<
   render() {
     let { privateKey, format } = this.state
     return (
-      <Card containerStyle={styles.container} >
-        <Text style={styles.welcome}> Import or generate key </Text>
-        <SelectFormat
-          selected={format}
-          select={format => this.setState({ format })}
-          style={styles.selectFormat} />
-        <Button
-          buttonStyle={styles.secondaryButton}
-          textStyle={styles.secondaryText}
-          onPress={() => this.setState({ privateKey: new bitcore.PrivateKey().toString() })}
-          title="Generate a new key" />
-        <FormInput value={this.state. privateKey} onChangeText={privateKey => this.setState({ privateKey })} />
+      <Card containerStyle={styles.container} wrapperStyle={styles.wrapper} title='Import or generate key' >
+        <View style={styles.top}> 
+          <SelectFormat
+            selected={format}
+            select={format => this.setState({ format })}
+            style={styles.selectFormat} />
+          <Button
+            buttonStyle={styles.secondaryButton}
+            textStyle={styles.secondaryText}
+            onPress={() => this.setState({ privateKey: new bitcore.PrivateKey().toString() })}
+            title="Generate a new key" />
+        </View> 
+        <FormInput
+          containerStyle={styles.input}
+          value={this.state.privateKey}
+          onChangeText={privateKey => this.setState({ privateKey })} />
         <Button
           buttonStyle={styles.primaryButton}
           onPress={() => this.props.loadPrivateKey(normalize(this.state))}
@@ -72,28 +77,35 @@ class LoadPrivateKey extends React.Component<
 const styles = EStyleSheet.create({
   $width: () => 0.5 * Dimensions.get('window').width,
   container: {
-    flex: 1,
-    flexDirection: 'row',
-    maxHeight: () => 0.75 * Dimensions.get('window').height,
-    width: () => 0.5 * Dimensions.get('window').width,
+    width: '$width',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'white',
     borderRadius: 3,
     borderWidth: 0
   },
+  top: {
+    width: '$width',
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  wrapper: {
+    width: '$width',
+    alignItems: 'center',
+  },
   primaryButton: {
     marginTop: 15,
-    borderColor: 'blue',
+    borderColor: 'lightblue',
     borderRadius: 3,
-    backgroundColor: 'blue',
+    backgroundColor: 'lightblue',
     borderWidth: 1,
     width: () => '0.5 * $width'
   },
   secondaryButton: {
-    marginTop: 15,
+    flex: 2,
     backgroundColor: 'white',
-    borderColor: 'blue',
+    borderColor: 'lightblue',
     borderRadius: 3,
     borderWidth: 2,
     width: () => '0.5 * $width'
@@ -101,16 +113,18 @@ const styles = EStyleSheet.create({
   secondaryText: {
     color: 'blue',
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
   selectFormat: {
     flex: 1,
     height: () => 0.1 * Dimensions.get('window').height,
     width: () => 0.25 * Dimensions.get('window').width,
   },
+  input: {
+    width: '$width - 30',
+    borderRadius: 3,
+    borderWidth: 1,
+    borderColor: 'lightblue',
+    margin: 15,
+  }
 });
 
 export default LoadPrivateKey

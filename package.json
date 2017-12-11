@@ -48,6 +48,8 @@
     "react-test-renderer": "^15.4.2",
     "redux": "^3.7.2",
     "redux-persist": "^5.4.0",
+    "redux-saga": "^0.16.0",
+    "redux-saga-routines": "^2.2.2",
     "ts-node": "^3.3.0",
     "typescript": "^2.6.2",
     "url-loader": "^0.6.2",
@@ -56,5 +58,8 @@
   },
   "jest": {
     "preset": "react-native"
+  },
+  "devDependencies": {
+    "babel-plugin-transform-regenerator": "^6.26.0"
   }
 }

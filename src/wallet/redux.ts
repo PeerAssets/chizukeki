@@ -1,6 +1,8 @@
 import PrivateKey from './LoadPrivateKey'
 import Wallet from './Wallet'
 
+import Saga, { routine } from './saga'
+
 
 type Creator<T extends string, P> = (payload: P) => { type: T, payload: P }
 
@@ -32,7 +34,7 @@ namespace Redux {
         return state || {}
     }
   }
-
+  export const saga = Saga
 }
 
 export default Redux
