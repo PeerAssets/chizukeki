@@ -7,8 +7,23 @@ import Redux from './redux'
 
 type GlobalState = { wallet: Redux.State } & any
 
-function Wallet({ privateKey, actions }: Redux.State & { actions: typeof Redux.actionCreators }){
-  return privateKey ? <Text>{privateKey}</Text> : <PrivateKey loadPrivateKey={actions.loadPrivateKey} />
+function DataVis({ address, unspentOutputs =[] }: Redux.State){
+  return (
+    <View>
+      <Text>Address: {address}</Text>
+      <Text> txos: </Text>
+      <Text>
+      { unspentOutputs.map(utxo => <Text>{JSON.stringify(utxo)}</Text>) }
+      </Text>
+    </View>
+  )
+
+}
+
+function Wallet({ actions, ...props }: Redux.State & { actions: typeof Redux.actionCreators }){
+  return props.privateKey ?
+    <DataVis {...props}/> :
+    <PrivateKey loadPrivateKey={actions.loadPrivateKey} />
 }
 
 export default connect(

@@ -2,12 +2,17 @@ import { fork, all, put, takeLatest, call } from 'redux-saga/effects'
 
 import { createRoutine } from 'redux-saga-routines';
 
-const routine = createRoutine('FETCH_UNSPENT_TRANSACTIONS')
+/*enum Routine {
+  Trigger = 'SYNC_UTXO/TRIGGER',
+  Request = 'SYNC_UTXO/REQUEST',
+  Success = 'SYNC_UTXO/SUCCESS',
+  Failure = 'SYNC_UTXO/FAILURE',
+  Fulfill = 'SYNC_UTXO/FULFILL',
+}*/
+const routine = createRoutine('SYNC_UTXO')
 
-
-// P9AqJKeEe9Y8e9j4zF88mzD7gm5UG928iP
-async function syncTransactions({ privateKey }) {
-  let response = await fetch(`https://explorer.peercoin.net/ext/listunspent/${privateKey}`)
+async function syncTransactions({ address }) {
+  let response = await fetch(`https://explorer.peercoin.net/ext/listunspent/${address}`)
   let { unspent_outputs } = await response.json()
   return unspent_outputs
 }

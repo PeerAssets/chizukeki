@@ -13,7 +13,10 @@ import {
 import bitcore from '../bitcore'
 
 namespace LoadPrivateKey {
-  export type Data = { privateKey: string }
+  export type Data = {
+    privateKey: string,
+    address: string,
+  }
 }
 
 type Format = 'wif' | 'raw'
@@ -33,19 +36,27 @@ function SelectFormat({ selected, select, style }: { selected: Format, select: (
   )
 }
 
-type State = LoadPrivateKey.Data & { format: Format }
+type State = Partial<LoadPrivateKey.Data> & { format: Format }
 
 function normalize({ privateKey, format }: State): LoadPrivateKey.Data {
-  return (format === 'wif') ?
-      { privateKey: bitcore.PrivateKey.fromWIF(privateKey).toString() } :
-      { privateKey }
+  let pKey = (format === 'wif') ?
+    bitcore.PrivateKey.fromWIF(privateKey) :
+    new bitcore.PrivateKey(privateKey)
+  return {
+    privateKey: pKey.toString(),
+    address: pKey.toAddress().toString(),
+  }
 }
 
 class LoadPrivateKey extends React.Component<
   { loadPrivateKey: (data: LoadPrivateKey.Data) => void },
   State
 > {
-  state = { privateKey: '', format: 'raw' as Format }
+  state = {
+    privateKey: undefined,
+    address: undefined,
+    format: 'raw' as Format
+  }
   render() {
     let { privateKey, format } = this.state
     return (
@@ -62,10 +73,12 @@ class LoadPrivateKey extends React.Component<
             title="Generate a new key" />
         </View> 
         <FormInput
-          containerStyle={styles.input}
+          containerStyle={[styles.input, styles.inputWidth]}
+          inputStyle={[styles.inputWidth]}
           value={this.state.privateKey}
           onChangeText={privateKey => this.setState({ privateKey })} />
         <Button
+          disabled={!this.state.privateKey}
           buttonStyle={styles.primaryButton}
           onPress={() => this.props.loadPrivateKey(normalize(this.state))}
           title="Import and Sync" />
@@ -118,8 +131,10 @@ const styles = EStyleSheet.create({
     height: () => 0.1 * Dimensions.get('window').height,
     width: () => 0.25 * Dimensions.get('window').width,
   },
-  input: {
+  inputWidth: {
     width: '$width - 30',
+  },
+  input: {
     borderRadius: 3,
     borderWidth: 1,
     borderColor: 'lightblue',

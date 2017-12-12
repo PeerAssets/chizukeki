@@ -8,9 +8,10 @@ namespace Wallet {
     tx_output_n: number,
     value: number,
   }
-  export type Data = PrivateKey.Data & {
-    unspent_outputs: Array<Transaction>
+  export type unspentOutputs = {
+    unspentOutputs: Array<Transaction>
   }
+  export type Data = PrivateKey.Data & unspentOutputs
 }
 
 export default Wallet

@@ -16,11 +16,12 @@ namespace Redux {
 
   export enum ActionType {
     LoadKey = 'LOAD_PRIVATE_KEY',
-    SyncUTXO = 'SYNC_UTXO',
+    SyncUTXO = 'SYNC_UTXO/SUCCESS',
   }
 
   export type Action = 
     | { type: ActionType.LoadKey, payload: PrivateKey.Data }
+    | { type: ActionType.SyncUTXO, payload: Wallet.unspentOutputs }
 
   export const actionCreators = {
     loadPrivateKey: Creator<ActionType.LoadKey, PrivateKey.Data>(ActionType.LoadKey)
@@ -29,7 +30,9 @@ namespace Redux {
   export function reducer(state: State, a: Action): State {
     switch (a.type) {
       case ActionType.LoadKey:
-        return Object.assign({ unspent_outputs: Array<Wallet.Transaction>() }, a.payload)
+        return Object.assign({ unspentOutputs: Array<Wallet.Transaction>() }, a.payload)
+      case ActionType.SyncUTXO:
+        return Object.assign({}, state, a.payload)
       default:
         return state || {}
     }
