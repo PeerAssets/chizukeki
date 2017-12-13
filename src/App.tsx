@@ -1,8 +1,9 @@
-import * as React from 'react';
-import { Text, View, Image } from 'react-native';
+import * as React from 'react'
+import { Text, View, Image } from 'react-native'
 import { Provider } from "react-redux"
 import { PersistGate } from 'redux-persist/es/integration/react'
-import EStyleSheet from 'react-native-extended-stylesheet';
+import EStyleSheet from 'react-native-extended-stylesheet'
+import { variables as globalStyles } from './style-variables'
 import { ConnectedRouter } from 'react-router-redux'
 
 import { Route } from './routing/router'
@@ -10,6 +11,11 @@ import configureStore, { history } from "./store"
 
 import Welcome from './wallet/Container'
 import Nav from './Menu'
+
+import {RkTheme} from 'react-native-ui-kitten';
+import {LightTheme} from './theme'
+RkTheme.setTheme(LightTheme, null);
+
 
 let { store, persistor } = configureStore()
 
@@ -53,8 +59,6 @@ const styles = EStyleSheet.create({
 
 // .build is required regardless of variables
 // here we theme, etc
-EStyleSheet.build({
-  $primary: '#2185d0'
-})
+EStyleSheet.build(globalStyles)
 
 

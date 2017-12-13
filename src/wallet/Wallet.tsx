@@ -1,4 +1,6 @@
-import { Dimensions, Text, View } from 'react-native';
+import * as React from 'react'
+import { Dimensions, View, Text } from 'react-native';
+import { Button, RkCard } from 'react-native-ui-kitten';
 import PrivateKey from './LoadPrivateKey'
 
 namespace Wallet {
@@ -12,6 +14,25 @@ namespace Wallet {
     unspentOutputs: Array<Transaction>
   }
   export type Data = PrivateKey.Data & unspentOutputs
+}
+
+
+let RkView = (View as any)
+
+function Wallet({ address, unspentOutputs = [] }: Partial<Wallet.Data>) {
+  return (
+    <RkCard>
+      <RkView rkCardHeader>
+        <Text>Address {address}</Text>
+      </RkView>
+      <RkView rkCardContent>
+        { unspentOutputs.map((utxo, i) => <Text key={i}>{JSON.stringify(utxo)}</Text>) }
+      </RkView>
+      <RkView rkCardFooter>
+        <Text>Footer</Text>
+      </RkView>
+    </RkCard>
+  )
 }
 
 export default Wallet

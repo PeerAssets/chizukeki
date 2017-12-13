@@ -50,7 +50,9 @@ module.exports = {
           path.resolve(__dirname, '../node_modules/react-native-uncompiled'),
           path.resolve(__dirname, '../node_modules/react-native-elements'),
           path.resolve(__dirname, '../node_modules/react-native-vector-icons'),
+          path.resolve(__dirname, '../node_modules/react-native-ui-kitten'),
         ],
+
         use: [
           'react-hot-loader/webpack',
           {

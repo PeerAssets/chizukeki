@@ -1,6 +1,7 @@
 import * as React from 'react'; import { Component } from 'react';
 import { Dimensions, Text, View } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
+import { mixins } from '../style-variables'
 import {
   FormLabel,
   FormInput,
@@ -28,7 +29,7 @@ function SelectFormat({ selected, select, style }: { selected: Format, select: (
   const formats: Format[] = ['wif', 'raw'] as Format[]
   return (
     <ButtonGroup
-      selectedBackgroundColor='lightblue'
+      selectedBackgroundColor={styles._selected.backgroundColor}
       onPress={(i: 0 | 1) => select(formats[i])}
       selectedIndex={formats.indexOf(selected)}
       buttons={formats.map(f => ({ element: buttons[f]}))}
@@ -80,6 +81,8 @@ class LoadPrivateKey extends React.Component<
         <Button
           disabled={!this.state.privateKey}
           buttonStyle={styles.primaryButton}
+          textStyle={styles.primaryText}
+          disabledStyle={styles.disabled}
           onPress={() => this.props.loadPrivateKey(normalize(this.state))}
           title="Import and Sync" />
       </Card>
@@ -88,12 +91,12 @@ class LoadPrivateKey extends React.Component<
 }
 
 const styles = EStyleSheet.create({
-  $width: () => 0.5 * Dimensions.get('window').width,
+  $width: 0.5 * Dimensions.get('window').width,
   container: {
     width: '$width',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: '$primaryBackground',
     borderRadius: 3,
     borderWidth: 0
   },
@@ -109,22 +112,28 @@ const styles = EStyleSheet.create({
   },
   primaryButton: {
     marginTop: 15,
-    borderColor: 'lightblue',
+    borderColor: '$primaryColor',
     borderRadius: 3,
-    backgroundColor: 'lightblue',
+    backgroundColor: '$primaryColor',
     borderWidth: 1,
     width: () => '0.5 * $width'
   },
+  primaryText: {
+    color: '$primaryBackground',
+  },
+  disabled: {
+    backgroundColor: '$grey',
+  },
   secondaryButton: {
     flex: 2,
-    backgroundColor: 'white',
-    borderColor: 'lightblue',
+    backgroundColor: '$primaryBackground',
+    borderColor: '$secondaryColor',
     borderRadius: 3,
     borderWidth: 2,
     width: () => '0.5 * $width'
   },
   secondaryText: {
-    color: 'blue',
+    color: '$secondaryColor',
   },
   selectFormat: {
     flex: 1,
@@ -137,9 +146,12 @@ const styles = EStyleSheet.create({
   input: {
     borderRadius: 3,
     borderWidth: 1,
-    borderColor: 'lightblue',
+    borderColor: '$primaryColor',
     margin: 15,
+  },
+  selected: {
+    backgroundColor: '$primaryColor'
   }
-});
+})
 
 export default LoadPrivateKey

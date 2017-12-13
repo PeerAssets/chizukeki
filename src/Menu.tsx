@@ -8,8 +8,6 @@ import { withRouter } from 'react-router'
 
 import { Link } from './routing/router' 
 
-import { TabViewAnimated, TabBar, SceneMap } from 'react-native-tab-view';
-
 function navLink(name: string, link?: string) {
   link = link || `/${name.toLowerCase()}`
   return [ link, () => (
@@ -51,10 +49,10 @@ export default withRouter(function Menu(props){
 
 const styles = EStyleSheet.create({
   container: {
+    width: '$width',
     flex: 1,
     zIndex: 1,
     position: 'absolute',
-    width: Dimensions.get('window').width,
     height: 50,
     padding: 0,
     left: 0,
