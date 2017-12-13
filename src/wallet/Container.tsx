@@ -13,7 +13,7 @@ function DataVis({ address, unspentOutputs =[] }: Redux.State){
       <Text>Address: {address}</Text>
       <Text> txos: </Text>
       <Text>
-      { unspentOutputs.map(utxo => <Text>{JSON.stringify(utxo)}</Text>) }
+      { unspentOutputs.map((utxo, i) => <Text key={i}>{JSON.stringify(utxo)}</Text>) }
       </Text>
     </View>
   )

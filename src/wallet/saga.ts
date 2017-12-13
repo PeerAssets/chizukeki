@@ -11,8 +11,12 @@ import { createRoutine } from 'redux-saga-routines';
 }*/
 const routine = createRoutine('SYNC_UTXO')
 
+function unspent({ address, network = 'ppc-test' }){
+  return `https://chainz.cryptoid.info/${network}/api.dws?q=unspent&key=7547f94398e3&active=${address}`
+}
+
 async function syncTransactions({ address }) {
-  let response = await fetch(`https://explorer.peercoin.net/ext/listunspent/${address}`)
+  let response = await fetch( unspent({ address }) )
   let { unspent_outputs } = await response.json()
   return unspent_outputs
 }

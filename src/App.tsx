@@ -9,6 +9,7 @@ import { Route } from './routing/router'
 import configureStore, { history } from "./store"
 
 import Welcome from './wallet/Container'
+import Nav from './Menu'
 
 let { store, persistor } = configureStore()
 
@@ -19,9 +20,11 @@ export default class App extends React.Component<{}> {
         <PersistGate persistor={persistor} loading={<Text>loading</Text>}>
           <ConnectedRouter history={history}>
             <View style={styles.container}>
+              <Nav/>
               <Image source={require("./welcome/logomask.png")}
                 style={styles.background} />
               <Route path="/" exact component={Welcome} />
+              <Route path="/wallet" exact component={Welcome} />
             </View>
           </ConnectedRouter>
         </PersistGate>

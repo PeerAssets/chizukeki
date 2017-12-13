@@ -5,7 +5,8 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
 
   entry: [
-    path.join(__dirname, '../index.web.ts')
+    'react-hot-loader/patch',
+    path.join(__dirname, '../index.web.tsx')
   ],
 
   output: {
@@ -44,32 +45,35 @@ module.exports = {
         test: /.jsx?|\.tsx?$/,
         // Add every directory that needs to be compiled by Babel during the build
         include: [
-          path.join(__dirname, '../index.web.ts'),
+          path.join(__dirname, '../index.web.tsx'),
           path.resolve(__dirname, '../src'),
           path.resolve(__dirname, '../node_modules/react-native-uncompiled'),
           path.resolve(__dirname, '../node_modules/react-native-elements'),
           path.resolve(__dirname, '../node_modules/react-native-vector-icons'),
         ],
-        use: {
-          loader: 'awesome-typescript-loader',
-          options: {
-            useWebpackText: true,
-            useTranspileModule: true,
-            doTypeCheck: true,
-            forkChecker: true,
+        use: [
+          'react-hot-loader/webpack',
+          {
+            loader: 'awesome-typescript-loader',
+            options: {
+              useWebpackText: true,
+              useTranspileModule: true,
+              doTypeCheck: true,
+              forkChecker: true,
 
-            useBabel: true,
-            useCache: true,
-            babelOptions: {
-              babelrc: false,
-              // This aliases 'react-native' to 'react-native-web' and includes only
-              // the modules needed by the app
-              plugins: ['react-native-web/babel', 'transform-regenerator'],
-              // The 'react-native' preset is recommended (or use your own .babelrc)
-              presets : [ 'react-native' ],
+              useBabel: true,
+              useCache: true,
+              babelOptions: {
+                babelrc: false,
+                // This aliases 'react-native' to 'react-native-web' and includes only
+                // the modules needed by the app
+                plugins: ['react-native-web/babel', 'transform-regenerator'],
+                // The 'react-native' preset is recommended (or use your own .babelrc)
+                presets : [ 'react-native' ],
+              }
             }
           }
-        }
+        ]
       },
       // This is needed for webpack to import static images in JavaScript files
       {
