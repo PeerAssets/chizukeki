@@ -19,7 +19,7 @@ module.exports = {
   devtool: "source-map",
 
   resolve: {
-    extensions: [ ".js", "jsx", ".ts", ".tsx", ".web.js", ".web.jsx" ],
+    extensions: [ ".js", ".jsx", ".ts", ".tsx", ".web.js", ".web.jsx" ],
     alias: {
       'react-native': 'react-native-web',
       'react-router-native': 'react-router',

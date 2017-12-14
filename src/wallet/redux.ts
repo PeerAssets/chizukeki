@@ -21,7 +21,7 @@ namespace Redux {
 
   export type Action = 
     | { type: ActionType.LoadKey, payload: PrivateKey.Data }
-    | { type: ActionType.SyncUTXO, payload: Wallet.unspentOutputs }
+    | { type: ActionType.SyncUTXO, payload: Wallet.Transaction }
 
   export const actionCreators = {
     loadPrivateKey: Creator<ActionType.LoadKey, PrivateKey.Data>(ActionType.LoadKey)
@@ -30,7 +30,7 @@ namespace Redux {
   export function reducer(state: State, a: Action): State {
     switch (a.type) {
       case ActionType.LoadKey:
-        return Object.assign({ unspentOutputs: Array<Wallet.Transaction>() }, a.payload)
+        return Object.assign({ unspentOutputs: Array<Wallet.Transaction>(), balance: 0 }, a.payload)
       case ActionType.SyncUTXO:
         return Object.assign({}, state, a.payload)
       default:

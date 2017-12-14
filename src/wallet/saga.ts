@@ -21,11 +21,17 @@ async function syncTransactions({ address }) {
   return unspent_outputs
 }
 
+function balance(unspentOutputs){
+  return unspentOutputs.reduce((sum, output) => 
+    sum + (Number(output.value) || 0), 0
+  ) / 100000000.0
+}
+
 function* sync({ payload }) {
   try {
     yield put(routine.request())
     const unspentOutputs = yield call(syncTransactions, payload)
-    yield put(routine.success({ unspentOutputs }))
+    yield put(routine.success({ unspentOutputs, balance: balance(unspentOutputs) }))
 
   } catch (error) {
     yield put(routine.failure(error.message));
