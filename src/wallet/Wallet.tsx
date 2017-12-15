@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { Dimensions, View, Text } from 'react-native'
-import { Button, RkCard, RkText } from 'react-native-ui-kitten'
+import { Button, RkCard, RkText, RkButton, RkStyleSheet } from 'react-native-ui-kitten'
 import PrivateKey from './LoadPrivateKey'
+import { unescape } from 'querystring';
 
 namespace Wallet {
   export type Transaction = {
@@ -19,21 +20,78 @@ namespace Wallet {
 
 let RkView = (View as any)
 
-function Wallet({ address, balance = 0 }: Partial<Wallet.Data>) {
-  console.log({balance})
+
+function Balance({ balance }) {
   return (
-    <RkCard>
-      <RkView rkCardHeader>
-        <RkText rkType='header2 inverseColor'>Address: {address}</RkText>
+    <RkView style={styles.column}>
+      <RkText rkType='header4'>Balance: ¤{balance.toLocaleString('en')}</RkText>
+    </RkView>
+  )
+}
+
+function TransactionCount({ unspentOutputs }) {
+  return (
+    <RkView style={styles.column}>
+      <RkText rkType='header4'>{unspentOutputs.length} transactions</RkText>
+    </RkView>
+  )
+}
+
+function Wallet({ address, unspentOutputs = [], balance = 0 }: Partial<Wallet.Data>) {
+  return (
+    <RkCard style={styles.card}>
+      <RkView rkCardHeader style={styles.row}>
+        <RkText rkType='header4'>Address: {address}</RkText>
       </RkView>
-      <RkView rkCardContent>
-        <RkText rkType='header2 inverseColor'>${ balance.toString() }</RkText>
+      <RkView rkCardContent style={styles.row}>
+        <Balance balance={balance}/>
+        <View style={styles.separator}/>
+        <TransactionCount unspentOutputs={unspentOutputs}/>
       </RkView>
-      <RkView rkCardFooter>
+      <RkView rkCardContent style={[styles.row, { paddingVertical: 8 }]}>
+        <RkButton rkType='clear link' style={styles.leftButton}>
+          Export
+        </RkButton>
       </RkView>
     </RkCard>
   )
 }
+
+let styles = RkStyleSheet.create(theme => ({
+  container: {
+    backgroundColor: theme.colors.screen.scroll,
+    paddingVertical: 8,
+    paddingHorizontal: 10
+  },
+  card: {
+    flexDirection: 'column',
+    flexWrap: 'wrap',
+  },
+  row: {
+    flexDirection: 'row',
+    borderColor: theme.colors.border.base,
+    borderBottomWidth: 1,
+  },
+  column: {
+    justifyContent: 'center',
+    textAlign: 'center',
+    flex: 1,
+  },
+  separator: {
+    backgroundColor: theme.colors.border.base,
+    alignSelf: 'center',
+    flexDirection: 'row',
+    flex: 0,
+    width: 1,
+    height: 42
+  },
+  leftButton: {
+    flex: 1,
+    alignSelf: 'center',
+    color: theme => theme.colors.primary,
+  },
+
+}))
 
 
 export default Wallet

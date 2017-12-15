@@ -13,8 +13,8 @@ import Welcome from './wallet/Container'
 import Nav from './Menu'
 
 import {RkTheme} from 'react-native-ui-kitten';
-import {LightTheme} from './theme'
-RkTheme.setTheme(LightTheme, null);
+import {bootstrap} from './bootstrap'
+bootstrap()
 
 
 let { store, persistor } = configureStore()
