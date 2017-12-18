@@ -2,10 +2,8 @@ import * as React from 'react'
 import { Dimensions, View, Text } from 'react-native'
 import { Button, RkCard, RkText, RkButton, RkStyleSheet } from 'react-native-ui-kitten'
 import PrivateKey from './LoadPrivateKey'
-import { unescape } from 'querystring';
 
-namespace Wallet {
-  export type Transaction = {
+namespace Wallet { export type Transaction = {
     script: string,
     tx_hash: string,
     tx_output_n: number,

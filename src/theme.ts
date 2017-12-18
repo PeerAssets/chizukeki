@@ -60,25 +60,6 @@ const Colors = {
   warning: '#feb401',
   danger: '#ed1c4d',
 
-  starsStat: '#2ab5fa',
-  tweetsStat: '#ffc61c',
-  likesStat: '#5468ff',
-
-  doughnutFirst: '#8a98ff',
-  doughnutSecond: '#ffd146',
-  doughnutThird: '#c2d521',
-  doughnutFourth: '#ff6b5c',
-
-  followersProgress: '#c2d521',
-
-  followersFirst: '#b3e5fc',
-  followersSecond: '#81d4fa',
-  followersThird: '#4fc3f7',
-  followersFourth: '#42a5f5',
-
-  chartsAreaStroke: '#097fe5',
-  chartsAreaFill: '#d6ecff'
-
 };
 
 const Fonts = {
@@ -133,37 +114,6 @@ export const LightTheme = {
     control: {
       background: Colors.background
     },
-    badge: {
-      likeBackground: Colors.primary,
-      likeForeground: Colors.inverseForeground,
-      plusBackground: Colors.success,
-      plusForeground: Colors.inverseForeground,
-    },
-    chat: {
-      messageInBackground: Colors.neutralBackground,
-      messageOutBackground: Colors.fadedBackground,
-      text: Colors.foreground
-    },
-    gradients: {
-      base: [Colors.gradientBaseBegin, Colors.gradientBaseEnd],
-      visa: [Colors.gradientVisaBegin, Colors.gradientVisaEnd],
-      mastercard: [Colors.gradientMasterBegin, Colors.gradientMasterEnd],
-      axp: [Colors.gradientAxpBegin, Colors.gradientAxpEnd],
-    },
-    dashboard: {
-      stars: Colors.starsStat,
-      tweets: Colors.tweetsStat,
-      likes: Colors.likesStat,
-    },
-    charts: {
-      followersProgress: Colors.followersProgress,
-      doughnut: [Colors.doughnutFirst, Colors.doughnutSecond, Colors.doughnutThird, Colors.doughnutFourth],
-      followersArea: [Colors.followersFirst, Colors.followersSecond, Colors.followersThird, Colors.followersFourth],
-      area: {
-        stroke: Colors.chartsAreaStroke,
-        fill: Colors.chartsAreaFill
-      }
-    }
   },
   fonts: {
     sizes: {
