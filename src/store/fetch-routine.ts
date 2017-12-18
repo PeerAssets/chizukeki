@@ -4,10 +4,11 @@ import createRoutine, { BasePayloads } from './routine'
 
 function fetchJSONRoutine<
   ActionPrefix extends string,
-  Payloads extends BasePayloads
+  Payloads extends BasePayloads,
+  Trigger extends any = any
   >(
-  { actionPrefix, fetchJSON }:
-  { actionPrefix: ActionPrefix, fetchJSON: (payload: Payloads['trigger']) => any }
+  { actionPrefix, fetchJSON, triggers = [] }:
+  { actionPrefix: ActionPrefix, fetchJSON: (payload: Payloads['trigger']) => any, triggers?: Array<Trigger> }
 ){
   const routine = createRoutine<typeof actionPrefix, {
   }>(actionPrefix)
@@ -20,8 +21,9 @@ function fetchJSONRoutine<
       yield put(routine.failure(error.message));
     }
   }
+  (triggers as Array<Trigger | typeof routine.actions.TRIGGER>).push(routine.actions.TRIGGER)
   function* trigger() {
-    yield takeLatest(routine.actions.TRIGGER as any, sync)
+    yield takeLatest(triggers as any, sync)
   }
   return { routine, sync, trigger }
 }

@@ -5,7 +5,6 @@ enum RoutineAction {
   Request = 'REQUEST',
   Success = 'SUCCESS',
   Failure = 'FAILURE',
-  Fulfill = 'FULFILL',
 }
 
 type RoutineActions<Prefix extends string> = {
@@ -63,16 +62,6 @@ function createRoutine<
     ...creators
   }
 }
-
-let routine = createRoutine('FETCH')
-routine.switch<'t'>({
-  TRIGGER: 't',
-  REQUEST: 't',
-  SUCCESS: 't',
-  FAILURE: 't',
-
-  DEFAULT: 't'
-})
 
 export default createRoutine
 

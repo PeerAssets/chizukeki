@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Dimensions, View, Text } from 'react-native'
 import { Button, RkCard, RkText, RkButton, RkStyleSheet } from 'react-native-ui-kitten'
 import PrivateKey from './LoadPrivateKey'
+import TransactionList from './Transaction'
 
 namespace Wallet { export type Transaction = {
     script: string,
@@ -51,6 +52,7 @@ function Wallet({ address, unspentOutputs = [], balance = 0 }: Partial<Wallet.Da
           Export
         </RkButton>
       </RkView>
+      <TransactionList />
     </RkCard>
   )
 }
