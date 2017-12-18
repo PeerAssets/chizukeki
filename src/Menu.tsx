@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { Header, ButtonGroup } from 'react-native-elements'
 import { Text, View, Dimensions } from 'react-native'
 import EStyleSheet from 'react-native-extended-stylesheet';
 
@@ -8,44 +7,34 @@ import { withRouter } from 'react-router'
 
 import { Link } from './routing/router' 
 
-function navLink(name: string, link?: string) {
-  link = link || `/${name.toLowerCase()}`
-  return [ link, () => (
-    <Link to={link} style={[styles.link]}>
-     {name}
-    </Link>
-  ) ]
-}
+import { RkButton } from 'react-native-ui-kitten'
 
-const links = [
-  navLink('Wallet'),
-  navLink('Decks')
-]
+function NavLink({
+  name,
+  link = `/${name.toLowerCase()}`,
+  selected 
+}: { name: string, link?: string, selected: string }) {
+  let style = selected === link ?
+    [styles.link, { backgroundColor: 'lightblue' }] :
+    [styles.link] 
+  return (
+    <RkButton style={style}>
+      <Link to={link}>{name}</Link>
+    </RkButton>
+  )
+}
 
 function Nav({ location, ...props }){
-  let urls = links.map(l => l[0])
-  let buttons = links.map(l => ({ element: l[1] }))
   return (
-    <ButtonGroup
-      containerBorderRadius={0}
-      containerStyle={styles.buttonContainer}
-      buttonStyle={styles.buttonStyle}
-      selectedBackgroundColor='lightblue'
-      onPress={(i: number) => { }}
-      selectedIndex={urls.indexOf(location.pathname)}
-      buttons={buttons}
-    />
+    <View style={[ styles.container, styles.buttonContainer ]}>
+      <NavLink name='Wallet' selected={location.pathname}/>
+      <NavLink name='Decks' selected={location.pathname}/>
+    </View>
   )
 }
 
 
-export default withRouter(function Menu(props){
-  return (
-    <Header
-      outerContainerStyles={styles.container}
-      leftComponent={<Nav {...props}/>} />
-  )
-})
+export default withRouter(Nav)
 
 const styles = EStyleSheet.create({
   container: {

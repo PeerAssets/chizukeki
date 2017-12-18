@@ -1,15 +1,8 @@
 import * as React from 'react'; import { Component } from 'react';
-import { Dimensions, Text, View } from 'react-native';
+import { Dimensions, Text, View, TouchableOpacity  } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { mixins } from '../style-variables'
-import {
-  FormLabel,
-  FormInput,
-  FormValidationMessage,
-  Card,
-  Button,
-  ButtonGroup
-} from 'react-native-elements'
+import { RkCard, RkButton, RkTextInput, RkChoice, RkChoiceGroup } from 'react-native-ui-kitten'
 
 import bitcore from '../bitcore'
 
@@ -21,19 +14,27 @@ namespace LoadPrivateKey {
 }
 
 type Format = 'wif' | 'raw'
+
+let Touchable = (TouchableOpacity as any)
+
 function SelectFormat({ selected, select, style }: { selected: Format, select: (f:Format) => void, style: any }){
-  const buttons = {
-    wif: () => <Text>Wif</Text>,
-    raw: () => <Text>Private Key</Text>
+  function Choice(
+    { selected, format, children }: { format: Format, selected: Format, children: string }
+  ){
+    return (
+      <Touchable choiceTrigger>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <RkChoice selected={selected === format} rkType='radio' onPress={() => select(format)}/>
+          <Text>{children}</Text>
+        </View>
+      </Touchable>
+    )
   }
-  const formats: Format[] = ['wif', 'raw'] as Format[]
   return (
-    <ButtonGroup
-      selectedBackgroundColor={styles._selected.backgroundColor}
-      onPress={(i: 0 | 1) => select(formats[i])}
-      selectedIndex={formats.indexOf(selected)}
-      buttons={formats.map(f => ({ element: buttons[f]}))}
-      containerStyle={style} />
+    <RkChoiceGroup radio>
+      <Choice format='wif' selected={selected}>Wif</Choice>
+      <Choice format='raw' selected={selected}>Private Key</Choice>
+    </RkChoiceGroup>
   )
 }
 
@@ -61,31 +62,32 @@ class LoadPrivateKey extends React.Component<
   render() {
     let { privateKey, format } = this.state
     return (
-      <Card containerStyle={styles.container} wrapperStyle={styles.wrapper} title='Import or generate key' >
+      <RkCard containerStyle={styles.container} wrapperStyle={styles.wrapper} title='Import or generate key' >
         <View style={styles.top}> 
           <SelectFormat
             selected={format}
             select={format => this.setState({ format })}
             style={styles.selectFormat} />
-          <Button
+          <RkButton
             buttonStyle={styles.secondaryButton}
             textStyle={styles.secondaryText}
             onPress={() => this.setState({ privateKey: new bitcore.PrivateKey().toString() })}
             title="Generate a new key" />
         </View> 
-        <FormInput
-          containerStyle={[styles.input, styles.inputWidth]}
-          inputStyle={[styles.inputWidth]}
-          value={this.state.privateKey}
-          onChangeText={privateKey => this.setState({ privateKey })} />
-        <Button
+        <View style={[styles.input, styles.inputWidth]}> 
+          <RkTextInput
+            value={this.state.privateKey}
+            onChangeText={privateKey => this.setState({ privateKey })}
+            inputStyle={ [styles.inputWidth] }/>
+        </View>
+        <RkButton
           disabled={!this.state.privateKey}
           buttonStyle={styles.primaryButton}
           textStyle={styles.primaryText}
           disabledStyle={styles.disabled}
           onPress={() => this.props.loadPrivateKey(normalize(this.state))}
           title="Import and Sync" />
-      </Card>
+      </RkCard>
     )
   }
 }
