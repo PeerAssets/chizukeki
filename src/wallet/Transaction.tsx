@@ -1,6 +1,10 @@
 import * as React from 'react'
-import { FlatList, Dimensions, View, TouchableOpacity } from 'react-native'
+import { Dimensions, View, TouchableOpacity } from 'react-native'
 import { Button, RkCard, RkText, RkButton, RkStyleSheet } from 'react-native-ui-kitten'
+
+import FlatList from 'react-native-web-lists/src/FlatList'
+import Icon from 'react-native-vector-icons/dist/FontAwesome';
+
 
 namespace BlockchainTransaction {
   export type Input = {
@@ -56,13 +60,22 @@ let testTransactions  = [
   }
 ]
 
+
+function Received(){
+  return (
+    <RkText>
+      <Icon name="rocket" size={30} color="blue" /> Received from
+    </RkText>
+  )
+}
+
 function WalletTransaction({ item: { amount, address, time, category } }: { item: WalletTransaction.Data }) {
   return (
     <RkView style={styles.transaction}>
       <RkText rkType='header4'>{amount.toString()} PPC</RkText>
       <RkText rkType='secondary2 hintColor'>{time.toString()}</RkText>
       <RkText rkType='secondary2 hintColor'>
-        {category === 'receive' ? 'received from' : 'sent to'}{address}
+        {category === 'receive' ? <Received/> : 'sent to'} {address}
       </RkText>
     </RkView>
   )

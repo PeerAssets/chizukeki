@@ -1,5 +1,7 @@
 import { Dimensions } from 'react-native';
 
+const { width, height } = Dimensions.get('window')
+
 function scaleUtils() {
   const { width, height } = Dimensions.get('window');
 
@@ -73,6 +75,8 @@ const FontBaseValue = 18;
 
 export const LightTheme = {
   name: 'light',
+  width,
+  height,
   colors: {
     accent: Colors.accent,
     primary: Colors.primary,

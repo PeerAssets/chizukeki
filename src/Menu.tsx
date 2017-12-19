@@ -7,7 +7,7 @@ import { withRouter } from 'react-router'
 
 import { Link } from './routing/router' 
 
-import { RkButton } from 'react-native-ui-kitten'
+import { RkButton, RkStyleSheet  } from 'react-native-ui-kitten'
 
 function NavLink({
   name,
@@ -15,18 +15,18 @@ function NavLink({
   selected 
 }: { name: string, link?: string, selected: string }) {
   let style = selected === link ?
-    [styles.link, { backgroundColor: 'lightblue' }] :
-    [styles.link] 
+    [styles.selected] :
+    [] 
   return (
     <RkButton style={style}>
-      <Link to={link}>{name}</Link>
+      <Link to={link} style={[styles.link]}>{name}</Link>
     </RkButton>
   )
 }
 
 function Nav({ location, ...props }){
   return (
-    <View style={[ styles.container, styles.buttonContainer ]}>
+    <View style={[ styles.container ]}>
       <NavLink name='Wallet' selected={location.pathname}/>
       <NavLink name='Decks' selected={location.pathname}/>
     </View>
@@ -36,9 +36,9 @@ function Nav({ location, ...props }){
 
 export default withRouter(Nav)
 
-const styles = EStyleSheet.create({
+let styles = RkStyleSheet.create(theme => ({
   container: {
-    width: '$width',
+    width: theme.width,
     flex: 1,
     zIndex: 1,
     position: 'absolute',
@@ -46,14 +46,7 @@ const styles = EStyleSheet.create({
     padding: 0,
     left: 0,
     top: 0,
-  },
-  buttonContainer: {
-    marginTop: 0,
-    marginBottom: 0,
-    height: 50,
-    borderRadius: 0,
-    borderWidth: 0,
-    backgroundColor: 'rgb(73,111,194)',
+    backgroundColor: theme.colors.screen.alter
   },
   buttonStyle: {
     paddingLeft: 10,
@@ -63,5 +56,8 @@ const styles = EStyleSheet.create({
   link: {
     color: 'black',
     textDecorationLine: 'none'
+  },
+  selected: {
+    backgroundColor: theme.colors.primary
   }
-})
+}))

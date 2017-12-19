@@ -48,7 +48,8 @@ function Wallet({ address, unspentOutputs = [], balance = 0 }: Partial<Wallet.Da
         <TransactionCount unspentOutputs={unspentOutputs}/>
       </RkView>
       <RkView rkCardContent style={[styles.row, { paddingVertical: 8 }]}>
-        <RkButton rkType='clear link' style={styles.leftButton}>
+        <RkButton rkType='clear link' style={styles.leftButton}
+            color={styles.leftButtonText.color} >
           Export
         </RkButton>
       </RkView>
@@ -73,8 +74,7 @@ let styles = RkStyleSheet.create(theme => ({
     borderBottomWidth: 1,
   },
   column: {
-    justifyContent: 'center',
-    textAlign: 'center',
+    alignItems: 'center',
     flex: 1,
   },
   separator: {
@@ -88,6 +88,8 @@ let styles = RkStyleSheet.create(theme => ({
   leftButton: {
     flex: 1,
     alignSelf: 'center',
+  },
+  leftButtonText: {
     color: theme => theme.colors.primary,
   },
 

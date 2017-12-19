@@ -48,8 +48,9 @@ module.exports = {
           path.join(__dirname, '../index.web.tsx'),
           path.resolve(__dirname, '../src'),
           path.resolve(__dirname, '../node_modules/react-native-uncompiled'),
-          path.resolve(__dirname, '../node_modules/react-native-vector-icons'),
+          //path.resolve(__dirname, '../node_modules/react-native-vector-icons'),
           path.resolve(__dirname, '../node_modules/react-native-ui-kitten'),
+          path.resolve(__dirname, '../node_modules/react-native-web-lists'),
         ],
 
         use: [
@@ -86,7 +87,11 @@ module.exports = {
           }
         }
       },
-
+      {
+        test: /\.ttf$/,
+        loader: "url-loader", // or directly file-loader
+        include: path.resolve(__dirname, '../node_modules/react-native-vector-icons'),
+      },
 
       /* All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
       {

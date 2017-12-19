@@ -78,7 +78,7 @@ class LoadPrivateKey extends React.Component<
           <RkTextInput
             value={this.state.privateKey}
             onChangeText={privateKey => this.setState({ privateKey })}
-            inputStyle={ [styles.inputWidth] }/>
+            inputStyle={[styles.inputWidth]}/>
         </View>
         <RkButton
           disabled={!this.state.privateKey}

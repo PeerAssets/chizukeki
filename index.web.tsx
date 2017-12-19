@@ -32,3 +32,5 @@ if (module.hot) {
   })
 }
 
+import bootstrapIcons from './web/icons'
+bootstrapIcons()

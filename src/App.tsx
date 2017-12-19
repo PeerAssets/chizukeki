@@ -16,7 +16,6 @@ import {RkTheme} from 'react-native-ui-kitten';
 import {bootstrap} from './bootstrap'
 bootstrap()
 
-
 let { store, persistor } = configureStore()
 
 export default class App extends React.Component<{}> {
