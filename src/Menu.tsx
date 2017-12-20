@@ -46,7 +46,7 @@ let styles = RkStyleSheet.create(theme => ({
     padding: 0,
     left: 0,
     top: 0,
-    flextDirection: 'row',
+    flexDirection: 'row',
     backgroundColor: theme.colors.screen.alter
   },
   buttonStyle: {

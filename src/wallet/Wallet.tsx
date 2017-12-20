@@ -4,7 +4,8 @@ import { Button, RkCard, RkText, RkButton, RkStyleSheet } from 'react-native-ui-
 import PrivateKey from './LoadPrivateKey'
 import TransactionList from './Transaction'
 
-namespace Wallet { export type Transaction = {
+namespace Wallet {
+  export type Transaction = {
     script: string,
     tx_hash: string,
     tx_output_n: number,
@@ -23,7 +24,7 @@ let RkView = (View as any)
 function Balance({ balance }) {
   return (
     <RkView style={styles.column}>
-      <RkText rkType='header4'>Balance: ¤{balance.toLocaleString('en')}</RkText>
+      <RkText rktype='header4'>Balance: ¤{balance.toLocaleString('en')}</RkText>
     </RkView>
   )
 }
@@ -31,24 +32,24 @@ function Balance({ balance }) {
 function TransactionCount({ unspentOutputs }) {
   return (
     <RkView style={styles.column}>
-      <RkText rkType='header4'>{unspentOutputs.length} transactions</RkText>
+      <RkText rktype='header4'>{unspentOutputs.length} transactions</RkText>
     </RkView>
   )
 }
 
 function Wallet({ address, unspentOutputs = [], balance = 0 }: Partial<Wallet.Data>) {
   return (
-    <RkCard style={styles.card}>
-      <RkView rkCardHeader style={styles.row}>
-        <RkText rkType='header4'>Address: {address}</RkText>
+    <RkCard rktype='shadowed' style={styles.card}>
+      <RkView rkcardheader style={styles.row}>
+        <RkText rktype='header4'>Address: {address}</RkText>
       </RkView>
-      <RkView rkCardContent style={styles.row}>
+      <RkView rkcardcontent style={styles.row}>
         <Balance balance={balance}/>
         <View style={styles.separator}/>
         <TransactionCount unspentOutputs={unspentOutputs}/>
       </RkView>
-      <RkView rkCardContent style={[styles.row, { paddingVertical: 8 }]}>
-        <RkButton rkType='clear link' style={styles.leftButton}
+      <RkView rkcardcontent style={[styles.row, { paddingVertical: 8 }]}>
+        <RkButton rktype='clear link' style={styles.leftButton}
             color={styles.leftButtonText.color} >
           Export
         </RkButton>

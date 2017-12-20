@@ -1,5 +1,6 @@
 var webpack = require("webpack");
 var path = require("path");
+var fs = require("fs");
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
@@ -19,6 +20,7 @@ module.exports = {
   devtool: "source-map",
 
   resolve: {
+    symlinks: false,
     extensions: [ ".js", ".jsx", ".ts", ".tsx", ".web.js", ".web.jsx" ],
     alias: {
       'react-native': 'react-native-web',
@@ -51,6 +53,7 @@ module.exports = {
           //path.resolve(__dirname, '../node_modules/react-native-vector-icons'),
           path.resolve(__dirname, '../node_modules/react-native-ui-kitten'),
           path.resolve(__dirname, '../node_modules/react-native-web-lists'),
+
         ],
 
         use: [
