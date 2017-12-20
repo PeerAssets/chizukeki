@@ -4,6 +4,7 @@ import { Button, RkCard, RkText, RkButton, RkStyleSheet } from 'react-native-ui-
 
 import FlatList from 'react-native-web-lists/src/FlatList'
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
+import moment from 'moment'
 
 
 namespace BlockchainTransaction {
@@ -61,22 +62,22 @@ let testTransactions  = [
 ]
 
 
-function Received(){
-  return (
-    <RkText>
-      <Icon name="rocket" size={30} color="blue" /> Received from
-    </RkText>
-  )
-}
-
 function WalletTransaction({ item: { amount, address, time, category } }: { item: WalletTransaction.Data }) {
   return (
     <RkView style={styles.transaction}>
-      <RkText rkType='header4'>{amount.toString()} PPC</RkText>
-      <RkText rkType='secondary2 hintColor'>{time.toString()}</RkText>
-      <RkText rkType='secondary2 hintColor'>
-        {category === 'receive' ? <Received/> : 'sent to'} {address}
-      </RkText>
+      <Icon name="arrow-circle-o-down" size={30} color={styles.received.color} style={styles.icon} />
+      <RkView style={styles.main} >
+        <RkView style={styles.top}>
+          <RkText rkType='header4'>
+            {category === 'receive' ? '+' : '-'}
+            {amount.toString()} PPC
+          </RkText>
+          <RkText style={styles.timestamp} rkType='secondary2 hintColor'>{moment(time).fromNow()}</RkText>
+        </RkView>
+        <RkText rkType='secondary2 hintColor'>
+          {category === 'receive' ? 'from' : 'to'} {address}
+        </RkText>
+      </RkView>
     </RkView>
   )
 }
@@ -98,6 +99,26 @@ let styles = RkStyleSheet.create(theme => ({
     flexDirection: 'row',
     padding: 16,
     alignItems: 'center'
+  },
+  icon: {
+    flex: 1
+  },
+  received: {
+    color: theme.colors.primary
+  },
+  sent: {
+    color: theme.colors.accent
+  },
+  main: {
+    paddingLeft: 10,
+    flex: 9,
+  },
+  top: {
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+  },
+  timestamp: {
+    textAlignVertical: 'top',
   }
 }))
 
