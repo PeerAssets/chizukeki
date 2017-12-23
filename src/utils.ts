@@ -1,87 +1,25 @@
-export function nestedStyles(styles) {
-  console.log(styles)
-  return Object.keys(styles)
-    .reduce((result, attr) => ({
-      [`${attr}Style`]: styles[attr],
-      ...result
-    }), {})
-}
+import EStyleSheet from 'react-native-extended-stylesheet'
 
-const styleProps ={
-  text: new Set([
-    'textShadowOffset',
-    'color',
-    'fontSize',
-    'fontStyle',
-    'fontWeight',
-    'lineHeight',
-    'textAlign',
-    'textDecorationLine',
-    'textShadowColor',
-    'fontFamily',
-    'textShadowRadius',
-    'includeFontPadding',
-    'textAlignVertical',
-    'fontVariant',
-    'letterSpacing',
-    'textDecorationColor',
-    'textDecorationStyle',
-    'writingDirection'
-  ]),
-  view: new Set([
-    'borderRightColor',
-    'backfaceVisibility',
-    'borderBottomColor',
-    'borderBottomEndRadius',
-    'borderBottomLeftRadius',
-    'borderBottomRightRadius',
-    'borderBottomStartRadius',
-    'borderBottomWidth',
-    'borderColor',
-    'borderEndColor',
-    'borderLeftColor',
-    'borderLeftWidth',
-    'borderRadius',
-    'backgroundColor',
-    'borderRightWidth',
-    'borderStartColor',
-    'borderStyle',
-    'borderTopColor',
-    'borderTopEndRadius',
-    'borderTopLeftRadius',
-    'borderTopRightRadius',
-    'borderTopStartRadius',
-    'borderTopWidth',
-    'borderWidth',
-    'opacity',
-    'elevation',
-  ])
-}
-
-function isStyleObj(obj): boolean {
-  for (let key in obj) {
-    if (styleProps.text.has(key) || styleProps.view.has(key)){
-      return true
-    }
+export function objectFromEntries(entries: Array<[string, any]>){
+  let obj: object = {}
+  for (let [ key, value ] of entries){
+    obj[key] = value
   }
-  return false
+  return obj
 }
 
-function filterObj(obj: Object, set: Set<string>){
-  return Object.keys(obj)
-    .filter(k => set.has(k))
-    .reduce((result, k) => {
-      result[k] = obj[k]
-      return result
-    }, {})
+export function mapEntries(obj: object, fn: (entry: [ string, any ]) => [ string, any ]){
+  return objectFromEntries(Object.entries(obj).map(fn))
 }
 
-function splitStyles(
-  styles,
-  { text, view }: { text: string, view: string } = { text: 'text', view: 'view' }
-){
-  return {
-    [text]: filterObj(styles, styleProps.text),
-    [view]: filterObj(styles, styleProps.view)
-  }
+type StyleSheet = {
+  [styleName: string]: object
+}
+
+type ComponentStyles = {
+  [component: string]: StyleSheet
+}
+
+export function ComponentStyles(styles: ComponentStyles){
+  return mapEntries(styles, ([ component, sheet ]) => [ component, EStyleSheet.create(sheet) ])
 }

@@ -1,20 +1,15 @@
 import * as React from 'react'
-import { Text, View, Image } from 'react-native'
+import { View, Image, Text } from 'react-native'
 import { Provider } from "react-redux"
 import { PersistGate } from 'redux-persist/es/integration/react'
 import EStyleSheet from 'react-native-extended-stylesheet'
-import { variables as globalStyles } from './style-variables'
 import { ConnectedRouter } from 'react-router-redux'
 
 import { Route } from './routing/router'
 import configureStore, { history } from "./store"
 
-import Welcome from './wallet/Container'
+import Wallet from './wallet/Container'
 import Nav from './Menu'
-
-import {RkTheme} from 'react-native-ui-kitten';
-import {bootstrap} from './bootstrap'
-bootstrap()
 
 let { store, persistor } = configureStore()
 
@@ -28,8 +23,8 @@ export default class App extends React.Component<{}> {
               <Nav/>
               <Image source={require("./welcome/logomask.png")}
                 style={styles.background} />
-              <Route path="/" exact component={Welcome} />
-              <Route path="/wallet" exact component={Welcome} />
+              <Route path="/" exact component={Wallet} />
+              <Route path="/wallet" exact component={Wallet} />
             </View>
           </ConnectedRouter>
         </PersistGate>
@@ -55,9 +50,3 @@ const styles = EStyleSheet.create({
     backgroundColor: '#DADADA',
   },
 })
-
-// .build is required regardless of variables
-// here we theme, etc
-EStyleSheet.build(globalStyles)
-
-

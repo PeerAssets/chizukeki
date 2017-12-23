@@ -4,7 +4,6 @@ import App from './src';
 import * as React from 'react'
 import { AppContainer } from 'react-hot-loader'
 
-
 function wrap(Application) {
   return () =>
     class Wrapper extends React.Component {
@@ -17,7 +16,6 @@ function wrap(Application) {
       }
     }
 }
-
 
 // App registration and rendering
 AppRegistry.registerComponent('peerassets-wallet', wrap(App))
@@ -32,5 +30,5 @@ if (module.hot) {
   })
 }
 
-import bootstrapIcons from './web/icons'
-bootstrapIcons()
+import injectFonts from './web/fonts'
+injectFonts()

@@ -7,7 +7,7 @@ import { withRouter } from 'react-router'
 
 import { Link } from './routing/router' 
 
-import { RkButton, RkStyleSheet  } from 'react-native-ui-kitten'
+import { Button } from 'native-base/src/index'
 
 function NavLink({
   name,
@@ -18,9 +18,9 @@ function NavLink({
     [styles.selected] :
     [] 
   return (
-    <RkButton style={style}>
+    <Button style={style}>
       <Link to={link} style={[styles.link]}>{name}</Link>
-    </RkButton>
+    </Button>
   )
 }
 
@@ -36,18 +36,14 @@ function Nav({ location, ...props }){
 
 export default withRouter(Nav)
 
-let styles = RkStyleSheet.create(theme => ({
+let styles = EStyleSheet.create({
   container: {
-    width: theme.width,
     flex: 1,
-    zIndex: 1,
-    position: 'absolute',
-    height: 50,
+    zIndex: 1, position: 'absolute', height: 50,
     padding: 0,
     left: 0,
     top: 0,
     flexDirection: 'row',
-    backgroundColor: theme.colors.screen.alter
   },
   buttonStyle: {
     paddingLeft: 10,
@@ -59,6 +55,6 @@ let styles = RkStyleSheet.create(theme => ({
     textDecorationLine: 'none'
   },
   selected: {
-    backgroundColor: theme.colors.primary
+    backgroundColor: 'white'
   }
-}))
+})

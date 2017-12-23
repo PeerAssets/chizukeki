@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { Dimensions, View, Text } from 'react-native'
-import { Button, RkCard, RkText, RkButton, RkStyleSheet } from 'react-native-ui-kitten'
 import PrivateKey from './LoadPrivateKey'
 import TransactionList from './Transaction'
+import { Button, Card } from 'native-base/src/index'
+import EStyleSheet from 'react-native-extended-stylesheet';
 
 namespace Wallet {
   export type Transaction = {
@@ -18,50 +19,43 @@ namespace Wallet {
   export type Data = PrivateKey.Data & Transactions
 }
 
-let RkView = (View as any)
-
-
 function Balance({ balance }) {
   return (
-    <RkView style={styles.column}>
-      <RkText rktype='header4'>Balance: ¤{balance.toLocaleString('en')}</RkText>
-    </RkView>
+    <View style={styles.column}>
+      <Text>Balance: ¤{balance.toLocaleString('en')}</Text>
+    </View>
   )
 }
 
 function TransactionCount({ unspentOutputs }) {
   return (
-    <RkView style={styles.column}>
-      <RkText rktype='header4'>{unspentOutputs.length} transactions</RkText>
-    </RkView>
+    <View style={styles.column}>
+      <Text>{unspentOutputs.length} transactions</Text>
+    </View>
   )
 }
 
-function Wallet({ address, unspentOutputs = [], balance = 0 }: Partial<Wallet.Data>) {
+function Wallet({ address, unspentOutputs = [], balance = 0, style }: Partial<Wallet.Data> & { style: any }) {
   return (
-    <RkCard rktype='shadowed' style={styles.card}>
-      <RkView rkcardheader style={styles.row}>
-        <RkText rktype='header4'>Address: {address}</RkText>
-      </RkView>
-      <RkView rkcardcontent style={styles.row}>
+    <Card style={style.card}>
+      <View style={style.header}>
+        <Text>Address: {address}</Text>
+      </View>
+      <View style={style.body}>
         <Balance balance={balance}/>
-        <View style={styles.separator}/>
+        <View style={style.separator}/>
         <TransactionCount unspentOutputs={unspentOutputs}/>
-      </RkView>
-      <RkView rkcardcontent style={[styles.row, { paddingVertical: 8 }]}>
-        <RkButton rktype='clear link' style={styles.leftButton}
-            color={styles.leftButtonText.color} >
-          Export
-        </RkButton>
-      </RkView>
+      </View>
+      <View style={[style.row, { paddingVertical: 8 }]}>
+        <Button> Export </Button>
+      </View>
       <TransactionList />
-    </RkCard>
+    </Card>
   )
 }
 
-let styles = RkStyleSheet.create(theme => ({
+let styles = {
   container: {
-    backgroundColor: theme.colors.screen.scroll,
     paddingVertical: 8,
     paddingHorizontal: 10
   },
@@ -71,7 +65,6 @@ let styles = RkStyleSheet.create(theme => ({
   },
   row: {
     flexDirection: 'row',
-    borderColor: theme.colors.border.base,
     borderBottomWidth: 1,
   },
   column: {
@@ -79,7 +72,6 @@ let styles = RkStyleSheet.create(theme => ({
     flex: 1,
   },
   separator: {
-    backgroundColor: theme.colors.border.base,
     alignSelf: 'center',
     flexDirection: 'row',
     flex: 0,
@@ -91,10 +83,9 @@ let styles = RkStyleSheet.create(theme => ({
     alignSelf: 'center',
   },
   leftButtonText: {
-    color: theme => theme.colors.primary,
+    color: 'blue'
   },
-
-}))
+}
 
 
 export default Wallet

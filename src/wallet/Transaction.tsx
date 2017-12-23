@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Dimensions, View, TouchableOpacity } from 'react-native'
-import { Button, RkCard, RkText, RkButton, RkStyleSheet } from 'react-native-ui-kitten'
+import { Button, Card, Text } from 'native-base/src/index'
+import EStyleSheet from 'react-native-extended-stylesheet';
 
 import FlatList from 'react-native-web-lists/src/FlatList'
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
@@ -64,21 +65,21 @@ let testTransactions  = [
 
 function WalletTransaction({ item: { amount, address, time, category } }: { item: WalletTransaction.Data }) {
   return (
-    <RkView style={styles.transaction}>
+    <View style={styles.transaction}>
       <Icon name="arrow-circle-o-down" size={30} color={styles.received.color} style={styles.icon} />
-      <RkView style={styles.main} >
-        <RkView style={styles.top}>
-          <RkText rkType='header4'>
+      <View style={styles.main} >
+        <View style={styles.top}>
+          <Text>
             {category === 'receive' ? '+' : '-'}
             {amount.toString()} PPC
-          </RkText>
-          <RkText style={styles.timestamp} rkType='secondary2 hintColor'>{moment(time).fromNow()}</RkText>
-        </RkView>
-        <RkText rkType='secondary2 hintColor'>
+          </Text>
+          <Text style={styles.timestamp}>{moment(time).fromNow()}</Text>
+        </View>
+        <Text >
           {category === 'receive' ? 'from' : 'to'} {address}
-        </RkText>
-      </RkView>
-    </RkView>
+        </Text>
+      </View>
+    </View>
   )
 }
 
@@ -94,7 +95,7 @@ function TransactionList({ transactions = testTransactions }: { transactions?: T
   )
 }
 
-let styles = RkStyleSheet.create(theme => ({
+let styles = EStyleSheet.create({
   transaction: {
     flexDirection: 'row',
     padding: 16,
@@ -102,12 +103,6 @@ let styles = RkStyleSheet.create(theme => ({
   },
   icon: {
     flex: 1
-  },
-  received: {
-    color: theme.colors.primary
-  },
-  sent: {
-    color: theme.colors.accent
   },
   main: {
     paddingLeft: 10,
@@ -120,7 +115,7 @@ let styles = RkStyleSheet.create(theme => ({
   timestamp: {
     textAlignVertical: 'top',
   }
-}))
+})
 
 
 export default TransactionList

@@ -3,6 +3,10 @@ var path = require("path");
 var fs = require("fs");
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
+function nodeModule(mod){
+  return path.resolve(__dirname, '../node_modules/' + mod)
+}
+
 module.exports = {
 
   entry: [
@@ -23,8 +27,11 @@ module.exports = {
     symlinks: false,
     extensions: [ ".js", ".jsx", ".ts", ".tsx", ".web.js", ".web.jsx" ],
     alias: {
-      'react-native': 'react-native-web',
+      'react-native$': 'react-native-web',
       'react-router-native': 'react-router',
+      'react-native/Libraries/Renderer/shims/ReactNativePropRegistry': 'react-native-web/dist/modules/ReactNativePropRegistry/index.js',
+      'react-native-vector-icons/Fonts': nodeModule('react-native-vector-icons/Fonts'),
+      'react-native-vector-icons': 'react-native-vector-icons/dist',
     },
   },
 
@@ -49,11 +56,11 @@ module.exports = {
         include: [
           path.join(__dirname, '../index.web.tsx'),
           path.resolve(__dirname, '../src'),
-          path.resolve(__dirname, '../node_modules/react-native-uncompiled'),
-          //path.resolve(__dirname, '../node_modules/react-native-vector-icons'),
-          path.resolve(__dirname, '../node_modules/react-native-ui-kitten'),
-          path.resolve(__dirname, '../node_modules/react-native-web-lists'),
-
+          nodeModule('react-native-uncompiled'),
+          nodeModule('react-native-web-lists'),
+          nodeModule('native-base'),
+          nodeModule('react-native-easy-grid'),
+          nodeModule('react-native-drawer'),
         ],
 
         use: [
@@ -66,8 +73,7 @@ module.exports = {
               doTypeCheck: true,
               forkChecker: true,
 
-              useBabel: true,
-              useCache: true,
+              useBabel: true, useCache: true,
               babelOptions: {
                 babelrc: false,
                 // This aliases 'react-native' to 'react-native-web' and includes only
@@ -93,7 +99,10 @@ module.exports = {
       {
         test: /\.ttf$/,
         loader: "url-loader", // or directly file-loader
-        include: path.resolve(__dirname, '../node_modules/react-native-vector-icons'),
+        include: [
+          nodeModule('react-native-vector-icons'),
+          nodeModule('native-base/Fonts'),
+        ]
       },
 
       /* All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
