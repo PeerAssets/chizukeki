@@ -1,59 +1,81 @@
 import * as React from 'react'
 import { Text, View, Dimensions } from 'react-native'
-import EStyleSheet from 'react-native-extended-stylesheet';
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 
-import { Link } from './routing/router' 
+import { Link } from './routing/router'
 
-import { Button } from 'native-base/src/index'
+import { Button, connectStyle, variables } from 'native-base/src/index'
 
-function NavLink({
-  name,
-  link = `/${name.toLowerCase()}`,
-  selected 
-}: { name: string, link?: string, selected: string }) {
-  return (
-    <Button transparent primary={selected === link}>
-      <Link to={link} style={[styles.link]}>{name}</Link>
-    </Button>
-  )
+let styles = {
+  nav: {
+    container: {
+      position: 'absolute',
+      top: 0,
+      right: 0,
+      left: 0,
+      height: 50,
+      opacity: 1,
+      flexDirection: 'row',
+      justifyContent: 'flex-start',
+
+      zIndex: 1,
+      width: '100%',
+      backgroundColor: variables.btnInfoBg
+    },
+  },
+  tab: {
+    button: {
+      height: '100%',
+      borderRadius: 0,
+      padding: 0,
+    },
+    link: {
+      color: variables.btnInfoColor,
+      textDecorationLine: 'none',
+      textDecoration: 'none',
+      paddingLeft: 15,
+      paddingRight: 15,
+      height: '100%',
+      justifyContent: 'center',
+      flexDirection: 'column',
+      display: 'flex'
+    },
+    selected: {
+      color: variables.btnPrimaryColor,
+    },
+  },
 }
 
-function Nav({ location, ...props }){
-  return (
-    <View style={[ styles.container ]}>
-      <NavLink name='Wallet' selected={location.pathname}/>
-      <NavLink name='Decks' selected={location.pathname}/>
-    </View>
-  )
-}
+const Tab = connectStyle('PeerKeeper.Nav.Tab', styles.tab)(
+  class Tab extends React.Component<{ name: string, link?: string, selected: string, style: any }> {
+    render() {
+      let { name, link = `/${this.props.name.toLowerCase()}`, style, selected } = this.props
+      let linkStyle = Object.assign({}, style.link, selected === link ? style.selected : {})
+      return (
+        <Button {...selected === link ?  { primary: true } : { info : true }} style={style.button}>
+          <Link to={link} style={linkStyle}>{name}</Link>
+        </Button>
+      )
+    }
+  }
+)
+
+const Nav = connectStyle('PeerKeeper.Nav', styles.nav)(
+  class Nav extends React.Component<{ location: { pathname: string }, style: any }> {
+    render() {
+      let { style, location } = this.props
+      return (
+        <View style={style.container}>
+          <Tab name='Wallet' selected={location.pathname} />
+          <Tab name='Decks' selected={location.pathname} />
+        </View>
+      )
+    }
+  }
+)
 
 
 export default withRouter(Nav)
 
-let styles = EStyleSheet.create({
-  container: {
-    flex: 1,
-    zIndex: 1,
-    position: 'absolute',
-    height: 50,
-    padding: 0,
-    left: 0,
-    top: 0,
-    flexDirection: 'row',
-  },
-  buttonStyle: {
-    paddingLeft: 10,
-    paddingRight: 10,
-    marginRight: 2,
-  },
-  link: {
-    color: 'black',
-    textDecorationLine: 'none',
-  },
-  selected: {
-    backgroundColor: 'white'
-  }
-})
