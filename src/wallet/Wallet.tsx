@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Dimensions, View, Text } from 'react-native'
 import PrivateKey from './LoadPrivateKey'
 import TransactionList from './Transaction'
-import { Button, Card } from 'native-base/src/index'
+import { Button, Card, connectStyle } from 'native-base/src/index'
 import EStyleSheet from 'react-native-extended-stylesheet';
 
 namespace Wallet {
@@ -35,24 +35,6 @@ function TransactionCount({ unspentOutputs }) {
   )
 }
 
-function Wallet({ address, unspentOutputs = [], balance = 0, style }: Partial<Wallet.Data> & { style: any }) {
-  return (
-    <Card style={style.card}>
-      <View style={style.header}>
-        <Text>Address: {address}</Text>
-      </View>
-      <View style={style.body}>
-        <Balance balance={balance}/>
-        <View style={style.separator}/>
-        <TransactionCount unspentOutputs={unspentOutputs}/>
-      </View>
-      <View style={[style.row, { paddingVertical: 8 }]}>
-        <Button> Export </Button>
-      </View>
-      <TransactionList />
-    </Card>
-  )
-}
 
 let styles = {
   container: {
@@ -68,8 +50,8 @@ let styles = {
     borderBottomWidth: 1,
   },
   column: {
-    alignItems: 'center',
-    flex: 1,
+    //alignItems: 'center',
+    //flex: 1,
   },
   separator: {
     alignSelf: 'center',
@@ -87,5 +69,28 @@ let styles = {
   },
 }
 
+const Wallet = connectStyle('PeerKeeper.Wallet', styles)(
+  class Wallet extends React.Component< Partial<Wallet.Data> & { style: any }> {
+    render() {
+      let { address, unspentOutputs = [], balance = 0, style } = this.props
+      return (
+        <Card style={style.card}>
+          <View style={style.header}>
+            <Text>Address: {address}</Text>
+          </View>
+          <View style={style.body}>
+            <Balance balance={balance} />
+            <View style={style.separator} />
+            <TransactionCount unspentOutputs={unspentOutputs} />
+          </View>
+          <View style={[style.row, { paddingVertical: 8 }]}>
+            {/*<Button> <Text> Export </Text> </Button>*/}
+          </View>
+          <TransactionList />
+        </Card>
+      )
+    }
+  }
+)
 
 export default Wallet

@@ -14,11 +14,8 @@ function NavLink({
   link = `/${name.toLowerCase()}`,
   selected 
 }: { name: string, link?: string, selected: string }) {
-  let style = selected === link ?
-    [styles.selected] :
-    [] 
   return (
-    <Button style={style}>
+    <Button transparent primary={selected === link}>
       <Link to={link} style={[styles.link]}>{name}</Link>
     </Button>
   )
@@ -39,7 +36,9 @@ export default withRouter(Nav)
 let styles = EStyleSheet.create({
   container: {
     flex: 1,
-    zIndex: 1, position: 'absolute', height: 50,
+    zIndex: 1,
+    position: 'absolute',
+    height: 50,
     padding: 0,
     left: 0,
     top: 0,
@@ -52,7 +51,7 @@ let styles = EStyleSheet.create({
   },
   link: {
     color: 'black',
-    textDecorationLine: 'none'
+    textDecorationLine: 'none',
   },
   selected: {
     backgroundColor: 'white'

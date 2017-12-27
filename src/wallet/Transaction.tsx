@@ -66,7 +66,7 @@ let testTransactions  = [
 function WalletTransaction({ item: { amount, address, time, category } }: { item: WalletTransaction.Data }) {
   return (
     <View style={styles.transaction}>
-      <Icon name="arrow-circle-o-down" size={30} color={styles.received.color} style={styles.icon} />
+      <Icon name="arrow-circle-o-down" size={30} color={'black'} style={styles.icon} />
       <View style={styles.main} >
         <View style={styles.top}>
           <Text>
