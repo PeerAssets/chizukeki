@@ -1,9 +1,10 @@
 import * as React from 'react'
-import { Dimensions, View, Text } from 'react-native'
+import { Dimensions, View, ViewStyle } from 'react-native'
 import PrivateKey from './LoadPrivateKey'
 import TransactionList from './Transaction'
-import { Button, Card, connectStyle } from 'native-base/src/index'
-import EStyleSheet from 'react-native-extended-stylesheet';
+import { Button, CardItem, Body, Text, Card, connectStyle, H2 } from 'native-base/src/index'
+
+let fieldStyles  = {}
 
 namespace Wallet {
   export type Transaction = {
@@ -19,46 +20,69 @@ namespace Wallet {
   export type Data = PrivateKey.Data & Transactions
 }
 
-function Balance({ balance }) {
+class Toggleable extends React.Component<any> {
+  render() {
+    let { toggle = ()=>{}, active = false, children, ...props } = this.props
+    return (
+      <Button {...active ? { primary: true } : { light: true }} {...props} onClick={toggle}>
+        { children }
+      </Button>
+    )
+  }
+}
+
+function Balance({ balance, ...props }) {
   return (
-    <View style={styles.column}>
-      <Text>Balance: ¤{balance.toLocaleString('en')}</Text>
+    <View {...props}>
+      <H2>{balance.toLocaleString('en')} PPC</H2>
+      <Text note>balance</Text>
     </View>
   )
 }
 
-function TransactionCount({ unspentOutputs }) {
+function TransactionCount({ unspentOutputs, ...props }) {
   return (
-    <View style={styles.column}>
+    <Toggleable {...props}>
       <Text>{unspentOutputs.length} transactions</Text>
-    </View>
+    </Toggleable>
   )
 }
 
 
 let styles = {
   container: {
-    paddingVertical: 8,
-    paddingHorizontal: 10
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    width: '100%',
+    maxWidth: 700,
+    padding: 15,
+    alignItems: 'flex-start',
   },
   card: {
+    flex: 3,
+    minWidth: 350,
+    margin: 7.5,
     flexDirection: 'column',
-    flexWrap: 'wrap',
+    justifcyContent: 'space-around',
+    alignItems: 'center',
+    overflow: 'hidden',
   },
-  row: {
+  body: {
     flexDirection: 'row',
-    borderBottomWidth: 1,
+    justifyContent: 'center',
+    minWidth: '350px'
   },
   column: {
-    //alignItems: 'center',
-    //flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 7.5,
+    flex: 1,
   },
   separator: {
     alignSelf: 'center',
     flexDirection: 'row',
     flex: 0,
     width: 1,
-    height: 42
   },
   leftButton: {
     flex: 1,
@@ -69,28 +93,39 @@ let styles = {
   },
 }
 
-const Wallet = connectStyle('PeerKeeper.Wallet', styles)(
-  class Wallet extends React.Component< Partial<Wallet.Data> & { style: any }> {
-    render() {
-      let { address, unspentOutputs = [], balance = 0, style } = this.props
-      return (
-        <Card style={style.card}>
-          <View style={style.header}>
-            <Text>Address: {address}</Text>
-          </View>
-          <View style={style.body}>
-            <Balance balance={balance} />
-            <View style={style.separator} />
-            <TransactionCount unspentOutputs={unspentOutputs} />
-          </View>
-          <View style={[style.row, { paddingVertical: 8 }]}>
-            {/*<Button> <Text> Export </Text> </Button>*/}
-          </View>
-          <TransactionList />
-        </Card>
-      )
-    }
+@connectStyle('PeerKeeper.Wallet', styles)
+class Wallet extends React.Component<
+  Partial<Wallet.Data> & { style?: any },
+  { transactions: boolean }
+> {
+  state = {
+    transactions: Dimensions.get('window').width > 600
   }
-)
+  render() {
+    let { address, unspentOutputs = [], balance = 0, style } = this.props
+    return (
+      <View style={style.container}>
+      <Card style={style.card}>
+        <CardItem header>
+          <Balance balance={balance} style={style.column} />
+        </CardItem>
+        <CardItem>
+          <Body style={style.body}>
+            <TransactionCount
+                active={this.state.transactions}
+                unspentOutputs={unspentOutputs}
+                style={style.column}
+                toggle={() => this.setState({ transactions: !this.state.transactions })} />
+            <Toggleable style={style.column}>
+              <Text> Export </Text>
+            </Toggleable >
+          </Body>
+        </CardItem>
+      </Card>
+      { this.state.transactions && <TransactionList /> }
+      </View>
+    )
+  }
+}
 
 export default Wallet

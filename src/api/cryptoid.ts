@@ -61,7 +61,10 @@ class Cryptoid {
   listTransactions = async (address: string) => {
     let resp = await this.blockRequest('address.summary', { id: address })
     if(resp){
-      return resp.tx.map(tuple => tuple[1].toLowerCase())
+      return resp.tx.map(([_0, txid, _2, _3, value, balance]) =>
+        ({ balance, value, id: txid.toLowerCase() }))
     }
   }
 } 
+
+export default Cryptoid

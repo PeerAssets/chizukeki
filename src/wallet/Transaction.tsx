@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { Dimensions, View, TouchableOpacity } from 'react-native'
-import { Button, Card, Text } from 'native-base/src/index'
+import { Dimensions, View, TouchableOpacity, ViewStyle } from 'react-native'
+import { Button, Card, Left, CardItem, Body, Text, H2 } from 'native-base/src/index'
 import EStyleSheet from 'react-native-extended-stylesheet';
 
 import FlatList from 'react-native-web-lists/src/FlatList'
@@ -39,7 +39,7 @@ namespace WalletTransaction {
     amount: number,
     confirmations: number,
 
-    blockhash:string,
+    blockhash: string,
     blockindex: number,
     txid: string,
     time: Date
@@ -48,7 +48,7 @@ namespace WalletTransaction {
 
 let RkView = (View as any)
 
-let testTransactions  = [
+let testTransactions = [
   {
     "account": "PACLI",
     "address": "n4KuTR5CzyQTbrpwbAKEdTfJERKmtHWWgr",
@@ -65,21 +65,25 @@ let testTransactions  = [
 
 function WalletTransaction({ item: { amount, address, time, category } }: { item: WalletTransaction.Data }) {
   return (
-    <View style={styles.transaction}>
-      <Icon name="arrow-circle-o-down" size={30} color={'black'} style={styles.icon} />
-      <View style={styles.main} >
-        <View style={styles.top}>
-          <Text>
-            {category === 'receive' ? '+' : '-'}
-            {amount.toString()} PPC
-          </Text>
-          <Text style={styles.timestamp}>{moment(time).fromNow()}</Text>
-        </View>
-        <Text >
+    <Card>
+      <CardItem header>
+        <Left>
+          <Icon name="arrow-circle-o-down" size={30} color={'black'} />
+          <Body>
+            <Text>
+              {category === 'receive' ? '+' : '-'}
+              {amount.toString()} PPC
+            </Text>
+            <Text note>{moment(time).fromNow()}</Text>
+          </Body>
+        </Left>
+      </CardItem>
+      <CardItem footer style={{maxWidth: '100%'}}>
+        <Text note style={{ellipsizeMode: 'middle', maxWidth: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {category === 'receive' ? 'from' : 'to'} {address}
         </Text>
-      </View>
-    </View>
+      </CardItem>
+    </Card>
   )
 }
 
@@ -89,20 +93,25 @@ namespace TransactionList {
 
 function TransactionList({ transactions = testTransactions }: { transactions?: TransactionList.Data }) {
   return (
-    <FlatList 
-      data={transactions}
-      renderItem={WalletTransaction}/>
+    <View style={styles.card}>
+      <H2>Transactions</H2>
+      <FlatList
+        data={transactions}
+        renderItem={WalletTransaction} />
+    </View>
   )
 }
 
-let styles = EStyleSheet.create({
+let styles = {
+  card: {
+    flex: 2,
+    minWidth: 200,
+    margin: 7.5,
+  },
   transaction: {
     flexDirection: 'row',
     padding: 16,
     alignItems: 'center'
-  },
-  icon: {
-    flex: 1
   },
   main: {
     paddingLeft: 10,
@@ -115,7 +124,7 @@ let styles = EStyleSheet.create({
   timestamp: {
     textAlignVertical: 'top',
   }
-})
+}
 
 
 export default TransactionList

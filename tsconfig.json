@@ -6,6 +6,7 @@
     "noImplicitAny": false,
     "strictNullChecks": true,
     "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
     "moduleResolution": "node",
     "module": "es6",
     "target": "es6",
