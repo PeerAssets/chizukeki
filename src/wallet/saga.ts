@@ -1,16 +1,7 @@
 import { fork, all, put, takeLatest, call } from 'redux-saga/effects'
 
 import fetchJSONRoutine from '../store/fetch-routine'
-
-function unspent({ address, network = 'ppc-test' }){
-  return `https://chainz.cryptoid.info/${network}/api.dws?q=unspent&key=7547f94398e3&active=${address}`
-}
-
-async function syncTransactions({ address }) {
-  let response = await fetch( unspent({ address }) )
-  let { unspent_outputs } = await response.json()
-  return unspent_outputs
-}
+import cryptoid from '../api/cryptoid'
 
 function balance(unspentOutputs){
   return unspentOutputs.reduce((sum, output) => 
@@ -18,14 +9,14 @@ function balance(unspentOutputs){
   ) / 100000000.0
 }
 
-async function fetchJSON(payload){
-  const unspentOutputs = await syncTransactions(payload)
+async function fetchJSON({ address }){
+  const unspentOutputs = await cryptoid.listUnspent(address)
   return { unspentOutputs, balance: balance(unspentOutputs) }
 }
 
 const { routine, sync, trigger } = fetchJSONRoutine<
   'FETCH_TRANSACTIONS',
-  { trigger: { address: string } }
+  { trigger: { privateKey: string, address: string, } }
 >({
   actionPrefix: 'FETCH_TRANSACTIONS',
   fetchJSON,
@@ -34,4 +25,4 @@ const { routine, sync, trigger } = fetchJSONRoutine<
 
 export default trigger
 
-export { routine }
+export { routine, sync }

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Dimensions, View, ViewStyle } from 'react-native'
+import { Dimensions, View, ViewStyle, Clipboard } from 'react-native'
 import PrivateKey from './LoadPrivateKey'
 import TransactionList from './Transaction'
 import { Button, CardItem, Body, Text, Card, connectStyle, H2 } from 'native-base/src/index'
@@ -102,7 +102,7 @@ class Wallet extends React.Component<
     transactions: Dimensions.get('window').width > 600
   }
   render() {
-    let { address, unspentOutputs = [], balance = 0, style } = this.props
+    let { address, unspentOutputs = [], balance = 0, style, privateKey } = this.props
     return (
       <View style={style.container}>
       <Card style={style.card}>
@@ -116,9 +116,12 @@ class Wallet extends React.Component<
                 unspentOutputs={unspentOutputs}
                 style={style.column}
                 toggle={() => this.setState({ transactions: !this.state.transactions })} />
-            <Toggleable style={style.column}>
+            <Button light disabled={!privateKey} style={style.column} onClick={() => privateKey && Clipboard.setString(privateKey)}>
               <Text> Export </Text>
-            </Toggleable >
+            </Button>
+            <Button light style={style.column}>
+              <Text> Sync </Text>
+            </Button>
           </Body>
         </CardItem>
       </Card>

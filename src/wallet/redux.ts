@@ -28,6 +28,11 @@ namespace Redux {
   }
 
   export function reducer(state: State, a: Action): State {
+    routine.switch.partial({
+      TRIGGER: () => Object.assign({}, state, a.payload),
+      DEFAULT: null
+    })(a)
+
     switch (a.type) {
       case ActionType.LoadKey:
         return Object.assign({ unspentOutputs: Array<Wallet.Transaction>(), balance: 0 }, a.payload)
@@ -38,6 +43,7 @@ namespace Redux {
     }
   }
   export const saga = Saga
+  export const routines = { sync: routine }
 }
 
 export default Redux

@@ -10,8 +10,7 @@ function fetchJSONRoutine<
   { actionPrefix, fetchJSON, triggers = [] }:
   { actionPrefix: ActionPrefix, fetchJSON: (payload: Payloads['trigger']) => any, triggers?: Array<Trigger> }
 ){
-  const routine = createRoutine<typeof actionPrefix, {
-  }>(actionPrefix)
+  const routine = createRoutine<typeof actionPrefix, Payloads>(actionPrefix)
   function* sync({ payload }: { payload: Payloads['trigger'] }) {
     try {
       yield put(routine.request())

@@ -31,7 +31,7 @@ function equals(a, b){
  *  type Tuple = ['a' | 'b' | 'c', '1' | '2' | '3' ]
  *  let cases = [
  *    [ ['a', '1'], () => 'a1' ],
- *    [ ['b', '2'], () => 'b2' ],
+ *    [ ['b', '2'], 'b2' ],
  *  ]
  *  let defaultCase = 'default'
  *  Switch<Tuple, 'a1' | 'b2' | 'default'>(['a', '1']) //=> 'a1'

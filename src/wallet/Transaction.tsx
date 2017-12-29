@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Dimensions, View, TouchableOpacity, ViewStyle } from 'react-native'
 import { Button, Card, Left, CardItem, Body, Text, H2 } from 'native-base/src/index'
-import EStyleSheet from 'react-native-extended-stylesheet';
 
 import FlatList from 'react-native-web-lists/src/FlatList'
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
@@ -70,7 +69,7 @@ function WalletTransaction({ item: { amount, address, time, category } }: { item
         <Left>
           <Icon name="arrow-circle-o-down" size={30} color={'black'} />
           <Body>
-            <Text>
+            <Text success>
               {category === 'receive' ? '+' : '-'}
               {amount.toString()} PPC
             </Text>

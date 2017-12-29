@@ -1,3 +1,5 @@
+import { curry, __, mapObjIndexed, chain, pick, pipe } from 'ramda'
+import { bindActionCreators, Dispatch, ActionCreatorsMapObject } from 'redux'
 import { Creator, Switch } from './actions'
 
 enum RoutineAction {
@@ -29,6 +31,21 @@ type BasePayloads = Partial<{
   failure: BasePayload
 }>
 
+// TODO maybe there's a type level way to dry this up,
+// unfinished because switch is complicated
+/* or there will be in the future
+type Routine<Prefix extends string, Payloads extends BasePayloads> = {
+  actions: RoutineActions<Prefix>,
+  switch: Switch.Dict(actions),
+
+  trigger: Creator<[ Prefix, RoutineAction.Trigger ], Payloads['trigger']>,
+  request: Creator.Empty<[ Prefix, RoutineAction.Request ]>,
+  success: Creator<[ Prefix, RoutineAction.Success ], Payloads['success']>,
+  failure: Creator<[ Prefix, RoutineAction.Failure ], Payloads['failure']>,
+}
+*/
+
+
 function routineActions<Prefix extends string>(prefix: Prefix): RoutineActions<Prefix> {
   return {
     TRIGGER: [ prefix, RoutineAction.Trigger ],
@@ -50,6 +67,26 @@ function routineCreators<
   }
 }
 
+const bindRoutineActions = curry((
+  routines: { [routine: string]: ActionCreatorsMapObject & any },
+  dispatch: Dispatch<any>
+) => mapObjIndexed(
+  pipe(
+    pick(['trigger', 'request', 'success', 'failure']),
+    curry(bindActionCreators)(__, dispatch)
+  ),
+  routines
+))
+
+function extractRoutineActions(
+  routines: { [routine: string]: ActionCreatorsMapObject & any },
+) {
+  return mapObjIndexed(
+    pick(['trigger', 'request', 'success', 'failure']),
+    routines
+  )
+}
+
 function createRoutine<
   Prefix extends string,
   Payloads extends BasePayloads
@@ -66,13 +103,14 @@ function createRoutine<
 export default createRoutine
 
 export {
-
   RoutineAction,
   RoutineActions,
 
   BasePayloads,
 
   routineActions,
-  routineCreators
+  routineCreators,
 
+  bindRoutineActions,
+  extractRoutineActions 
 }

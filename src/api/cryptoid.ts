@@ -67,4 +67,4 @@ class Cryptoid {
   }
 } 
 
-export default Cryptoid
+export default new Cryptoid()
