@@ -67,16 +67,18 @@ function routineCreators<
   }
 }
 
-const bindRoutineActions = curry((
+function bindRoutineActions(
   routines: { [routine: string]: ActionCreatorsMapObject & any },
   dispatch: Dispatch<any>
-) => mapObjIndexed(
-  pipe(
-    pick(['trigger', 'request', 'success', 'failure']),
-    curry(bindActionCreators)(__, dispatch)
-  ),
-  routines
-))
+){
+  return mapObjIndexed(
+    pipe(
+      pick(['trigger', 'request', 'success', 'failure']),
+      curry(bindActionCreators)(__, dispatch)
+    ),
+    routines
+  )
+}
 
 function extractRoutineActions(
   routines: { [routine: string]: ActionCreatorsMapObject & any },

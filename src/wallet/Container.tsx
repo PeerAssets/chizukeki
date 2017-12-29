@@ -19,5 +19,5 @@ function Container({ routines, ...props }: Redux.State & { routines: typeof rout
 
 export default connect(
   ({ wallet }: GlobalState) => wallet,
-  bindRoutineActions(Redux.routines)
+  (dispatch: Dispatch<any>) => ({ routines: bindRoutineActions(Redux.routines, dispatch) })
 )(Container)

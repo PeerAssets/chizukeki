@@ -1,9 +1,26 @@
 import * as React from 'react'; import { Component } from 'react';
-import { Dimensions, View, TouchableOpacity  } from 'react-native';
+import { Dimensions, View, TouchableOpacity } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
-import { Container, Header, Content, Card, CardItem, Text, Body, Input, Button, Radio } from 'native-base/src/index'
+import {
+  Container,
+  Segment,
+  Header,
+  Content,
+  Card,
+  CardItem,
+  Text,
+  H2,
+  Body,
+  Input,
+  Button,
+  Item,
+  Right,
+  variables
+} from 'native-base/src/index'
+import Icon from 'react-native-vector-icons/dist/FontAwesome';
 
 import bitcore from '../bitcore'
+import Wrapper from './Wrapper'
 
 namespace LoadPrivateKey {
   export type Data = {
@@ -16,24 +33,23 @@ type Format = 'wif' | 'raw'
 
 let Touchable = (TouchableOpacity as any)
 
-function SelectFormat({ selected, select, style }: { selected: Format, select: (f:Format) => void, style: any }){
-  function Choice(
-    { selected, format, children }: { format: Format, selected: Format, children: string }
-  ){
+function SelectFormat({ selected, select, style }: { selected: Format, select: (f: Format) => void, style: any }) {
+  function Choice({ selected, format, children, style = [], ...props }) {
     return (
-      <Touchable choiceTrigger>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Radio selected={selected === format} onPress={() => select(format)}/>
-          <Text>{children}</Text>
-        </View>
-      </Touchable>
+      <Button
+        active={selected === format}
+        onClick={() => select(format)}
+        style={[{height: '100%', borderColor: variables.segmentBackgroundColor }, ...style]}
+        {...props}>
+        <Text>{children}</Text>
+      </Button>
     )
   }
   return (
-    <View>
-      <Choice format='wif' selected={selected}>Wif</Choice>
-      <Choice format='raw' selected={selected}>Private Key</Choice>
-    </View>
+    <Segment>
+      <Choice first format='wif' selected={selected}>Wif</Choice>
+      <Choice last format='raw' selected={selected}>Private Key</Choice>
+    </Segment>
   )
 }
 
@@ -52,7 +68,7 @@ function normalize({ privateKey, format }: State): LoadPrivateKey.Data {
 class LoadPrivateKey extends React.Component<
   { loadPrivateKey: (data: LoadPrivateKey.Data) => void },
   State
-> {
+  > {
   state = {
     privateKey: undefined,
     address: undefined,
@@ -61,30 +77,45 @@ class LoadPrivateKey extends React.Component<
   render() {
     let { privateKey, format } = this.state
     return (
-      <Card containerStyle={styles.container} wrapperStyle={styles.wrapper} title='Import or generate key' >
-        <CardItem header> 
-          <SelectFormat
-            selected={format}
-            select={format => this.setState({ format })}
-            style={styles.selectFormat} />
-          <Button
-            onPress={() => this.setState({ privateKey: new bitcore.PrivateKey().toString() })}
-            title="Generate a new key" />
-        </CardItem> 
-        <CardItem> 
-          <Body> 
-            <Input
-              value={this.state.privateKey}
-              onChangeText={privateKey => this.setState({ privateKey })} />
-          </Body> 
-        </CardItem>
-        <CardItem footer> 
-          <Button
-            disabled={!this.state.privateKey}
-            onPress={() => this.props.loadPrivateKey(normalize(this.state))}
-            title="Import and Sync" />
-        </CardItem>
-      </Card>
+      <Wrapper>
+        <Card >
+          <CardItem header>
+            <Body style={{ flexDirection: 'row', width: '100%', flexWrap: 'wrap' }}>
+              <H2>Import or generate key</H2>
+              <Right>
+                <Button
+                  info
+                  style={styles.selectFormat}
+                  onPress={() => this.setState({ privateKey: new bitcore.PrivateKey().toString(), format: 'raw' })}>
+                  <Text>Generate</Text>
+                </Button>
+              </Right>
+            </Body>
+          </CardItem>
+          <CardItem>
+            <Body  style={{ flexDirection: 'row',justifyContent: 'space-around', width: '100%', flexWrap: 'wrap' }}>
+              <SelectFormat
+                selected={format}
+                select={format => this.setState({ format })}
+                style={styles.selectFormat} />
+              <Item style={{ flex: 3, marginLeft: 15, minWidth: 300 }}>
+                <Icon active name='lock' />
+                <Input
+                  value={this.state.privateKey}
+                  onChangeText={privateKey => this.setState({ privateKey })} />
+              </Item>
+            </Body>
+          </CardItem>
+          <CardItem footer>
+            <Body>
+            <Button success block disabled={!this.state.privateKey}
+                onPress={() => this.props.loadPrivateKey(normalize(this.state))}>
+              <Text>Import and Sync</Text>
+            </Button>
+            </Body>
+          </CardItem>
+        </Card>
+      </Wrapper>
     )
   }
 }
@@ -136,8 +167,6 @@ const styles = EStyleSheet.create({
   },
   selectFormat: {
     flex: 1,
-    height: () => 0.1 * Dimensions.get('window').height,
-    width: () => 0.25 * Dimensions.get('window').width,
   },
   inputWidth: {
     width: '$width - 30',

@@ -28,6 +28,7 @@ function equals(a, b){
 }
 
 /*
+ *  Build a switch that keys off of tuples with a required default case
  *  type Tuple = ['a' | 'b' | 'c', '1' | '2' | '3' ]
  *  let cases = [
  *    [ ['a', '1'], () => 'a1' ],
@@ -55,6 +56,12 @@ function Switch<Tuple extends Array<string>, Return extends any = any>(
   }
 }
 
+/*
+ *  Helper wrappers around the above switch that creates switch factory for the given keys
+ *  DEFAULT is always required
+ *  let dictSwitch = Switch.Dict({ a: ['a', '1'], b: ['b', 2] })
+ *  dictSwitch({ a: 'a1', b: 'b2', DEFAULT: 'default' })(['b', 2]) //=> 'b2'
+ */ 
 namespace Switch {
   export function Dict<Key extends string, Tuple extends Array<string>>(mapping: Record<Key, Tuple>){
 

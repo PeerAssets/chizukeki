@@ -3,8 +3,9 @@ import { Dimensions, View, ViewStyle, Clipboard } from 'react-native'
 import PrivateKey from './LoadPrivateKey'
 import TransactionList from './Transaction'
 import { Button, CardItem, Body, Text, Card, connectStyle, H2 } from 'native-base/src/index'
+import Wrapper from './Wrapper'
 
-let fieldStyles  = {}
+let fieldStyles = {}
 
 namespace Wallet {
   export type Transaction = {
@@ -22,10 +23,10 @@ namespace Wallet {
 
 class Toggleable extends React.Component<any> {
   render() {
-    let { toggle = ()=>{}, active = false, children, ...props } = this.props
+    let { toggle = () => { }, active = false, children, ...props } = this.props
     return (
       <Button {...active ? { primary: true } : { light: true }} {...props} onClick={toggle}>
-        { children }
+        {children}
       </Button>
     )
   }
@@ -50,14 +51,6 @@ function TransactionCount({ unspentOutputs, ...props }) {
 
 
 let styles = {
-  container: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    width: '100%',
-    maxWidth: 700,
-    padding: 15,
-    alignItems: 'flex-start',
-  },
   card: {
     flex: 3,
     minWidth: 350,
@@ -95,8 +88,8 @@ let styles = {
 
 @connectStyle('PeerKeeper.Wallet', styles)
 class Wallet extends React.Component<
-  Partial<Wallet.Data> & { style?: any },
-  { transactions: boolean }
+Partial<Wallet.Data> & { style?: any },
+{ transactions: boolean }
 > {
   state = {
     transactions: Dimensions.get('window').width > 600
@@ -104,29 +97,28 @@ class Wallet extends React.Component<
   render() {
     let { address, unspentOutputs = [], balance = 0, style, privateKey } = this.props
     return (
-      <View style={style.container}>
-      <Card style={style.card}>
-        <CardItem header>
-          <Balance balance={balance} style={style.column} />
-        </CardItem>
-        <CardItem>
-          <Body style={style.body}>
-            <TransactionCount
-                active={this.state.transactions}
+      <Wrapper>
+        <Card style={style.card}>
+          <CardItem header>
+            <Balance balance={balance} style={style.column} />
+          </CardItem>
+          <CardItem>
+            <Body style={style.body}>
+              <TransactionCount active={this.state.transactions}
                 unspentOutputs={unspentOutputs}
                 style={style.column}
                 toggle={() => this.setState({ transactions: !this.state.transactions })} />
-            <Button light disabled={!privateKey} style={style.column} onClick={() => privateKey && Clipboard.setString(privateKey)}>
-              <Text> Export </Text>
-            </Button>
-            <Button light style={style.column}>
-              <Text> Sync </Text>
-            </Button>
-          </Body>
-        </CardItem>
-      </Card>
-      { this.state.transactions && <TransactionList /> }
-      </View>
+              <Button light disabled={!privateKey} style={style.column} onClick={() => privateKey && Clipboard.setString(privateKey)}>
+                <Text> Export </Text>
+              </Button>
+              <Button light style={style.column}>
+                <Text> Sync </Text>
+              </Button>
+            </Body>
+          </CardItem>
+        </Card>
+        {this.state.transactions && <TransactionList />}
+      </Wrapper>
     )
   }
 }
