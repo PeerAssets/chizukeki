@@ -94,9 +94,12 @@ function createRoutine<
   Payloads extends BasePayloads
 >(prefix: Prefix){
   let actions = routineActions(prefix)
+  let _Actions: ActionTuple<Prefix> = actions.TRIGGER // for extracting the Action type
+
   let creators = routineCreators<Prefix, Payloads>(actions)
   return {
     actions,
+    _Actions,
     switch: Switch.Dict(actions),
     ...creators
   }

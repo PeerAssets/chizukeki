@@ -10,37 +10,25 @@ function Creator<T extends string, P>(name: T): Creator<T, P> {
   return (payload: P) => ({ type: name, payload })
 }
 
+type BindActionHistory = {
+  lastAction: 'TRIGGER' | 'REQUEST' | 'SUCCESS' | 'FAILURE'
+}
+
 namespace Redux {
 
   export type State = Partial<Wallet.Data>
 
-  export enum ActionType {
-    LoadKey = 'LOAD_PRIVATE_KEY',
-    SyncUTXO = 'SYNC_UTXO/SUCCESS',
-  }
+  export type ActionType = typeof routine._Actions
 
-  export type Action = 
-    | { type: ActionType.LoadKey, payload: PrivateKey.Data }
-    | { type: ActionType.SyncUTXO, payload: Wallet.Transaction }
+  export type Action = typeof routine._Actions
 
-  export const actionCreators = {
-    loadPrivateKey: Creator<ActionType.LoadKey, PrivateKey.Data>(ActionType.LoadKey)
-  }
-
-  export function reducer(state: State, a: Action): State {
-    routine.switch.partial({
-      TRIGGER: () => Object.assign({}, state, a.payload),
-      DEFAULT: null
+  export function reducer(state: State = {}, a: typeof routine._Actions): State {
+    return routine.switch<State>({
+      TRIGGER: () => 
+        Object.assign({ unspentOutputs: Array<Wallet.Transaction>(), balance: 0 }, a.payload),
+      SUCCESS: () => Object.assign({}, state, a.payload),
+      DEFAULT: state
     })(a)
-
-    switch (a.type) {
-      case ActionType.LoadKey:
-        return Object.assign({ unspentOutputs: Array<Wallet.Transaction>(), balance: 0 }, a.payload)
-      case ActionType.SyncUTXO:
-        return Object.assign({}, state, a.payload)
-      default:
-        return state || {}
-    }
   }
   export const saga = Saga
   export const routines = { sync: routine }

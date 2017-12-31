@@ -59,6 +59,7 @@
     "redux-saga": "^0.16.0",
     "ts-node": "^3.3.0",
     "typescript": "^2.6.2",
+    "typescript-fsa": "^2.5.0",
     "url-loader": "^0.6.2",
     "webpack": "^3.9.1",
     "webpack-dev-server": "^2.9.5"
