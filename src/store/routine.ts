@@ -9,7 +9,7 @@ enum RoutineAction {
   Failure = 'FAILURE',
 }
 
-type RoutineActions<Prefix extends string> = {
+type Types<Prefix extends string> = {
   TRIGGER: [ Prefix, RoutineAction.Trigger ],
   REQUEST: [ Prefix, RoutineAction.Request ],
   SUCCESS: [ Prefix, RoutineAction.Success ],
@@ -28,8 +28,14 @@ type BasePayloads = Partial<{
   trigger: BasePayload,
   request: BasePayload,
   success: BasePayload
-  failure: BasePayload
+  failure: Error
 }>
+
+type FullActions<Prefix extends string, Payloads extends BasePayloads> =
+  | { type: [Prefix, RoutineAction.Trigger], payload: BasePayload['trigger']}
+  | { type: [Prefix, RoutineAction.Request], payload: BasePayload['request']}
+  | { type: [Prefix, RoutineAction.Success], payload: BasePayload['success']}
+  | { type: [Prefix, RoutineAction.Failure], payload: BasePayload['failure']}
 
 // TODO maybe there's a type level way to dry this up,
 // unfinished because switch is complicated
@@ -46,7 +52,7 @@ type Routine<Prefix extends string, Payloads extends BasePayloads> = {
 */
 
 
-function routineActions<Prefix extends string>(prefix: Prefix): RoutineActions<Prefix> {
+function routineActions<Prefix extends string>(prefix: Prefix): Types<Prefix> {
   return {
     TRIGGER: [ prefix, RoutineAction.Trigger ],
     REQUEST: [ prefix, RoutineAction.Request ],
@@ -55,10 +61,17 @@ function routineActions<Prefix extends string>(prefix: Prefix): RoutineActions<P
   }
 }
 
+type RoutineCreators<Prefix extends string, Payloads extends BasePayloads> = {
+  trigger: Creator<Types<Prefix>['TRIGGER'], Payloads['trigger']>,
+  request: Creator.Empty<Types<Prefix>['REQUEST']>,
+  success: Creator<Types<Prefix>['SUCCESS'], Payloads['success']>,
+  failure: Creator<Types<Prefix>['FAILURE'], Payloads['failure']>,
+}
+
 function routineCreators<
   Prefix extends string,
   Payloads extends BasePayloads
->(actions: RoutineActions<Prefix>){
+>(actions: Types<Prefix>){
   return {
     trigger: Creator<typeof actions.TRIGGER, Payloads['trigger']>(actions.TRIGGER),
     request: Creator.Empty<typeof actions.REQUEST>(actions.REQUEST),
@@ -89,27 +102,32 @@ function extractRoutineActions(
   )
 }
 
+class Routine<Prefix extends string, Payloads extends BasePayloads>{
+  types: Types<Prefix>
+  switch: Switch.Dict<keyof Types<Prefix>>
+  // for type extraction
+  _Types: ActionTuple<Prefix>
+  _Actions: FullActions<Prefix, Payloads>
+  creators: RoutineCreators<Prefix, Payloads>
+  constructor(prefix: Prefix){
+    this.types = routineActions(prefix)
+    this.creators = routineCreators<Prefix, Payloads>(this.types)
+    this.switch = Switch.Dict(this.types)
+  }
+}
+
 function createRoutine<
   Prefix extends string,
   Payloads extends BasePayloads
 >(prefix: Prefix){
-  let actions = routineActions(prefix)
-  let _Actions: ActionTuple<Prefix> = actions.TRIGGER // for extracting the Action type
-
-  let creators = routineCreators<Prefix, Payloads>(actions)
-  return {
-    actions,
-    _Actions,
-    switch: Switch.Dict(actions),
-    ...creators
-  }
+  return new Routine<Prefix, Payloads>(prefix)
 }
 
 export default createRoutine
 
 export {
   RoutineAction,
-  RoutineActions,
+  Types,
 
   BasePayloads,
 

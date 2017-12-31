@@ -1,5 +1,8 @@
 
-type Creator<T, P> = (payload: P) => { type: T, payload: P }
+type Creator<T, P> = (payload: P) => {
+  type: T, 
+  payload: P
+}
 
 function Creator<T, P>(type: T): Creator<T, P> {
   return (payload: P) => ({ type, payload })
@@ -27,53 +30,6 @@ type BaseFields = Partial<{
   meta: any,
   error?: true
 }>
-
-function typedCreator<
-  Fields extends BaseFields = {}
->(fields?: Include<keyof Fields>) {
-  if (!fields){
-    return function()
-
-  }
-}
-
-type TypedCreator<T, Fields extends BaseFields> = (payload: P) => { type: T, payload: P }
-
-function includes(tuple: Array<string>, match: Array<string>): boolean {
-  for(let m in match){
-    if(!tuple.includes(m)){
-      return false
-    }
-  }
-  return true
-}
-
-class Action<
-  Tuple extends Array<string>,
-  Fields extends BaseFields = {},
-> {
-  readonly type: string & { tuple: Tuple }
-  constructor(tuple: Tuple, readonly public fields?: Include<keyof Fields>){
-    this.type = Object.assign(tuple.join('/'), { tuple })
-  }
-  get creator(){
-    let { type, fields } = this
-    if(!fields){
-      return () => ({ type })
-    } else if(includes(fields, ['payload', 'error', 'meta'])){
-      return (payload: Fields['payload'] | Error, meta?: Fields['meta']) => {
-        if(payload instanceof Error){
-          let a = { error: true, payload }
-          return meta ? { ...a, meta } : a
-        }
-      }
-    }
-
-  }
-  valueOf(){
-    return this.type
-  }
-}
 
 type NotFunction = object | string | boolean | number
 type Block<Return> = () => Return
@@ -125,16 +81,20 @@ function Switch<Tuple extends Array<string>, Return extends any = any>(
  *  let dictSwitch = Switch.Dict({ a: ['a', '1'], b: ['b', 2] })
  *  dictSwitch({ a: 'a1', b: 'b2', DEFAULT: 'default' })(['b', 2]) //=> 'b2'
  */ 
-
-
 namespace Switch {
+  type Default<Return> = { DEFAULT: Return | Block<Return> }
+  type CaseDict<Key extends string, Return> = Record<Key, Return | Block<Return>>
+
+  export type Dict<Key extends string> = {
+    // The root switch is exhaustive 
+    <Return extends any = any>(caseDict: CaseDict<Key, Return> & Default<Return>),
+    // All we need for a partial alternative is type casting
+    partial<Return extends any = any>(caseDict: Partial<CaseDict<Key, Return>> & Default<Return>)
+  }
+
   export function Dict<Key extends string, Tuple extends Array<string>>(mapping: Record<Key, Tuple>){
-
-    type Default<Return> = { DEFAULT: Return | Block<Return> }
-    type CaseDict<Return> = Record<Key, Return | Block<Return>>
-
     // D is the dictionary of cases
-    function DictSwitch<Return extends any = any, D = CaseDict<Return>>(caseDict: D & Default<Return>){
+    function DictSwitch<Return extends any = any, D = CaseDict<Key, Return>>(caseDict: D & Default<Return>){
       let defaultCase = caseDict.DEFAULT
       delete caseDict.DEFAULT
       let cases: Cases<Tuple, Return> = Object.entries(caseDict).map(
@@ -142,15 +102,8 @@ namespace Switch {
       return Switch<Tuple, Return>(cases, defaultCase)
     }
 
-    type DictSwitch = {
-      // The root switch is exhaustive 
-      <Return extends any = any>(caseDict: CaseDict<Return> & Default<Return>),
-      // All we need for a partial alternative is type casting
-      partial<Return extends any = any>(caseDict: Partial<CaseDict<Return>> & Default<Return>)
-    }
-
-    let S = <DictSwitch>DictSwitch
-    S.partial = <DictSwitch['partial']>DictSwitch
+    let S = <Dict<Key>>DictSwitch
+    S.partial = <Dict<Key>['partial']>DictSwitch
 
     return S
   }
