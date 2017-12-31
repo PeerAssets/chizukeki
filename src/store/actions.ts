@@ -12,15 +12,66 @@ namespace Creator {
   }
 }
 
-class Action<Tuple extends Array<string>, Payload extends any = null> {
-  type: string
-  constructor(public tuple: Tuple, creatorType){
-    this.type = tuple.join('/')
+type Allowed =
+  | 'payload'
+  | 'error'
+  | 'meta'
+
+type Include<Allowed> =
+  | [ Allowed, Allowed, Allowed ]
+  | [ Allowed, Allowed ]
+  | [ Allowed ]
+
+type BaseFields = Partial<{
+  payload: any,
+  meta: any,
+  error?: true
+}>
+
+function typedCreator<
+  Fields extends BaseFields = {}
+>(fields?: Include<keyof Fields>) {
+  if (!fields){
+    return function()
+
   }
-  creator(){
+}
+
+type TypedCreator<T, Fields extends BaseFields> = (payload: P) => { type: T, payload: P }
+
+function includes(tuple: Array<string>, match: Array<string>): boolean {
+  for(let m in match){
+    if(!tuple.includes(m)){
+      return false
+    }
+  }
+  return true
+}
+
+class Action<
+  Tuple extends Array<string>,
+  Fields extends BaseFields = {},
+> {
+  readonly type: string & { tuple: Tuple }
+  constructor(tuple: Tuple, readonly public fields?: Include<keyof Fields>){
+    this.type = Object.assign(tuple.join('/'), { tuple })
+  }
+  get creator(){
+    let { type, fields } = this
+    if(!fields){
+      return () => ({ type })
+    } else if(includes(fields, ['payload', 'error', 'meta'])){
+      return (payload: Fields['payload'] | Error, meta?: Fields['meta']) => {
+        if(payload instanceof Error){
+          let a = { error: true, payload }
+          return meta ? { ...a, meta } : a
+        }
+      }
+    }
+
   }
   valueOf(){
-    return this.tuple
+    return this.type
   }
 }
 
@@ -74,7 +125,6 @@ function Switch<Tuple extends Array<string>, Return extends any = any>(
  *  let dictSwitch = Switch.Dict({ a: ['a', '1'], b: ['b', 2] })
  *  dictSwitch({ a: 'a1', b: 'b2', DEFAULT: 'default' })(['b', 2]) //=> 'b2'
  */ 
-
 
 
 namespace Switch {
