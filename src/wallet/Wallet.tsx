@@ -56,7 +56,7 @@ let styles = {
     minWidth: 350,
     margin: 7.5,
     flexDirection: 'column',
-    justifcyContent: 'space-around',
+    justifyContent: 'space-around',
     alignItems: 'center',
     overflow: 'hidden',
   },

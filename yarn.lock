@@ -5718,6 +5718,10 @@ redux-persist@^5.4.0:
   version "5.4.0"
   resolved "https://registry.yarnpkg.com/redux-persist/-/redux-persist-5.4.0.tgz#a1062313546a9d4ca6f9271464d18f736e8ca394"
 
+"redux-saga@>=0.14.0 <0.16.0":
+  version "0.15.6"
+  resolved "https://registry.yarnpkg.com/redux-saga/-/redux-saga-0.15.6.tgz#8638dc522de6c6c0a496fe8b2b5466287ac2dc4d"
+
 redux-saga@^0.16.0:
   version "0.16.0"
   resolved "https://registry.yarnpkg.com/redux-saga/-/redux-saga-0.16.0.tgz#0a231db0a1489301dd980f6f2f88d8ced418f724"
@@ -6679,6 +6683,10 @@ tsconfig@^6.0.0:
     strip-bom "^3.0.0"
     strip-json-comments "^2.0.0"
 
+tslib@^1.7.1:
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.8.1.tgz#6946af2d1d651a7b1863b531d6e5afa41aa44eac"
+
 tsscmp@1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/tsscmp/-/tsscmp-1.0.5.tgz#7dc4a33af71581ab4337da91d85ca5427ebd9a97"
@@ -6718,7 +6726,15 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
-typescript-fsa@^2.5.0:
+typescript-fsa-redux-saga@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/typescript-fsa-redux-saga/-/typescript-fsa-redux-saga-1.0.3.tgz#5b7ab5e8ef9761a6809a1267a610926139b82f5b"
+  dependencies:
+    redux-saga ">=0.14.0 <0.16.0"
+    tslib "^1.7.1"
+    typescript-fsa "^2.0.0"
+
+typescript-fsa@^2.0.0, typescript-fsa@^2.5.0:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/typescript-fsa/-/typescript-fsa-2.5.0.tgz#1baec01b5e8f5f34c322679d1327016e9e294faf"
 

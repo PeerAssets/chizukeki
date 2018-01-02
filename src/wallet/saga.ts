@@ -11,16 +11,17 @@ function balance(unspentOutputs){
 
 async function fetchJSON({ address }){
   const unspentOutputs = await cryptoid.listUnspent(address)
+  console.log('touched')
   return { unspentOutputs, balance: balance(unspentOutputs) }
 }
 
-const { routine, sync, trigger } = fetchJSONRoutine<
-  'FETCH_TRANSACTIONS',
-  { trigger: { privateKey: string, address: string, } }
+const { routine, fetchSaga: sync, trigger } = fetchJSONRoutine<
+  { privateKey: string, address: string },
+  { unspentOutputs: Array<any>, balance: number },
+  Error
 >({
-  actionPrefix: 'FETCH_TRANSACTIONS',
+  type: 'FETCH_TRANSACTIONS',
   fetchJSON,
-  triggers: [ 'LOAD_PRIVATE_KEY' ]
 })
 
 export default trigger

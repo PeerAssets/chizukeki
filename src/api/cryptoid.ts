@@ -18,11 +18,11 @@ function params(query: object) {
 }
 
 class Cryptoid {
-  explorerUrl = 'https://chainz.cryptoid.info/explorer/'
+  explorerUrl = 'https://chainz.cryptoid.info'
   constructor(private key: string = '7547f94398e3', private network: string = 'ppc-test'){ }
   private blockRequest = async (call, query: object & { id: string }) => {
     let { explorerUrl, network } = this
-    let response = await fetch(`${explorerUrl}/${call}.dws?coin=${network}&${params(query)}`)
+    let response = await fetch(`${explorerUrl}/explorer/${call}.dws?coin=${network}&${params(query)}`)
     let body = await response.json()
     return body
   }

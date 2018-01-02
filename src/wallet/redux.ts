@@ -14,18 +14,14 @@ function Creator<T extends string, P>(name: T): Creator<T, P> {
 namespace Redux {
 
 
-  export type ActionType = typeof routine._Actions
-
   export type State = Partial<Wallet.Data>
 
-  export type Action = typeof routine._Actions
-
-  export function reducer(state: State = {}, a: typeof routine._Actions): State {
-    return routine.switch.partial<State>({
-      TRIGGER: () => 
-        Object.assign({ unspentOutputs: Array<Wallet.Transaction>(), balance: 0 }, a.payload),
-      SUCCESS: () => Object.assign({}, state, a.payload),
-      DEFAULT: state
+  export function reducer(state: State = {}, a): State {
+    return routine.switch<any>({
+      started: (payload) => 
+        Object.assign({ unspentOutputs: Array<Wallet.Transaction>(), balance: 0 }, payload),
+      done: (payload) => Object.assign({}, state, payload),
+      error: () => state
     })(a.type)
   }
   export const saga = Saga
