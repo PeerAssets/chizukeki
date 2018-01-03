@@ -1,7 +1,31 @@
 import { SagaIterator } from 'redux-saga'
 import { fork, all, put, takeLatest, call, cancelled } from 'redux-saga/effects'
 import actionCreatorFactory, { isType, AnyAction, ActionCreator, AsyncActionCreators } from 'typescript-fsa'
-//import { bindAsyncAction } from 'typescript-fsa-redux-saga'
+
+// TODO: not sure why this caused trouble
+// import { bindAsyncAction } from 'typescript-fsa-redux-saga'
+function bindAsyncAction(
+  actionCreator: AsyncActionCreators<any, any, any>,
+) {
+  return (worker: (params: any, ...args: any[]) => Promise<any> | SagaIterator) => {
+    return function* boundAsyncActionSaga(params: any, ...args: any[]): SagaIterator {
+      yield put(actionCreator.started(params));
+
+      try {
+        const result = yield (call as any)(worker, params, ...args);
+        yield put(actionCreator.done({params, result}));
+        return result;
+      } catch (error) {
+        yield put(actionCreator.failed({params, error}));
+        throw error;
+      } finally {
+        if (yield cancelled()) {
+          yield put(actionCreator.failed({params, error: 'cancelled'}));
+        }
+      }
+    }
+  };
+}
 
 const actionCreator = actionCreatorFactory()
 
@@ -33,28 +57,6 @@ function expandedRoutine<Start, Success, Error>(type: string, commonMeta?: Meta)
   })
 }
 
-function bindAsyncAction(
-  actionCreator: AsyncActionCreators<any, any, any>,
-) {
-  return (worker: (params: any, ...args: any[]) => Promise<any> | SagaIterator) => {
-    return function* boundAsyncActionSaga(params: any, ...args: any[]): SagaIterator {
-      yield put(actionCreator.started(params));
-
-      try {
-        const result = yield (call as any)(worker, params, ...args);
-        yield put(actionCreator.done({params, result}));
-        return result;
-      } catch (error) {
-        yield put(actionCreator.failed({params, error}));
-        throw error;
-      } finally {
-        if (yield cancelled()) {
-          yield put(actionCreator.failed({params, error: 'cancelled'}));
-        }
-      }
-    }
-  };
-}
 
 type Params<Start, Success, Error> = {
   type: string,
