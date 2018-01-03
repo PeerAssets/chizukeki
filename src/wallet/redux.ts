@@ -13,19 +13,19 @@ function Creator<T extends string, P>(name: T): Creator<T, P> {
 
 namespace Redux {
 
-
   export type State = Partial<Wallet.Data>
 
   export function reducer(state: State = {}, a): State {
-    return routine.switch<any>({
+    return routine.switch<any>(a, {
       started: (payload) => 
         Object.assign({ unspentOutputs: Array<Wallet.Transaction>(), balance: 0 }, payload),
       done: (payload) => Object.assign({}, state, payload),
-      error: () => state
-    })(a.type)
+      failed: () => state
+    }) || state
   }
   export const saga = Saga
   export const routines = { sync: routine }
+  
 }
 
 export default Redux

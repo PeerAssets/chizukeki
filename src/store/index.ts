@@ -27,6 +27,8 @@ export default function configureStore() {
     applyMiddleware(saga, logger, routerMiddleware(history)),
   )
   let persistor = persistStore(store)
+
   saga.run(Wallet.saga)
+
   return { store, persistor }
 }

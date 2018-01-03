@@ -11,7 +11,7 @@ function balance(unspentOutputs){
 
 async function fetchJSON({ address }){
   const unspentOutputs = await cryptoid.listUnspent(address)
-  console.log('touched')
+  console.log({ unspentOutputs })
   return { unspentOutputs, balance: balance(unspentOutputs) }
 }
 
