@@ -13,8 +13,35 @@ namespace ApiCalls {
   export type All = Public | Private
 }
 
+type Summary = {
+  tx: Array<[any, string, any, any, number, number]>,
+  received: number,
+  sent: number,
+  balance: number
+  [rest: string]: any
+}
+
+export type Wallet = {
+  received: number,
+  sent: number,
+  balance: number,
+  transactions: Array<Wallet.Transaction>
+}
+
+export namespace Wallet {
+  export type Transaction = {
+    balance: number,
+    value: number,
+    id: string
+  }
+}
+
 function params(query: object) {
   return Object.keys(query).reduce((q, key) => `${q}&${key}=${query[key]}`, '')
+}
+
+function normalizeSatoshis(satoshis: number){
+  return satoshis / 100000000.0
 }
 
 class Cryptoid {
@@ -65,6 +92,22 @@ class Cryptoid {
         ({ balance, value, id: txid.toLowerCase() }))
     }
   }
+
+  summary = async (address: string) => {
+    let resp = await this.blockRequest('address.summary', { id: address })
+    if(resp){
+      /* unused fields: block, stake, stakenb, stakeIn, stakeOut receivednb, sentnb, */
+      let { tx, received, sent, balance }: Summary = resp;
+      [received, sent, balance] = [received, sent, balance].map(normalizeSatoshis)
+      let transactions = resp.tx.map(([_0, txid, _2, _3, value, balance]) =>
+        ({ balance, value, id: txid.toLowerCase() }))
+      let wallet: Wallet = { received, sent, balance, transactions }
+      return wallet
+    } else {
+      throw Error('could not sync with cryptoid')
+    }
+  }
+
 } 
 
 export default new Cryptoid()

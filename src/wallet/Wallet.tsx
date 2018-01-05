@@ -5,20 +5,13 @@ import TransactionList from './Transaction'
 import { Button, CardItem, Body, Text, Card, connectStyle, H2 } from 'native-base/src/index'
 import Wrapper from './Wrapper'
 
+import { Wallet as WalletData } from './api/cryptoid'
+
 let fieldStyles = {}
 
 namespace Wallet {
-  export type Transaction = {
-    script: string,
-    tx_hash: string,
-    tx_output_n: number,
-    value: number,
-  }
-  export type Transactions = {
-    unspentOutputs: Array<Transaction>,
-    balance: number
-  }
-  export type Data = PrivateKey.Data & Transactions
+  export type Transaction = WalletData.Transaction
+  export type Data = PrivateKey.Data & WalletData
 }
 
 class Toggleable extends React.Component<any> {

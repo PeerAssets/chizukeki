@@ -72,7 +72,7 @@ function normalize({ privateKey, format }: State): LoadPrivateKey.Data {
 }
 
 class LoadPrivateKey extends React.Component<
-  { loadPrivateKey: (data: LoadPrivateKey.Data) => void },
+  { action: string, loadPrivateKey: (data: LoadPrivateKey.Data) => void },
   State
   > {
   state = {
@@ -104,7 +104,7 @@ class LoadPrivateKey extends React.Component<
               <Item style={{ marginLeft: 15, minWidth: 300 }}>
                 <Icon active name='lock' />
                 <Input
-                  placeholder="Paste key here or Generate a new one"
+                  placeholder={`Paste ${ format === 'raw' ? 'private' : format } key here or Generate a new one`}
                   style={{ fontSize: 12, lineHeight: 14, textOverflow: 'ellipsis' }}
                   value={this.state.privateKey}
                   onChangeText={privateKey => this.setState({ privateKey })} />

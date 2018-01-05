@@ -5,27 +5,18 @@ import { ActionAware } from '../store/actions'
 import Saga, { routine } from './saga'
 
 
-type Creator<T extends string, P> = (payload: P) => { type: T, payload: P }
+export type State = Partial<Wallet.Data> & ActionAware.Bind
 
-function Creator<T extends string, P>(name: T): Creator<T, P> {
-  return (payload: P) => ({ type: name, payload })
+function reducer(state: State = ActionAware.initialState(routine.allTypes), action): State {
+  return routine.switch<any>(action, {
+    started: (payload) =>
+      Object.assign({ unspentOutputs: Array<Wallet.Transaction>(), balance: 0 }, payload),
+    done: (payload) => Object.assign({}, state, payload),
+    failed: () => state
+  }) || state
 }
 
-namespace Redux {
+export default ActionAware.bind(reducer)
 
-  export type State = Partial<Wallet.Data>
-
-  export function reducer(state: State = {}, a): State {
-    return routine.switch<any>(a, {
-      started: (payload) => 
-        Object.assign({ unspentOutputs: Array<Wallet.Transaction>(), balance: 0 }, payload),
-      done: (payload) => Object.assign({}, state, payload),
-      failed: () => state
-    }) || state
-  }
-  export const saga = Saga
-  export const routines = { sync: routine }
-  
-}
-
-export default Redux
+export const saga = Saga
+export const routines = { sync: routine }
