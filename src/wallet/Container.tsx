@@ -6,17 +6,25 @@ import { connect } from 'react-redux'
 import * as Redux from './redux'
 import Wallet from './Wallet'
 
-type GlobalState = { wallet: Redux.State }
+type Routine = {
+  syncStage: typeof Redux.routines.sync.currentStage 
+  actions: { sync: typeof Redux.routines.sync.trigger } 
+}
 
-function Container({ action, routines, ...props }: Redux.State & { routines: typeof Redux.routines }){
+function Container({ syncStage, actions, ...props }: Redux.State & Routine){
   return props.privateKey ?
     <Wallet {...props}/> :
-    <PrivateKey action={action.latest} loadPrivateKey={routines.sync.trigger} />
+    <PrivateKey syncStage={syncStage} loadPrivateKey={actions.sync} />
 }
 
 export default connect(
-  ({ wallet }: GlobalState) => wallet,
-  (dispatch: Dispatch<any>) => ({ routines: {
-    sync: bindActionCreators({ trigger: Redux.routines.sync.trigger }, dispatch)
-  } })
+  ({ wallet }: { wallet: Redux.State }) => {
+    return Object.assign({
+      syncStage: Redux.routines.sync.stage(wallet.action.latest), 
+      wallet
+    })
+  },
+  (dispatch: Dispatch<any>) => ({ actions: bindActionCreators({
+    sync: Redux.routines.sync.trigger
+  }, dispatch) })
 )(Container)

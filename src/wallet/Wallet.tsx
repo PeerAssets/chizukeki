@@ -88,7 +88,7 @@ Partial<Wallet.Data> & { style?: any },
     transactions: Dimensions.get('window').width > 600
   }
   render() {
-    let { address, unspentOutputs = [], balance = 0, style, privateKey } = this.props
+    let { address, transactions = [], balance = 0, style, privateKey } = this.props
     return (
       <Wrapper>
         <Card style={style.card}>
@@ -98,7 +98,7 @@ Partial<Wallet.Data> & { style?: any },
           <CardItem>
             <Body style={style.body}>
               <TransactionCount active={this.state.transactions}
-                unspentOutputs={unspentOutputs}
+                unspentOutputs={transactions}
                 style={style.column}
                 toggle={() => this.setState({ transactions: !this.state.transactions })} />
               <Button light disabled={!privateKey} style={style.column} onClick={() => privateKey && Clipboard.setString(privateKey)}>

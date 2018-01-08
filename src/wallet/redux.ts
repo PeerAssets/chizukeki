@@ -3,20 +3,24 @@ import Wallet from './Wallet'
 
 import { ActionAware } from '../store/actions'
 import Saga, { routine } from './saga'
+import { AnyAction } from 'typescript-fsa';
 
 
 export type State = Partial<Wallet.Data> & ActionAware.Bind
 
-function reducer(state: State = ActionAware.initialState(routine.allTypes), action): State {
-  return routine.switch<any>(action, {
-    started: (payload) =>
-      Object.assign({ unspentOutputs: Array<Wallet.Transaction>(), balance: 0 }, payload),
+function walletReducer(state: State = ActionAware.initialState(routine.allTypes), action: AnyAction): State {
+  return routine.switch<State>(action, {
+    started: (payload): State => ({
+      transactions: Array<Wallet.Transaction>(),
+      balance: 0,
+      ...state,
+      ...payload
+    }),
     done: (payload) => Object.assign({}, state, payload),
     failed: () => state
   }) || state
 }
 
-export default ActionAware.bind(reducer)
-
+export const reducer = ActionAware.bind(walletReducer)
 export const saga = Saga
 export const routines = { sync: routine }

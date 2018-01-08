@@ -21,7 +21,7 @@ module.exports = {
   },
 
   // Enable sourcemaps for debugging webpack's output.
-  devtool: "source-map",
+  devtool: "eval-source-map",
 
   resolve: {
     symlinks: false,
@@ -73,7 +73,8 @@ module.exports = {
               doTypeCheck: true,
               forkChecker: true,
 
-              useBabel: true, useCache: true,
+              useBabel: true,
+              useCache: true,
               babelOptions: {
                 babelrc: false,
                 // This aliases 'react-native' to 'react-native-web' and includes only

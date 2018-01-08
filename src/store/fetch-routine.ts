@@ -1,5 +1,4 @@
-import { SagaIterator } from 'redux-saga'
-import { fork, all, put, takeLatest, call, cancelled } from 'redux-saga/effects'
+import { takeLatest } from 'redux-saga/effects'
 import actionCreatorFactory, { isType, AnyAction, ActionCreator, AsyncActionCreators } from 'typescript-fsa'
 import expandedRoutine, { bindAsyncAction, Meta } from './routine'
 
@@ -12,7 +11,7 @@ type Params<Start, Success, Error> = {
 function fetchJSONRoutine<Start, Success, Error>({ fetchJSON, type, commonMeta }: Params<Start, Success, Error>) {
   type Trigger = { type: string, payload: Start }
 
-  let routine = expandedRoutine(type, commonMeta)
+  let routine = expandedRoutine<Start, Success, Error>(type, commonMeta)
 
   const fetchSaga = bindAsyncAction(routine)(fetchJSON)
 

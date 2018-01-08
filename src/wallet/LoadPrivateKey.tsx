@@ -1,5 +1,5 @@
 import * as React from 'react'; import { Component } from 'react';
-import { Dimensions, View, TouchableOpacity } from 'react-native';
+import { Dimensions, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import {
   Container,
@@ -71,8 +71,31 @@ function normalize({ privateKey, format }: State): LoadPrivateKey.Data {
   }
 }
 
+// TODO implicit coupling to routine
+let buttonText = {
+  STARTED: 'Syncing wallet activity',
+  DONE: 'Successfully synced!',
+  FAILED: 'There was a problem syncing'
+}
+function RoutineButton({ stage, ...props }){
+  let mode = stage === 'DONE'
+    ? { success: true }
+    : stage === 'FAILED'
+    ? { danger: true }
+    : { info: true }
+  return (
+    <Button {...mode} block {...props}>
+      <ActivityIndicator animating={stage === 'STARTED' }/>
+      <Text>{buttonText[stage] || 'Import and Sync'}</Text>
+    </Button>
+  )
+}
+
 class LoadPrivateKey extends React.Component<
-  { action: string, loadPrivateKey: (data: LoadPrivateKey.Data) => void },
+  { 
+    syncStage?: string | undefined,
+    loadPrivateKey: (data: LoadPrivateKey.Data) => void
+  },
   State
   > {
   state = {
@@ -96,7 +119,7 @@ class LoadPrivateKey extends React.Component<
             </Body>
           </CardItem>
           <CardItem>
-            <Body  style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%', flexWrap: 'wrap' }}>
+            <Body style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%', flexWrap: 'wrap' }}>
               <SelectFormat
                 selected={format}
                 select={format => this.setState({ format })}
@@ -113,10 +136,8 @@ class LoadPrivateKey extends React.Component<
           </CardItem>
           <CardItem footer>
             <Body>
-            <Button success block disabled={!this.state.privateKey}
-                onPress={() => this.props.loadPrivateKey(normalize(this.state))}>
-              <Text>Import and Sync</Text>
-            </Button>
+              <RoutineButton stage={this.props.syncStage} block disabled={!this.state.privateKey}
+                onPress={() => this.props.loadPrivateKey(normalize(this.state))}/>
             </Body>
           </CardItem>
         </Card>

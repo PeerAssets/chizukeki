@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
-    "web": "webpack-dev-server -d --config web/webpack.config.js --inline --colors",
+    "web": "webpack-dev-server -d --config web/webpack.config.js --colors",
     "native": "tsc  --watch --pretty --sourceMap --target es2015 --module commonjs",
     "build": "webpack -d --config web/webpack.config.js --colors",
     "test": "jest"
@@ -56,7 +56,7 @@
     "react-test-renderer": "^16.2.0",
     "redux": "^3.7.2",
     "redux-persist": "^5.4.0",
-    "redux-saga": "1.0",
+    "redux-saga": "^1.0.0",
     "ts-node": "^3.3.0",
     "typescript": "^2.6.2",
     "typescript-fsa": "^2.5.0",

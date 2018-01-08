@@ -8,7 +8,7 @@ import { createHistory } from '../routing'
 
 import { logger } from './utils'
 
-import Wallet from '../wallet/redux'
+import  * as Wallet from '../wallet/redux'
 
 export const history = createHistory()
 
