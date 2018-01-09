@@ -8,7 +8,7 @@ const { routine, fetchSaga: sync, trigger } = fetchJSONRoutine<
   Error
 >({
   type: 'FETCH_TRANSACTIONS',
-  fetchJSON: ({ address }) => cryptoid.summary(address),
+  fetchJSON: ({ address }) => cryptoid.wallet(address),
 })
 
 export default trigger

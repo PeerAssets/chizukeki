@@ -17,14 +17,14 @@ namespace Creator {
 }
 
 
-class ActionAware<ActionType extends string = string> {
+class ActionHistory<ActionType extends string = string> {
   constructor(
     public following: Array<ActionType>,
     public history: Array<ActionType> = []
   ){ }
   push(action: ActionType){
     return this.following.includes(action) ?
-      new ActionAware<ActionType>(this.following, [ ...this.history, action ]) :
+      new ActionHistory<ActionType>(this.following, [ ...this.history, action ]) :
       this
   }
   get latest(): ActionType | undefined {
@@ -32,12 +32,12 @@ class ActionAware<ActionType extends string = string> {
   }
 }
 
-namespace ActionAware {
+namespace ActionHistory {
   export type Bind<ActionType extends string = string> = {
-    action: ActionAware<ActionType>
+    actionHistory: ActionHistory<ActionType>
   }
   export function initialState<ActionType extends string = string>(following: Array<ActionType>) {
-    return { action: new ActionAware<ActionType>(following) }
+    return { actionHistory: new ActionHistory<ActionType>(following) }
   }
   export function bind<
     ActionType extends string = string,
@@ -46,11 +46,11 @@ namespace ActionAware {
     return (_state: S, action) => {
       // we call the reducer first in case initialState was provided there
       let state = reducer(_state, action)
-      let actionHistory = state.action || (initialState && initialState.action)
-      return Object.assign({}, state, { action: actionHistory.push(action.type) })
+      let actionHistory = state.actionHistory || (initialState && initialState.actionHistory)
+      return Object.assign({}, state, { actionHistory: actionHistory.push(action.type) })
     }
   }
 }
 
 
-export { Creator, ActionAware }
+export { Creator, ActionHistory }

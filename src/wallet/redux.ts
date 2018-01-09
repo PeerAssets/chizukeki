@@ -1,26 +1,27 @@
 import PrivateKey from './LoadPrivateKey'
 import Wallet from './Wallet'
 
-import { ActionAware } from '../store/actions'
+import { ActionHistory } from '../store/actions'
 import Saga, { routine } from './saga'
 import { AnyAction } from 'typescript-fsa';
 
 
-export type State = Partial<Wallet.Data> & ActionAware.Bind
+export type State = { wallet?: undefined | Wallet.Loading | Wallet.Data } & ActionHistory.Bind
 
-function walletReducer(state: State = ActionAware.initialState(routine.allTypes), action: AnyAction): State {
+function walletReducer(state: State = ActionHistory.initialState(routine.allTypes), action: AnyAction): State {
   return routine.switch<State>(action, {
-    started: (payload): State => ({
-      transactions: Array<Wallet.Transaction>(),
-      balance: 0,
+    started: payload => ({
       ...state,
-      ...payload
+      wallet: payload
     }),
-    done: (payload) => Object.assign({}, state, payload),
+    done: (payload) => ({
+      ...state,
+      wallet: Object.assign(state.wallet, payload)
+    }),
     failed: () => state
   }) || state
 }
 
-export const reducer = ActionAware.bind(walletReducer)
+export const reducer = ActionHistory.bind(walletReducer)
 export const saga = Saga
 export const routines = { sync: routine }

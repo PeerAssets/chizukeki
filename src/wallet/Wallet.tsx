@@ -9,11 +9,6 @@ import { Wallet as WalletData } from './api/cryptoid'
 
 let fieldStyles = {}
 
-namespace Wallet {
-  export type Transaction = WalletData.Transaction
-  export type Data = PrivateKey.Data & WalletData
-}
-
 class Toggleable extends React.Component<any> {
   render() {
     let { toggle = () => { }, active = false, children, ...props } = this.props
@@ -36,8 +31,7 @@ function Balance({ balance, ...props }) {
 
 function TransactionCount({ unspentOutputs, ...props }) {
   return (
-    <Toggleable {...props}>
-      <Text>{unspentOutputs.length} transactions</Text>
+    <Toggleable {...props}> <Text>{unspentOutputs.length} transactions</Text>
     </Toggleable>
   )
 }
@@ -113,6 +107,15 @@ Partial<Wallet.Data> & { style?: any },
         {this.state.transactions && <TransactionList />}
       </Wrapper>
     )
+  }
+}
+
+namespace Wallet {
+  export type Transaction = WalletData.Transaction
+  export type Loading = PrivateKey.Data
+  export type Data = Loading & WalletData
+  export function isLoaded(wallet: Loading | Data | undefined): wallet is Data {
+    return Boolean(wallet && wallet.hasOwnProperty('_meta'))
   }
 }
 

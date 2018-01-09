@@ -12,7 +12,6 @@ function bindAsyncAction(
   return (worker: (params: any, ...args: any[]) => Promise<any> | SagaIterator) => {
     return function* boundAsyncActionSaga(params: any, ...args: any[]): SagaIterator {
       yield put(creator.started(params));
-
       try {
         const result = yield (call as any)(worker, params, ...args);
         yield put(creator.done({params, result}));
@@ -33,11 +32,25 @@ const actionCreator = actionCreatorFactory()
 
 type Meta = null | {[key: string]: any};
 
-type Block<Payload, Return> = (payload: Payload) => Return
-  | (() => Return)
+type IncludePayload<Payload, Return> = (payload: Payload) => Return
+type IgnorePayload<Return> = () => Return
+
+type Block<Payload, Return> = IncludePayload<Payload, Return>
+  | IgnorePayload<Return>
 
 function isUncallable<Return>(u: any): u is Return {
   return typeof(u) !== 'function'
+}
+
+function ignore<T>(u: any): u is T {
+  return false
+}
+
+function handleOptionalPayload<Payload, Return>(f: Block<Payload, Return>, payload: Payload){
+  if(ignore<IgnorePayload<Return>>(f)){
+    throw Error('impossible')
+  }
+  return f(payload)
 }
 
 function routineSwitch<Start, Success, Error>(
@@ -48,10 +61,20 @@ function routineSwitch<Start, Success, Error>(
     done: Block<Success, Return> | Return
     failed: Block<Error, Return> | Return
   }): Return | void => {
-    for (let key in cases){
-      if(isType(action, routine[key])){
-        return isUncallable<Return>(cases[key]) ? cases[key] : cases[key](action.payload)
-      }
+    if(isType(action, routine.started)){
+      return isUncallable<Return>(cases.started) ?
+        cases.started :
+        handleOptionalPayload(cases.started, action.payload)
+    }
+    if(isType(action, routine.done)){
+      return isUncallable<Return>(cases.done) ?
+        cases.done :
+        handleOptionalPayload(cases.done, action.payload.result)
+    }
+    if(isType(action, routine.failed)){
+      return isUncallable<Return>(cases.failed) ?
+        cases.failed :
+        handleOptionalPayload(cases.failed, action.payload.error)
     }
   }
 }
