@@ -8,7 +8,6 @@ import actionCreatorFactory, { isType, AnyAction, ActionCreator, AsyncActionCrea
 function bindAsyncAction(
   creator: AsyncActionCreators<any, any, any>,
 ) {
-  console.log(creator)
   return (worker: (params: any, ...args: any[]) => Promise<any> | SagaIterator) => {
     return function* boundAsyncActionSaga(params: any, ...args: any[]): SagaIterator {
       yield put(creator.started(params));

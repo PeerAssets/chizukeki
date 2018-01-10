@@ -15,9 +15,9 @@ import {
   Button,
   Item,
   Right,
+  Icon,
   variables
 } from 'native-base/src/index'
-import Icon from 'react-native-vector-icons/dist/FontAwesome';
 
 import bitcore from '../bitcore'
 import Wrapper from './Wrapper'
@@ -77,14 +77,14 @@ let buttonText = {
   DONE: 'Successfully synced!',
   FAILED: 'There was a problem syncing'
 }
-function RoutineButton({ stage, ...props }){
-  let mode = stage === 'DONE'
+function RoutineButton({ stage, onPress, ...props }){
+  let stageBased = stage === 'DONE'
     ? { success: true }
     : stage === 'FAILED'
     ? { danger: true }
-    : { info: true }
+    : { info: true, onPress }
   return (
-    <Button {...mode} block {...props}>
+    <Button {...stageBased } {...props}>
       <ActivityIndicator animating={stage === 'STARTED' }/>
       <Text>{buttonText[stage] || 'Import and Sync'}</Text>
     </Button>

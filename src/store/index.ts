@@ -1,8 +1,11 @@
 import { createStore, applyMiddleware, combineReducers } from 'redux';
 import { routerReducer as router, routerMiddleware } from 'react-router-redux'
 import createSagaMiddleware from 'redux-saga'
+
 import { persistStore, persistCombineReducers } from 'redux-persist'
 import storage from 'redux-persist/es/storage' // handles web/native 
+import { hardSet } from 'redux-persist/lib/stateReconciler/hardSet'
+
 
 import { createHistory } from '../routing'
 
@@ -14,7 +17,11 @@ export const history = createHistory()
 
 /* Persist to either device or localStorage
  * */
-const reducer = persistCombineReducers({ key: 'root', storage }, {
+const reducer = persistCombineReducers({
+  key: 'root',
+  stateReconciler: hardSet,
+  storage
+}, {
   router,
   wallet: Wallet.reducer
 })

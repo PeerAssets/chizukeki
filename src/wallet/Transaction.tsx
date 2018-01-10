@@ -1,86 +1,39 @@
 import * as React from 'react'
 import { Dimensions, View, TouchableOpacity, ViewStyle } from 'react-native'
-import { Button, Card, Left, CardItem, Body, Text, H2 } from 'native-base/src/index'
+import { Button, Card, Left, CardItem, Body, Text, H2, Icon } from 'native-base/src/index'
 
 import FlatList from 'react-native-web-lists/src/FlatList'
-import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import moment from 'moment'
 
-
-namespace BlockchainTransaction {
-  export type Input = {
-    amount: number,
-    txid: string,
-    n: number,
-    addresses: string
-  }
-  export type Output = {
-    script: string,
-    amount: number,
-    n: number,
-    addresses: string,
-  }
-  export type Data = {
-    hash: string,
-    block: number,
-    timestamp: Date,
-    total: number,
-    inputs: Array<Input>,
-    outputs: Array<Output>,
-  }
-}
+import { Wallet } from './api/cryptoid'
 
 namespace WalletTransaction {
-  export type Data = {
-    account: string,
-    address: string,
-    category: "send" | "receive",
-    amount: number,
-    confirmations: number,
-
-    blockhash: string,
-    blockindex: number,
-    txid: string,
-    time: Date
-  }
+  export type Data = Wallet.Transaction
 }
 
-let RkView = (View as any)
-
-let testTransactions = [
-  {
-    "account": "PACLI",
-    "address": "n4KuTR5CzyQTbrpwbAKEdTfJERKmtHWWgr",
-    "category": "receive",
-    "amount": 10,
-    "confirmations": 21689,
-    "blockhash": "05b527fc23e47001984d43b0c7b9b9e173e971cf458c1175794d396697f344d3",
-    "blockindex": 3,
-    "txid": "6c578275df1eb9cb59e2bd933a7b7c5a0c7869f3044f8fd4e089fdb98204571e",
-    "time": new Date(1502835418)
-  }
-]
-
-
-function WalletTransaction({ item: { amount, address, time, category } }: { item: WalletTransaction.Data }) {
+function WalletTransaction({ item: { value, timestamp } }: { item: WalletTransaction.Data }) {
+  let io = (inbound, outbound) => value > 0 ? inbound : outbound
+  let textProps = io({ success: true }, { dark: true })
   return (
     <Card>
       <CardItem header>
         <Left>
-          <Icon name="arrow-circle-o-down" size={30} color={'black'} />
+          <Icon {...textProps} name={`arrow-circle-o-${io('down', 'up')}`} size={30} color={'black'} />
           <Body>
-            <Text success>
-              {category === 'receive' ? '+' : '-'}
-              {amount.toString()} PPC
+            <Text {...textProps}>
+              {io('+', '-')}
+              {value.toString()} PPC
             </Text>
-            <Text note>{moment(time).fromNow()}</Text>
+            <Text note>{moment(timestamp).fromNow()}</Text>
           </Body>
         </Left>
       </CardItem>
       <CardItem footer style={{maxWidth: '100%'}}>
+      {/*
         <Text note style={{ellipsizeMode: 'middle', maxWidth: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          {category === 'receive' ? 'from' : 'to'} {address}
+          {io('from', 'to')} {address}
         </Text>
+      */}
       </CardItem>
     </Card>
   )
@@ -90,7 +43,8 @@ namespace TransactionList {
   export type Data = Array<WalletTransaction.Data>
 }
 
-function TransactionList({ transactions = testTransactions }: { transactions?: TransactionList.Data }) {
+function TransactionList({ transactions }: { transactions: TransactionList.Data }) {
+  console.log(transactions)
   return (
     <View style={styles.card}>
       <H2>Transactions</H2>

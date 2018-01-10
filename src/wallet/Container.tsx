@@ -21,7 +21,7 @@ function Container({ syncStage, actions, wallet }: Props){
 export default connect(
   ({ wallet: { actionHistory, wallet } }: { wallet: Redux.State }) => {
     return {
-      syncStage: Redux.routines.sync.stage(actionHistory.latest), 
+      syncStage: Redux.routines.sync.stage(actionHistory.latest),
       wallet
     }
   },

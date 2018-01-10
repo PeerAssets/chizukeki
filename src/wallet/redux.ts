@@ -8,7 +8,7 @@ import { AnyAction } from 'typescript-fsa';
 
 export type State = { wallet?: undefined | Wallet.Loading | Wallet.Data } & ActionHistory.Bind
 
-function walletReducer(state: State = ActionHistory.initialState(routine.allTypes), action: AnyAction): State {
+function walletReducer(state: State = ActionHistory.of(routine.allTypes), action: AnyAction): State {
   return routine.switch<State>(action, {
     started: payload => ({
       ...state,

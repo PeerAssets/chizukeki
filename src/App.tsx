@@ -10,7 +10,13 @@ import configureStore, { history } from "./store"
 import Wallet from './wallet/Container'
 import Nav from './Menu'
 
+
+import { StyleProvider, variables } from 'native-base/src/index';
+import theme from './theme'
+
 let { store, persistor } = configureStore()
+
+variables.iconFamily = 'FontAwesome'
 
 export default class App extends React.Component<{}> {
   render() {
@@ -18,13 +24,17 @@ export default class App extends React.Component<{}> {
       <Provider store={store}>
         <PersistGate persistor={persistor} loading={<Text>loading</Text>}>
           <ConnectedRouter history={history}>
-            <View style={styles.container}>
-              <Image source={require("./welcome/logomask.png")}
-                style={styles.background} />
-              <Nav/>
-              <Route path="/" exact component={Wallet} />
-              <Route path="/wallet" exact component={Wallet} />
-            </View>
+            <StyleProvider style={theme(variables)}>
+              <View style={styles.wrapper}>
+                <Image source={require("./welcome/logomask.png")}
+                  style={styles.background} />
+                <View style={styles.container}>
+                  <Nav/>
+                  <Route path="/" exact component={Wallet} />
+                  <Route path="/wallet" exact component={Wallet} />
+                </View>
+              </View>
+            </StyleProvider>
           </ConnectedRouter>
         </PersistGate>
       </Provider>
@@ -34,6 +44,10 @@ export default class App extends React.Component<{}> {
 
 
 const styles = StyleSheet.create({
+  wrapper: {
+    height: '100%',
+    backgroundColor: '#DADADA'
+  },
   background: {
     position: 'absolute',
     height: 300,
@@ -43,10 +57,9 @@ const styles = StyleSheet.create({
     zIndex: 0,
   },
   container: {
-    flex: 1,
+    minHeight: '100%',
     paddingTop: 50,
     justifyContent: 'flex-start',
     alignItems: 'center',
-    backgroundColor: '#DADADA',
   },
 })

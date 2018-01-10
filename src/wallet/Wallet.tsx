@@ -31,7 +31,8 @@ function Balance({ balance, ...props }) {
 
 function TransactionCount({ unspentOutputs, ...props }) {
   return (
-    <Toggleable {...props}> <Text>{unspentOutputs.length} transactions</Text>
+    <Toggleable {...props}>
+      <Text>{unspentOutputs.length} transactions</Text>
     </Toggleable>
   )
 }
@@ -104,7 +105,7 @@ Partial<Wallet.Data> & { style?: any },
             </Body>
           </CardItem>
         </Card>
-        {this.state.transactions && <TransactionList />}
+        {this.state.transactions && <TransactionList transactions={transactions} />}
       </Wrapper>
     )
   }
