@@ -1,6 +1,6 @@
 import { fork, all, put, takeLatest, call } from 'redux-saga/effects'
 import fetchJSONRoutine from '../store/fetch-routine'
-import cryptoid, { Wallet } from './api/cryptoid'
+import cryptoid, { Wallet } from './explorerApi/cryptoid'
 
 const { routine, fetchSaga: sync, trigger } = fetchJSONRoutine<
   { privateKey: string, address: string },

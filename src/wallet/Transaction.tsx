@@ -44,7 +44,6 @@ namespace TransactionList {
 }
 
 function TransactionList({ transactions }: { transactions: TransactionList.Data }) {
-  console.log(transactions)
   return (
     <View style={styles.card}>
       <H2>Transactions</H2>

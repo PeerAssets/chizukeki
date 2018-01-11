@@ -1,3 +1,4 @@
+import { getJSON, stringifyQuery, Satoshis, normalizeSatoshis, Wallet, walletMeta } from './common'
 
 namespace ApiCalls {
   export type Public = 
@@ -9,9 +10,8 @@ namespace ApiCalls {
     | 'getbalance'
     | 'unspent'
     | 'multiaddr'
-
-  export type All = Public | Private
 }
+type ApiCalls = ApiCalls.Public | ApiCalls.Private
 
 namespace MultiAddress {
   export type Transaction = {
@@ -33,27 +33,6 @@ namespace MultiAddress {
   }
 }
 
-export type Wallet = {
-  _meta: {
-    created: Date,
-    updated: Date,
-  },
-  received: number,
-  sent: number,
-  balance: number,
-  totalTransactions: number,
-  transactions: Array<Wallet.Transaction>
-}
-
-export namespace Wallet {
-  export type Transaction = {
-    balance: number,
-    value: number,
-    id: string,
-    confirmations: number,
-    timestamp: Date,
-  }
-}
 
 function normalizeTransactions(balance: number, txs: Array<MultiAddress.Transaction>){
   let transactions: Array<Wallet.Transaction> = []
@@ -70,15 +49,15 @@ function normalizeTransactions(balance: number, txs: Array<MultiAddress.Transact
       i++
       change += txs[i].change
     }
-    let value = normalizeSatoshis(change)
+    let amount = normalizeSatoshis(change)
     transactions.push({
       id,
       confirmations,
-      value,
+      amount,
       balance,
       timestamp: new Date(time_utc)
     })
-    balance -= value
+    balance -= amount
   }
   return transactions
 }
@@ -95,40 +74,22 @@ function normalizeWallet({
   let [ received, sent, balance ] = [
     total_received, total_sent, final_balance
   ].map(normalizeSatoshis)
-  let created = new Date()
   return {
-    _meta: {
-      created,
-      updated: created,
-    },
+    ...walletMeta(),
     balance,
     received,
     sent,
     totalTransactions,
     transactions: normalizeTransactions(balance, txs)
-  }
-}
-
-function params(query: object) {
-  return Object.keys(query).reduce((q, key) => `${q}&${key}=${query[key]}`, '')
-}
-
-function normalizeSatoshis(satoshis: number){
-  return satoshis / 100000000.0
-}
-
-async function getJSON<T = any>(url: string){
-  let response = await fetch(url)
-  let body: T = await response.json()
-  return body
+  })
 }
 
 class Cryptoid {
   explorerUrl = 'https://chainz.cryptoid.info'
   constructor(private key: string = '7547f94398e3', private network: string = 'ppc-test'){ }
-  private apiRequest = (call: ApiCalls.All, query: object) => {
+  private apiRequest = (call: ApiCalls, query: object) => {
     let { explorerUrl, network } = this
-    return getJSON(`${explorerUrl}/${network}/api.dws?q=${call}&${params(query)}`)
+    return getJSON(`${explorerUrl}/${network}/api.dws?q=${call}&${stringifyQuery(query)}`)
   }
   private publicApiRequest = async (call: ApiCalls.Public, query: object) =>
     this.apiRequest(call, query)
@@ -152,7 +113,6 @@ class Cryptoid {
 
   wallet = async (address: string) => {
     let resp = await this.privateApiRequest('multiaddr', { active: address })
-    window['resp'] = resp
     if(resp){
       return normalizeWallet(resp as MultiAddress.Response)
     } else {
