@@ -7,6 +7,16 @@ namespace Wallet {
     confirmations: number,
     timestamp: Date,
   }
+  export function empty(): Wallet {
+    return Object.assign(
+      walletMeta(), {
+        balance: 0,
+        sent: 0,
+        received: 0,
+        totalTransactions: 0,
+        transactions: [],
+    })
+  }
 }
 
 type Wallet = {

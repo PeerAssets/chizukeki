@@ -13,8 +13,8 @@ namespace ApiCalls {
     | 'listunspent'
     | 'txinfo'
     | 'getbalance'
-
 }
+
 type ApiCalls = ApiCalls.Coind | ApiCalls.Extended
 
 namespace GetRawTransaction {
@@ -73,7 +73,7 @@ namespace GetAddress {
     sent: number,
     received: number,
     balance: number,
-    last_txns: Array<Transaction>,
+    last_txs: Array<Transaction>,
   }
 }
 
@@ -97,7 +97,7 @@ namespace normalize {
     return nTransactions
   }
 
-  export function wallet({ last_txns, ...wallet }: GetAddress.Response, txs: Array<GetRawTransaction.Response>): Wallet {
+  export function wallet({ last_txs, ...wallet }: GetAddress.Response, txs: Array<GetRawTransaction.Response>): Wallet {
     return Object.assign(
       walletMeta(),
       wallet,
@@ -110,13 +110,21 @@ namespace normalize {
 }
 
 
+type Error = {
+  error: string,
+  [key: string]: any
+}
+function isError(r: any): r is Error {
+  return r.hasOwnProperty('error')
+}
+
 class PeercoinExplorer {
   explorerUrl = 'https://explorer.peercoin.net'
   apiRequest<T = any>(call: ApiCalls.Coind, query: object, errorMessage = `PeercoinExplorer.ext.${call} request returned empty`){
-    return getJSON<T>(`${this.explorerUrl}/api/${call}?${stringifyQuery(query)}`, errorMessage)
+    return getJSON<T | Error>(`${this.explorerUrl}/api/${call}?${stringifyQuery(query)}`, errorMessage)
   }
   extendedRequest<T = any>(call: ApiCalls.Extended, param: string, errorMessage = `PeercoinExplorer.ext.${call} request returned empty`){
-    return getJSON<T>(`${this.explorerUrl}/ext/${[ call, param ].join('/')}`, errorMessage)
+    return getJSON<T | Error>(`${this.explorerUrl}/ext/${[ call, param ].join('/')}`, errorMessage)
   }
   getBalance = async (address: string) => {
     let balance = await this.extendedRequest('getbalance', address)
@@ -128,16 +136,24 @@ class PeercoinExplorer {
     return unspent_outputs
   }
 
-  getRawTransaciton = (txid: string) => this.apiRequest<GetRawTransaction.Response>('getrawtransaction', { txid })
+  getRawTransaciton = (txid: string) => this.apiRequest<GetRawTransaction.Response>('getrawtransaction', { txid, decrypt: 1 })
   transactionInfo = (id: string) => this.extendedRequest('txinfo', id)
   getAddress = (address: string) => this.extendedRequest<GetAddress.Response>('getaddress', address)
 
   wallet = async (address: string) => {
     let resp = await this.getAddress(address)
-    let transactions = await Promise.all(
-      resp.last_txns.map(txn => this.getRawTransaciton(txn.addresses))
-    )
-    return normalize.wallet(resp, transactions)
+    if(isError(resp)){
+      if(resp.error === "address not found."){
+        return Wallet.empty()
+      }
+      throw Error(resp.error)
+    } else {
+      let transactions = await Promise.all(
+        resp.last_txs.map(txn => this.getRawTransaciton(txn.addresses))
+      )
+      // TODO retry sync, background sync? redux-offline?
+      return normalize.wallet(resp, transactions.filter(t => !isError(t)) as Array<GetRawTransaction.Response>)
+    }
   }
 
 } 

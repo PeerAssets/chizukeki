@@ -1,12 +1,12 @@
 import { getJSON, stringifyQuery, Satoshis, normalizeSatoshis, Wallet, walletMeta } from './common'
 
 namespace ApiCalls {
-  export type Public = 
+  export type Public =
     | 'getblockcount'
     | 'getdifficulty'
     | 'getreceivedbyaddress'
 
-  export type Private = 
+  export type Private =
     | 'getbalance'
     | 'unspent'
     | 'multiaddr'
@@ -33,67 +33,70 @@ namespace MultiAddress {
   }
 }
 
-
-function normalizeTransactions(balance: number, txs: Array<MultiAddress.Transaction>){
-  let transactions: Array<Wallet.Transaction> = []
-  for(let i = 0; i < txs.length; i++){
-    let {
+namespace normalize {
+  export function transactions(balance: number, txs: Array<MultiAddress.Transaction>) {
+    let nTransactions: Array<Wallet.Transaction> = []
+    for (let i = 0; i < txs.length; i++) {
+      let {
       hash: id,
-      confirmations,
-      change,
-      time_utc,
-      n = 1, 
+        confirmations,
+        change,
+        time_utc,
+        n = 1,
     } = txs[i]
-    // consume subsequent transaction segments if n > 1
-    while(n --> 1){
-      i++
-      change += txs[i].change
+      // consume subsequent transaction segments if n > 1
+      while (n-- > 1) {
+        i++
+        change += txs[i].change
+      }
+      let amount = normalizeSatoshis(change)
+      nTransactions.push({
+        id,
+        confirmations,
+        amount,
+        balance,
+        timestamp: new Date(time_utc)
+      })
+      balance -= amount
     }
-    let amount = normalizeSatoshis(change)
-    transactions.push({
-      id,
-      confirmations,
-      amount,
-      balance,
-      timestamp: new Date(time_utc)
-    })
-    balance -= amount
+    return nTransactions
   }
-  return transactions
-}
-
-function normalizeWallet({
+  export function wallet({
   addresses: [{
     total_received = 0,
     total_sent = 0,
     final_balance = 0,
     n_tx: totalTransactions = 0
-  } = {}], 
-  txs 
+  } = {}],
+    txs
 }: MultiAddress.Response): Wallet {
-  let [ received, sent, balance ] = [
-    total_received, total_sent, final_balance
-  ].map(normalizeSatoshis)
-  return {
-    ...walletMeta(),
-    balance,
-    received,
-    sent,
-    totalTransactions,
-    transactions: normalizeTransactions(balance, txs)
-  })
+    let [received, sent, balance] = [
+      total_received, total_sent, final_balance
+    ].map(normalizeSatoshis)
+    return {
+      ...walletMeta(),
+      balance,
+      received,
+      sent,
+      totalTransactions,
+      transactions: normalize.transactions(balance, txs)
+    }
+  }
+
 }
+
+
 
 class Cryptoid {
   explorerUrl = 'https://chainz.cryptoid.info'
-  constructor(private key: string = '7547f94398e3', private network: string = 'ppc-test'){ }
+  constructor(private key: string = '7547f94398e3', private network: string = 'ppc-test') { }
   private apiRequest = (call: ApiCalls, query: object) => {
     let { explorerUrl, network } = this
     return getJSON(`${explorerUrl}/${network}/api.dws?q=${call}&${stringifyQuery(query)}`)
   }
   private publicApiRequest = async (call: ApiCalls.Public, query: object) =>
     this.apiRequest(call, query)
-  private privateApiRequest = async (call: ApiCalls.Private, query: object) => 
+  private privateApiRequest = async (call: ApiCalls.Private, query: object) =>
     this.apiRequest(call, { key: this.key, ...query })
 
   getBalance = async (address: string) => {
@@ -113,8 +116,8 @@ class Cryptoid {
 
   wallet = async (address: string) => {
     let resp = await this.privateApiRequest('multiaddr', { active: address })
-    if(resp){
-      return normalizeWallet(resp as MultiAddress.Response)
+    if (resp) {
+      return normalize.wallet(resp as MultiAddress.Response)
     } else {
       throw Error('could not sync with cryptoid')
     }
@@ -165,6 +168,6 @@ class Cryptoid {
   }
   / * TODO block requests don't work without cors */
 
-} 
+}
 
 export default new Cryptoid()

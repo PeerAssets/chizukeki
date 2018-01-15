@@ -5,14 +5,14 @@ import { Button, Card, Left, CardItem, Body, Text, H2, Icon } from 'native-base/
 import FlatList from 'react-native-web-lists/src/FlatList'
 import moment from 'moment'
 
-import { Wallet } from './api/cryptoid'
+import { Wallet } from './explorerApi/common'
 
 namespace WalletTransaction {
   export type Data = Wallet.Transaction
 }
 
-function WalletTransaction({ item: { value, timestamp } }: { item: WalletTransaction.Data }) {
-  let io = (inbound, outbound) => value > 0 ? inbound : outbound
+function WalletTransaction({ item: { amount, timestamp } }: { item: WalletTransaction.Data }) {
+  let io = (inbound, outbound) => amount > 0 ? inbound : outbound
   let textProps = io({ success: true }, { dark: true })
   return (
     <Card>
@@ -22,7 +22,7 @@ function WalletTransaction({ item: { value, timestamp } }: { item: WalletTransac
           <Body>
             <Text {...textProps}>
               {io('+', '-')}
-              {value.toString()} PPC
+              {amount.toString()} PPC
             </Text>
             <Text note>{moment(timestamp).fromNow()}</Text>
           </Body>

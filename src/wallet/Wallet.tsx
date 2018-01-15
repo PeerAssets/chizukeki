@@ -5,7 +5,7 @@ import TransactionList from './Transaction'
 import { Button, CardItem, Body, Text, Card, connectStyle, H2 } from 'native-base/src/index'
 import Wrapper from './Wrapper'
 
-import { Wallet as WalletData } from './api/cryptoid'
+import { Wallet as WalletData } from './explorerApi/common'
 
 let fieldStyles = {}
 

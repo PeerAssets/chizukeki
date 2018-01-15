@@ -17,7 +17,7 @@ function bindAsyncAction(
         return result;
       } catch (error) {
         yield put(creator.failed({params, error}));
-        throw error;
+        console.error(error);
       } finally {
         if (yield cancelled()) {
           yield put(creator.failed({params, error: 'cancelled'}));
