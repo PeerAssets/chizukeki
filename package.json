@@ -35,6 +35,7 @@
     "bitcore-lib": "^0.15.0",
     "deepmerge": "^2.0.1",
     "file-loader": "^1.1.5",
+    "google-protobuf": "^3.5.0",
     "history": "^4.7.2",
     "html-webpack-plugin": "^2.30.1",
     "jest": "21.2.1",

@@ -19,7 +19,7 @@ import {
   variables
 } from 'native-base/src/index'
 
-import bitcore from '../bitcore'
+import bitcore from '../lib/bitcore'
 import Wrapper from './Wrapper'
 
 namespace LoadPrivateKey {

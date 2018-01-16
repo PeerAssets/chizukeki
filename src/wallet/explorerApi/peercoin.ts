@@ -1,3 +1,4 @@
+import bitcore from '../../lib/bitcore'
 import { getJSON, stringifyQuery, Satoshis, normalizeSatoshis, Wallet, walletMeta } from './common'
 
 namespace ApiCalls {
@@ -17,28 +18,24 @@ namespace ApiCalls {
 
 type ApiCalls = ApiCalls.Coind | ApiCalls.Extended
 
-namespace GetRawTransaction {
-  export type VOut = {
+namespace RawTransaction {
+  export type UTXO = {
     value: number,
     n: number,
     scriptPubKey: any
   }
-  export type Output = {
-    script: string,
-    amount: Satoshis
-  }
-
-  export type Response = {
-    txid: string,
-    time: number,
-    confirmations: number,
-    vout: Array<VOut>,
-    vin: Array<any>,
-    blockhash: string,
-    blocktime: number
-  }
-
 }
+
+type RawTransaction = {
+  txid: string,
+  time: number,
+  confirmations: number,
+  vout: Array<RawTransaction.UTXO>,
+  vin: Array<any>,
+  blockhash: string,
+  blocktime: number
+}
+
 
 namespace TxInfo {
   export type Input = {
@@ -81,7 +78,7 @@ namespace normalize {
 
   export const satoshis = normalizeSatoshis
 
-  export function transactions(balance: number, txs: Array<GetRawTransaction.Response>){
+  export function transactions(balance: number, txs: Array<RawTransaction>){
     let nTransactions: Array<Wallet.Transaction> = []
     for (let { txid: id, confirmations, time, vout } of txs ){
       let amount = vout.reduce((a, { value }) => a + value, 0)
@@ -97,7 +94,7 @@ namespace normalize {
     return nTransactions
   }
 
-  export function wallet({ last_txs, ...wallet }: GetAddress.Response, txs: Array<GetRawTransaction.Response>): Wallet {
+  export function wallet({ last_txs, ...wallet }: GetAddress.Response, txs: Array<RawTransaction>): Wallet {
     return Object.assign(
       walletMeta(),
       wallet,
@@ -136,7 +133,12 @@ class PeercoinExplorer {
     return unspent_outputs
   }
 
-  getRawTransaciton = (txid: string) => this.apiRequest<GetRawTransaction.Response>('getrawtransaction', { txid, decrypt: 1 })
+  getRawTransaciton = (txid: string) => this.apiRequest<RawTransaction>('getrawtransaction', { txid, decrypt: 1 })
+  sendRawTransaciton({ value, ...utxo }: RawTransaction.UTXO){
+    let hex: string = (new bitcore.Transaction({ amount: value, ...utxo })).toString()
+    return this.apiRequest<any>('sendrawtransaction', { hex })
+  }
+
   transactionInfo = (id: string) => this.extendedRequest('txinfo', id)
   getAddress = (address: string) => this.extendedRequest<GetAddress.Response>('getaddress', address)
 
@@ -152,7 +154,7 @@ class PeercoinExplorer {
         resp.last_txs.map(txn => this.getRawTransaciton(txn.addresses))
       )
       // TODO retry sync, background sync? redux-offline?
-      return normalize.wallet(resp, transactions.filter(t => !isError(t)) as Array<GetRawTransaction.Response>)
+      return normalize.wallet(resp, transactions.filter(t => !isError(t)) as Array<RawTransaction>)
     }
   }
 
