@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "web": "webpack-dev-server -d --config web/webpack.config.js --colors",
-    "native": "tsc  --watch --pretty --sourceMap --target es2015 --module commonjs",
+    "native": "tsc --watch --pretty --sourceMap --target es2015 --module commonjs",
     "build": "webpack -d --config web/webpack.config.js --colors",
     "test": "jest"
   },

@@ -87,7 +87,7 @@ namespace normalize {
         confirmations,
         amount,
         balance,
-        timestamp: new Date(time)
+        timestamp: new Date(time * 1000)
       })
       balance -= amount
     }
