@@ -13,7 +13,7 @@ import { logger } from './utils'
 
 import  * as Wallet from '../wallet/redux'
 
-export const history = createHistory({ basename: process.env.PUBLIC_PATH || '' })
+export const history = createHistory({ basename: process.env.PUBLIC_PATH || '/' })
 
 /* Persist to either device or localStorage
  * */

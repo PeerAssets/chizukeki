@@ -46,6 +46,10 @@ module.exports = {
       chunksSortMode: 'dependency',
       template: path.resolve(__dirname, './index.ejs')
     }),
+    new webpack.EnvironmentPlugin({
+      NODE_ENV: 'development',
+      PUBLIC_PATH: '/'
+    })
   ],
 
   module: {
