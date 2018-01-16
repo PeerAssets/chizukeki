@@ -1,3 +1,10 @@
+# Vim 
+.*.sw*
+dist/
+
+# ****************************
+# GENERATED 
+# ****************************
 # OSX
 #
 .DS_Store
@@ -50,11 +57,6 @@ buck-out/
 */fastlane/report.xml
 */fastlane/Preview.html
 */fastlane/screenshots
-<<<<<<< ours
 
-.*.sw*
 .awcache/
 
-dist/
-=======
->>>>>>> theirs

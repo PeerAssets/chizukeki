@@ -7,6 +7,9 @@
     "web": "webpack-dev-server -d --config web/webpack.config.js --colors",
     "native": "tsc --watch --pretty --sourceMap --target es2015 --module commonjs",
     "build": "webpack -d --config web/webpack.config.js --colors",
+    "build-gh-pages": "PUBLIC_PATH=/chizukeki webpack -d --config web/webpack.config.js --colors",
+    "deploy-gh-pages": "bash web/deploy.sh",
+    "gh-pages": "npm run build-gh-pages && npm run deploy-gh-pages",
     "test": "jest"
   },
   "dependencies": {
