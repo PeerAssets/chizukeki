@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Dimensions, View, ViewStyle, Clipboard } from 'react-native'
 import PrivateKey from './LoadPrivateKey'
 import TransactionList from './Transaction'
+import SendTransaction from './SendTransaction'
 import { Button, CardItem, Body, Text, Card, connectStyle, H2 } from 'native-base/src/index'
 import Wrapper from './Wrapper'
 
@@ -106,6 +107,8 @@ Partial<Wallet.Data> & { style?: any },
           </CardItem>
         </Card>
         {this.state.transactions && <TransactionList transactions={transactions} />}
+
+        <SendTransaction style={style.card} send={()=>{}} syncStage='' />
       </Wrapper>
     )
   }

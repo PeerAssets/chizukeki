@@ -18,6 +18,18 @@ namespace ApiCalls {
 
 type ApiCalls = ApiCalls.Coind | ApiCalls.Extended
 
+namespace Unspent {
+  export type Output = {
+    tx_hash: string,
+    script: string,
+    tx_output_n: number,
+    value: Satoshis,
+  }
+}
+type Unspent = {
+  unspent_outputs: Array<Unspent.Output>
+}
+
 namespace RawTransaction {
   export type UTXO = {
     value: number,
@@ -78,29 +90,41 @@ namespace normalize {
 
   export const satoshis = normalizeSatoshis
 
+  export function unspentOutput({ tx_hash, script, tx_output_n, value }: Unspent.Output): Wallet.UTXO {
+    return {
+      txid: tx_hash,
+      scriptPubKey: script,
+      vout: tx_output_n,
+      amount: satoshis(value)
+    }
+  }
+
   export function transactions(balance: number, txs: Array<RawTransaction>){
     let nTransactions: Array<Wallet.Transaction> = []
-    for (let { txid: id, confirmations, time, vout } of txs ){
+    for (let raw of txs){
+      let { txid: id, confirmations, time, vout } = raw
       let amount = vout.reduce((a, { value }) => a + value, 0)
       nTransactions.push({
         id,
         confirmations,
         amount,
         balance,
-        timestamp: new Date(time * 1000)
+        timestamp: new Date(time * 1000),
+        raw
       })
       balance -= amount
     }
     return nTransactions
   }
 
-  export function wallet({ last_txs, ...wallet }: GetAddress.Response, txs: Array<RawTransaction>): Wallet {
+  export function wallet({ last_txs, ...wallet }: GetAddress.Response, txs: Array<RawTransaction>, unspentOutputs: Array<Wallet.UTXO>): Wallet {
     return Object.assign(
       walletMeta(),
       wallet,
       {
         transactions: normalize.transactions(wallet.balance, txs),
-        totalTransactions: txs.length
+        totalTransactions: txs.length,
+        unspentOutputs
       }
     )
   }
@@ -114,10 +138,25 @@ type Error = {
 function isError(r: any): r is Error {
   return r.hasOwnProperty('error')
 }
+async function throwing<T>(p: Promise<Error | T>){
+  let r = await p
+  if(isError(r)){
+    throw Error(r.error)
+  }
+  return r
+}
+
+async function defaultOnError<T>(p: Promise<T>, def: T){
+  try {
+    return p
+  } catch {
+    return def
+  }
+}
 
 class PeercoinExplorer {
   explorerUrl = 'https://explorer.peercoin.net'
-  apiRequest<T = any>(call: ApiCalls.Coind, query: object, errorMessage = `PeercoinExplorer.ext.${call} request returned empty`){
+  apiRequest<T = any>(call: ApiCalls.Coind, query: object, errorMessage = `PeercoinExplorer.api.${call} request returned empty`){
     return getJSON<T | Error>(`${this.explorerUrl}/api/${call}?${stringifyQuery(query)}`, errorMessage)
   }
   extendedRequest<T = any>(call: ApiCalls.Extended, param: string, errorMessage = `PeercoinExplorer.ext.${call} request returned empty`){
@@ -129,8 +168,8 @@ class PeercoinExplorer {
   }
 
   listUnspent = async (address: string) => {
-    let { unspent_outputs } = await this.extendedRequest('listunspent', address)
-    return unspent_outputs
+    let { unspent_outputs } = await throwing(this.extendedRequest<Unspent>('listunspent', address))
+    return unspent_outputs.map(normalize.unspentOutput)
   }
 
   getRawTransaciton = (txid: string) => this.apiRequest<RawTransaction>('getrawtransaction', { txid, decrypt: 1 })
@@ -153,8 +192,9 @@ class PeercoinExplorer {
       let transactions = await Promise.all(
         resp.last_txs.map(txn => this.getRawTransaciton(txn.addresses))
       )
+      let unspent = await defaultOnError(this.listUnspent(address), [])
       // TODO retry sync, background sync? redux-offline?
-      return normalize.wallet(resp, transactions.filter(t => !isError(t)) as Array<RawTransaction>)
+      return normalize.wallet(resp, transactions.filter(t => !isError(t)) as Array<RawTransaction>, unspent)
     }
   }
 

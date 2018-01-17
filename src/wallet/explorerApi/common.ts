@@ -1,11 +1,25 @@
 
+export type Satoshis = number
+
 namespace Wallet {
+  export type UTXO = {
+    txid: string,
+    scriptPubKey: string,
+    vout: number,
+    amount: number,
+    // unused address, confirmations
+  }
   export type Transaction = {
     balance: number,
     amount: number,
     id: string,
     confirmations: number,
     timestamp: Date,
+    raw?: {
+      [key: string]: any,
+      vout: Array<any>,
+      vin: Array<any>,
+    }
   }
   export function empty(): Wallet {
     return Object.assign(
@@ -15,6 +29,7 @@ namespace Wallet {
         received: 0,
         totalTransactions: 0,
         transactions: [],
+        unspentOutputs: []
     })
   }
 }
@@ -28,7 +43,8 @@ type Wallet = {
   sent: number,
   balance: number,
   totalTransactions: number,
-  transactions: Array<Wallet.Transaction>
+  transactions: Array<Wallet.Transaction>,
+  unspentOutputs: Array<Wallet.UTXO>
 }
 
 export function walletMeta() {
@@ -40,8 +56,6 @@ export function walletMeta() {
     }
   }
 }
-
-export type Satoshis = number
 
 export function normalizeSatoshis(amountInSatoshis: Satoshis) {
   return amountInSatoshis / 100000000.0

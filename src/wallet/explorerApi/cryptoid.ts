@@ -38,12 +38,12 @@ namespace normalize {
     let nTransactions: Array<Wallet.Transaction> = []
     for (let i = 0; i < txs.length; i++) {
       let {
-      hash: id,
+        hash: id,
         confirmations,
         change,
         time_utc,
         n = 1,
-    } = txs[i]
+      } = txs[i]
       // consume subsequent transaction segments if n > 1
       while (n-- > 1) {
         i++
@@ -55,26 +55,27 @@ namespace normalize {
         confirmations,
         amount,
         balance,
-        timestamp: new Date(time_utc)
+        timestamp: new Date(time_utc),
       })
       balance -= amount
     }
     return nTransactions
   }
   export function wallet({
-  addresses: [{
-    total_received = 0,
-    total_sent = 0,
-    final_balance = 0,
-    n_tx: totalTransactions = 0
-  } = {}],
-    txs
-}: MultiAddress.Response): Wallet {
+      addresses: [{
+        total_received = 0,
+        total_sent = 0,
+        final_balance = 0,
+        n_tx: totalTransactions = 0
+      } = {}],
+        txs
+    }: MultiAddress.Response, unspentOutputs: Array<Wallet.UTXO>): Wallet {
     let [received, sent, balance] = [
       total_received, total_sent, final_balance
     ].map(normalizeSatoshis)
     return {
       ...walletMeta(),
+      unspentOutputs,
       balance,
       received,
       sent,
@@ -90,14 +91,15 @@ namespace normalize {
 class Cryptoid {
   explorerUrl = 'https://chainz.cryptoid.info'
   constructor(private key: string = '7547f94398e3', private network: string = 'ppc-test') { }
-  private apiRequest = (call: ApiCalls, query: object) => {
+  apiRequest<T = any>(call: ApiCalls, query: object){
     let { explorerUrl, network } = this
-    return getJSON(`${explorerUrl}/${network}/api.dws?q=${call}&${stringifyQuery(query)}`)
+    return getJSON<T>(`${explorerUrl}/${network}/api.dws?q=${call}&${stringifyQuery(query)}`)
   }
   private publicApiRequest = async (call: ApiCalls.Public, query: object) =>
     this.apiRequest(call, query)
-  private privateApiRequest = async (call: ApiCalls.Private, query: object) =>
-    this.apiRequest(call, { key: this.key, ...query })
+  privateApiRequest<T = any>(call: ApiCalls.Private, query: object){
+    return this.apiRequest<T>(call, { key: this.key, ...query })
+  }
 
   getBalance = async (address: string) => {
     let balance = await this.privateApiRequest('getbalance', { a: address })
@@ -105,7 +107,7 @@ class Cryptoid {
   }
 
   listUnspent = async (address: string) => {
-    let { unspent_outputs } = await this.privateApiRequest('unspent', { active: address })
+    let { unspent_outputs } = await this.privateApiRequest<{ unspent_outputs: Array<Wallet.UTXO> }>('unspent', { active: address })
     return unspent_outputs
   }
 
@@ -116,8 +118,9 @@ class Cryptoid {
 
   wallet = async (address: string) => {
     let resp = await this.privateApiRequest('multiaddr', { active: address })
+    let unspent = await this.listUnspent(address)
     if (resp) {
-      return normalize.wallet(resp as MultiAddress.Response)
+      return normalize.wallet(resp as MultiAddress.Response, unspent)
     } else {
       throw Error('could not sync with cryptoid')
     }
