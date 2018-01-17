@@ -51,7 +51,7 @@ function RoutineButton({ stage, onPress, ...props }){
   return (
     <Button {...stageBased } {...props}>
       <ActivityIndicator animating={stage === 'STARTED' }/>
-      <Text>{buttonText[stage] || 'Import and Sync'}</Text>
+      <Text>{buttonText[stage] || 'Send'}</Text>
     </Button>
   )
 }
@@ -66,7 +66,7 @@ class SendTransaction extends React.Component<
   > {
   state = {
     toAddress: '',
-    amount: 0.00,
+    amount: undefined,
   }
   render() {
     return (
@@ -81,24 +81,24 @@ class SendTransaction extends React.Component<
             <Item fixedLabel style={{ marginLeft: 15, minWidth: 300 }}>
               <Label>To address</Label>
               <Input
-                style={{ fontSize: 12, lineHeight: 14, textOverflow: 'ellipsis' }}
+                style={{ lineHeight: 14, textOverflow: 'ellipsis' }}
                 value={this.state.toAddress}
                 onChangeText={toAddress => this.setState({ toAddress })} />
             </Item>
             <Item fixedLabel style={{ marginLeft: 15, minWidth: 300 }}>
-              <Label>Amount in PPC</Label>
+              <Label>PPC</Label>
               <Input
                 keyboardType='numeric'
-                placeholder
-                style={{ fontSize: 12, lineHeight: 14, textOverflow: 'ellipsis' }}
+                placeholder='0.00'
+                style={{ lineHeight: 14, textOverflow: 'ellipsis' }}
                 value={this.state.amount}
-                onChangeText={amount => this.setState({ amount: Number(amount) || 0 })} />
+                onChangeText={amount => this.setState({ amount: Number(amount) || undefined })} />
             </Item>
           </Body>
         </CardItem>
         <CardItem footer>
           <Body>
-            <RoutineButton stage={this.props.syncStage} block disabled={isFilled(this.state)}
+            <RoutineButton stage={this.props.syncStage} block disabled={!isFilled(this.state)}
               onPress={() => isFilled(this.state) ? this.props.send(this.state) : null} />
           </Body>
         </CardItem>

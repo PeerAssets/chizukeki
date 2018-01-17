@@ -26,7 +26,7 @@ export default class App extends React.Component<{}> {
           <ConnectedRouter history={history}>
             <StyleProvider style={theme(variables)}>
               <View style={styles.wrapper}>
-                <Image source={require("./welcome/logomask.png")}
+                <Image source={require("./assets/logomask.png")}
                   style={styles.background} />
                 <View style={styles.container}>
                   <Nav/>

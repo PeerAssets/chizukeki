@@ -1,5 +1,16 @@
 
-export type Satoshis = number
+type Satoshis = number
+export const inACoin = 100000000.0
+namespace Satoshis {
+  export function fromAmount(amount: number): Satoshis {
+    return Math.floor(amount * inACoin)
+  }
+  export function toAmount(amountInSatoshis: Satoshis): number {
+    return amountInSatoshis / inACoin
+  }
+}
+
+
 
 namespace Wallet {
   export type UTXO = {
@@ -57,10 +68,6 @@ export function walletMeta() {
   }
 }
 
-export function normalizeSatoshis(amountInSatoshis: Satoshis) {
-  return amountInSatoshis / 100000000.0
-}
-
 export function stringifyQuery(query: object) {
   return Object.keys(query).reduce((q, key) => `${q}&${key}=${query[key]}`, '')
 }
@@ -75,4 +82,4 @@ export async function getJSON<T = any>(url: string, emptyErrorMessage?: void | s
   }
 }
 
-export { Wallet }
+export { Wallet, Satoshis }

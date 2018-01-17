@@ -1,4 +1,4 @@
-import { getJSON, stringifyQuery, Satoshis, normalizeSatoshis, Wallet, walletMeta } from './common'
+import { getJSON, stringifyQuery, Satoshis, Wallet, walletMeta } from './common'
 
 namespace ApiCalls {
   export type Public =
@@ -49,7 +49,7 @@ namespace normalize {
         i++
         change += txs[i].change
       }
-      let amount = normalizeSatoshis(change)
+      let amount = Satoshis.toAmount(change)
       nTransactions.push({
         id,
         confirmations,
@@ -72,7 +72,7 @@ namespace normalize {
     }: MultiAddress.Response, unspentOutputs: Array<Wallet.UTXO>): Wallet {
     let [received, sent, balance] = [
       total_received, total_sent, final_balance
-    ].map(normalizeSatoshis)
+    ].map(Satoshis.toAmount)
     return {
       ...walletMeta(),
       unspentOutputs,

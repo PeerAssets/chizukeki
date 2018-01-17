@@ -8,8 +8,6 @@ import Wrapper from './Wrapper'
 
 import { Wallet as WalletData } from './explorerApi/common'
 
-let fieldStyles = {}
-
 class Toggleable extends React.Component<any> {
   render() {
     let { toggle = () => { }, active = false, children, ...props } = this.props
@@ -60,31 +58,18 @@ let styles = {
     margin: 7.5,
     flex: 1,
   },
-  separator: {
-    alignSelf: 'center',
-    flexDirection: 'row',
-    flex: 0,
-    width: 1,
-  },
-  leftButton: {
-    flex: 1,
-    alignSelf: 'center',
-  },
-  leftButtonText: {
-    color: 'blue'
-  },
 }
 
 @connectStyle('PeerKeeper.Wallet', styles)
 class Wallet extends React.Component<
-Partial<Wallet.Data> & { style?: any },
-{ transactions: boolean }
+  Partial<Wallet.Data> & { style?: any, sendTransaction: (s: SendTransaction.Data) => void },
+  { transactions: boolean }
 > {
   state = {
     transactions: Dimensions.get('window').width > 600
   }
   render() {
-    let { address, transactions = [], balance = 0, style, privateKey } = this.props
+    let { address, transactions = [], balance = 0, style, privateKey, sendTransaction } = this.props
     return (
       <Wrapper>
         <Card style={style.card}>
@@ -100,7 +85,7 @@ Partial<Wallet.Data> & { style?: any },
               <Button light disabled={!privateKey} style={style.column} onClick={() => privateKey && Clipboard.setString(privateKey)}>
                 <Text> Export </Text>
               </Button>
-              <Button light style={style.column}>
+              <Button light disabled style={style.column}>
                 <Text> Sync </Text>
               </Button>
             </Body>
@@ -108,7 +93,7 @@ Partial<Wallet.Data> & { style?: any },
         </Card>
         {this.state.transactions && <TransactionList transactions={transactions} />}
 
-        <SendTransaction style={style.card} send={()=>{}} syncStage='' />
+        <SendTransaction style={style.card} send={sendTransaction} syncStage='' />
       </Wrapper>
     )
   }

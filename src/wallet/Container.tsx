@@ -8,13 +8,16 @@ import Wallet from './Wallet'
 
 type Props = {
   syncStage: typeof Redux.routines.sync.currentStage 
-  actions: { sync: typeof Redux.routines.sync.trigger } 
+  actions: {
+    sync: typeof Redux.routines.sync.trigger
+    sendTransaction: typeof Redux.routines.sendTransaction.trigger
+  } 
   wallet: Wallet.Data
 }
 
 function Container({ syncStage, actions, wallet }: Props){
   return Wallet.isLoaded(wallet) ?
-    <Wallet {...wallet}/> :
+    <Wallet {...wallet} sendTransaction={({ amount, toAddress }) => actions.sendTransaction({ amount, toAddress, wallet })}/> :
     <PrivateKey syncStage={syncStage} loadPrivateKey={actions.sync} />
 }
 
@@ -26,6 +29,7 @@ export default connect(
     }
   },
   (dispatch: Dispatch<any>) => ({ actions: bindActionCreators({
-    sync: Redux.routines.sync.trigger
+    sync: Redux.routines.sync.trigger,
+    sendTransaction: Redux.routines.sendTransaction.trigger
   }, dispatch) })
 )(Container)

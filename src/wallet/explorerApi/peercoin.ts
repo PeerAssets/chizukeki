@@ -1,5 +1,5 @@
 import bitcore from '../../lib/bitcore'
-import { getJSON, stringifyQuery, Satoshis, normalizeSatoshis, Wallet, walletMeta } from './common'
+import { getJSON, stringifyQuery, Satoshis, Wallet, walletMeta } from './common'
 
 namespace ApiCalls {
   export type Coind = 
@@ -22,7 +22,8 @@ namespace Unspent {
   export type Output = {
     tx_hash: string,
     script: string,
-    tx_output_n: number,
+    // TODO [[explorer.peercoin]] correct and normalize output
+    tx_ouput_n: number,
     value: Satoshis,
   }
 }
@@ -35,6 +36,14 @@ namespace RawTransaction {
     value: number,
     n: number,
     scriptPubKey: any
+  }
+  export type ToSend = {
+    unspentOutputs: Array<Wallet.UTXO>,
+    toAddress: string,
+    amount: number,
+    changeAddress: string,
+    privateKey: string,
+    fee?: number
   }
 }
 
@@ -88,13 +97,13 @@ namespace GetAddress {
 
 namespace normalize {
 
-  export const satoshis = normalizeSatoshis
+  export const satoshis = Satoshis.toAmount
 
-  export function unspentOutput({ tx_hash, script, tx_output_n, value }: Unspent.Output): Wallet.UTXO {
+  export function unspentOutput({ tx_hash, script, tx_ouput_n, value }: Unspent.Output): Wallet.UTXO {
     return {
       txid: tx_hash,
       scriptPubKey: script,
-      vout: tx_output_n,
+      vout: tx_ouput_n,
       amount: satoshis(value)
     }
   }
@@ -173,8 +182,16 @@ class PeercoinExplorer {
   }
 
   getRawTransaciton = (txid: string) => this.apiRequest<RawTransaction>('getrawtransaction', { txid, decrypt: 1 })
-  sendRawTransaciton({ value, ...utxo }: RawTransaction.UTXO){
-    let hex: string = (new bitcore.Transaction({ amount: value, ...utxo })).toString()
+  sendRawTransaciton({ unspentOutputs, toAddress, amount, changeAddress, privateKey, fee = 0.01 }: RawTransaction.ToSend){
+    let signature = new bitcore.PrivateKey(privateKey)
+    let transaction = new bitcore.Transaction()
+      .from(unspentOutputs)
+      .to(toAddress, Satoshis.fromAmount(amount))
+      .change(changeAddress)
+      .fee(Satoshis.fromAmount(fee))
+    debugger;
+    let hex = transaction.sign(signature).serialize()
+    console.log(hex)
     return this.apiRequest<any>('sendrawtransaction', { hex })
   }
 

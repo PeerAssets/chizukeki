@@ -2,14 +2,14 @@ import PrivateKey from './LoadPrivateKey'
 import Wallet from './Wallet'
 
 import { ActionHistory } from '../store/actions'
-import Saga, { routine } from './saga'
+import Saga, { syncWallet, sendTransaction } from './saga'
 import { AnyAction } from 'typescript-fsa';
 
 
 export type State = { wallet?: undefined | Wallet.Loading | Wallet.Data } & ActionHistory.Bind
 
-function walletReducer(state: State = ActionHistory.of(routine.allTypes), action: AnyAction): State {
-  return routine.switch<State>(action, {
+function walletReducer(state: State = ActionHistory.of(syncWallet.routine.allTypes), action: AnyAction): State {
+  return syncWallet.routine.switch<State>(action, {
     started: payload => ({
       ...state,
       wallet: payload
@@ -24,4 +24,7 @@ function walletReducer(state: State = ActionHistory.of(routine.allTypes), action
 
 export const reducer = ActionHistory.bind(walletReducer)
 export const saga = Saga
-export const routines = { sync: routine }
+export const routines = {
+  sync: syncWallet.routine,
+  sendTransaction: sendTransaction.routine
+}

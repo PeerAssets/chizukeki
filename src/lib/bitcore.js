@@ -32,7 +32,7 @@ bitcore.Networks.add({
     xprivkey: 0x04358394,
   });
 
-bitcore.Networks.defaultNetwork = bitcore.Networks.get('peercoin-testnet');
+bitcore.Networks.defaultNetwork = bitcore.Networks.get('peercoin');
 
 
 //

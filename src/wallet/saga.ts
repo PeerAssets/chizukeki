@@ -1,18 +1,39 @@
 import { fork, all, put, takeLatest, call } from 'redux-saga/effects'
 import fetchJSONRoutine from '../store/fetch-routine'
-import { peercoin, Wallet } from './explorerApi'
+import { peercoin, Wallet as ExplorerWallet } from './explorerApi'
+import LocalWallet from './Wallet'
 
-window['api'] = peercoin
+import bitcore from '../lib/bitcore'
 
-const { routine, fetchSaga: sync, trigger } = fetchJSONRoutine<
+const syncWallet = fetchJSONRoutine<
   { privateKey: string, address: string },
-  Wallet,
+  ExplorerWallet,
   Error
 >({
   type: 'SYNC_WALLET',
   fetchJSON: ({ address }) => peercoin.wallet(address),
 })
 
-export default trigger
+const sendTransaction = fetchJSONRoutine<
+  { wallet: LocalWallet.Data, toAddress: string, amount: number },
+  any,
+  Error
+>({
+  type: 'SEND_TRANSACTION',
+  fetchJSON: ({ wallet: { address, privateKey, unspentOutputs }, toAddress, amount }) => peercoin.sendRawTransaciton({
+    changeAddress: address,
+    toAddress,
+    amount,
+    unspentOutputs,
+    privateKey,
+  })
+})
 
-export { routine, sync }
+export default function * (){
+  yield all([
+    fork(syncWallet.trigger),
+    fork(sendTransaction.trigger),
+  ])
+}
+
+export { syncWallet, sendTransaction }
