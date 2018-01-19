@@ -185,13 +185,14 @@ class PeercoinExplorer {
   sendRawTransaciton({ unspentOutputs, toAddress, amount, changeAddress, privateKey, fee = 0.01 }: RawTransaction.ToSend){
     let signature = new bitcore.PrivateKey(privateKey)
     let transaction = new bitcore.Transaction()
-      .from(unspentOutputs)
+      .from(unspentOutputs.map(({ amount, ...utxo }) => ({
+        ...utxo,
+        satoshis: Satoshis.fromAmount(amount)
+      })))
       .to(toAddress, Satoshis.fromAmount(amount))
       .change(changeAddress)
       .fee(Satoshis.fromAmount(fee))
-    debugger;
     let hex = transaction.sign(signature).serialize()
-    console.log(hex)
     return this.apiRequest<any>('sendrawtransaction', { hex })
   }
 
