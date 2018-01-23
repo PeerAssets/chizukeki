@@ -1,16 +1,19 @@
 import * as React from 'react'
-import { Dimensions, Text, View } from 'react-native';
-import PrivateKey from './LoadPrivateKey'
 import { bindActionCreators, Dispatch } from 'redux'
 import { connect } from 'react-redux'
+import { Dimensions, Text, View } from 'react-native';
+import { ActionHistory } from '../store/actions'
+import PrivateKey from './LoadPrivateKey'
 import * as Redux from './redux'
 import Wallet from './Wallet'
 
+let { sendTransaction, sync } = Redux.routines
+
 type Props = {
-  syncStage: typeof Redux.routines.sync.currentStage 
+  syncStage: typeof sync.currentStage 
   actions: {
-    sync: typeof Redux.routines.sync.trigger
-    sendTransaction: typeof Redux.routines.sendTransaction.trigger
+    sync: typeof sync.trigger
+    sendTransaction: typeof sendTransaction.trigger
   } 
   wallet: Wallet.Data
 }
@@ -24,12 +27,13 @@ function Container({ syncStage, actions, wallet }: Props){
 export default connect(
   ({ wallet: { actionHistory, wallet } }: { wallet: Redux.State }) => {
     return {
-      syncStage: Redux.routines.sync.stage(actionHistory.latest),
+      syncStage: sync.stage(ActionHistory.filterWithPrefix(sync.trigger.type, actionHistory).latest),
       wallet
     }
   },
   (dispatch: Dispatch<any>) => ({ actions: bindActionCreators({
-    sync: Redux.routines.sync.trigger,
+    sync: sync.trigger,
     sendTransaction: Redux.routines.sendTransaction.trigger
   }, dispatch) })
 )(Container)
+

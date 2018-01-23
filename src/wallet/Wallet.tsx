@@ -101,6 +101,7 @@ class Wallet extends React.Component<
 
 namespace Wallet {
   export type Transaction = WalletData.Transaction
+  export type PendingTransaction = WalletData.PendingTransaction
   export type Loading = PrivateKey.Data
   export type Data = Loading & WalletData
   export function isLoaded(wallet: Loading | Data | undefined): wallet is Data {

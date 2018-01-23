@@ -37,12 +37,34 @@ namespace ActionHistory {
   }
   export function push<ActionType extends string = string>(
     ah: ActionHistory<ActionType>, action: ActionType
-  ){
-    if(ah.following.includes(action)){
+  ){ if(ah.following.includes(action)){
       ah.history.push(action)
       ah.latest = action
     }
     return ah
+  }
+  export function filter<ActionType extends string = string>(
+    filter: (action: ActionType) => boolean,
+    { history, following, latest }: ActionHistory<ActionType>, 
+  ){
+    history = history.filter(filter)
+    return {
+      history,
+      following: following.filter(filter),
+      latest: history[history.length - 1]
+    }
+  }
+  export function filterWithPrefix<ActionType extends string = string>(
+    prefix: string,
+    { history, following, latest }: ActionHistory<ActionType>, 
+  ){
+    let filter = (action: ActionType) => action.startsWith(prefix)
+    history = history.filter(filter)
+    return {
+      history,
+      following: following.filter(filter),
+      latest: history[history.length - 1]
+    }
   }
   export function bind<
     ActionType extends string = string,

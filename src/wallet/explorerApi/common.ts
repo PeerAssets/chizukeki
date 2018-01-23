@@ -30,6 +30,7 @@ namespace Wallet {
       vin: Array<any>,
     }
   }
+  export type PendingTransaction = Pick<Transaction, 'id' | 'amount' | 'timestamp' | 'raw'>
   export function empty(): Wallet {
     return Object.assign(
       walletMeta(), {
@@ -68,6 +69,13 @@ export function walletMeta() {
 
 export function stringifyQuery(query: object) {
   return Object.keys(query).reduce((q, key) => q ? `${q}&${key}=${query[key]}` : `${key}=${query[key]}`, '')
+}
+
+
+export async function getText(url: string) {
+  let response = await fetch(url)
+  let body = await response.text()
+  return body
 }
 
 export async function getJSON<T = any>(url: string, emptyErrorMessage?: void | string) {

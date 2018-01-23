@@ -1,5 +1,5 @@
 import bitcore from '../../lib/bitcore'
-import { getJSON, stringifyQuery, Satoshis, Wallet, walletMeta } from './common'
+import { getJSON, getText, stringifyQuery, Satoshis, Wallet, walletMeta } from './common'
 
 namespace ApiCalls {
   export type Coind = 
@@ -165,6 +165,9 @@ async function defaultOnError<T>(p: Promise<T>, def: T){
 
 class PeercoinExplorer {
   explorerUrl = 'https://explorer.peercoin.net'
+  rawApiRequest(call: ApiCalls.Coind, query: object){
+    return getText(`${this.explorerUrl}/api/${call}?${stringifyQuery(query)}`)
+  }
   apiRequest<T = any>(call: ApiCalls.Coind, query: object, errorMessage = `PeercoinExplorer.api.${call} request returned empty`){
     return getJSON<T | Error>(`${this.explorerUrl}/api/${call}?${stringifyQuery(query)}`, errorMessage)
   }
@@ -181,8 +184,11 @@ class PeercoinExplorer {
     return unspent_outputs.map(normalize.unspentOutput)
   }
 
-  getRawTransaciton = (txid: string) => this.apiRequest<RawTransaction>('getrawtransaction', { txid, decrypt: 1 })
-  sendRawTransaciton({ unspentOutputs, toAddress, amount, changeAddress, privateKey, fee = 0.01 }: RawTransaction.ToSend){
+  getRawTransaction = (txid: string) => this.apiRequest<RawTransaction>('getrawtransaction', { txid, decrypt: 1 })
+
+  sendRawTransaction = async (
+    { unspentOutputs, toAddress, amount, changeAddress, privateKey, fee = 0.01, }: RawTransaction.ToSend
+  ): Promise<Wallet.PendingTransaction> => {
     let signature = new bitcore.PrivateKey(privateKey)
     let transaction = new bitcore.Transaction()
       .from(unspentOutputs.map(({ amount, ...utxo }) => ({
@@ -193,7 +199,19 @@ class PeercoinExplorer {
       .change(changeAddress)
       .fee(Satoshis.fromAmount(fee))
     let hex = transaction.sign(signature).serialize()
-    return this.apiRequest<any>('sendrawtransaction', { hex })
+    let response = await this.rawApiRequest('sendrawtransaction', { hex })
+    if (response === 'There was an error. Check your console.'){
+      throw Error('Invalid Transaction')
+    }
+    let { id, outputs, inputs, ...raw }: {
+      id: string, outputs: Array<any>, inputs: Array<any>
+    } = bitcore.Transaction(hex).toObject()
+    return {
+      id,
+      timestamp: new Date(),
+      amount,
+      raw: { vout: outputs, vin: inputs, ...raw }
+    }
   }
 
   transactionInfo = (id: string) => this.extendedRequest('txinfo', id)
@@ -208,7 +226,7 @@ class PeercoinExplorer {
       throw Error(resp.error)
     } else {
       let transactions = await Promise.all(
-        resp.last_txs.map(txn => this.getRawTransaciton(txn.addresses))
+        resp.last_txs.map(txn => this.getRawTransaction(txn.addresses))
       )
       let unspent = await defaultOnError(this.listUnspent(address), [])
       // TODO retry sync, background sync? redux-offline?

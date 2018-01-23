@@ -7,6 +7,7 @@ import actionCreatorFactory, { isType, AnyAction, ActionCreator, AsyncActionCrea
 // import { bindAsyncAction } from 'typescript-fsa-redux-saga'
 function bindAsyncAction(
   creator: AsyncActionCreators<any, any, any>,
+  throwing: boolean = false
 ) {
   return (worker: (params: any, ...args: any[]) => Promise<any> | SagaIterator) => {
     return function* boundAsyncActionSaga(params: any, ...args: any[]): SagaIterator {
@@ -17,7 +18,9 @@ function bindAsyncAction(
         return result;
       } catch (error) {
         yield put(creator.failed({params, error}));
-        throw error
+        if(throwing){
+          throw error
+        }
       } finally {
         if (yield cancelled()) {
           yield put(creator.failed({params, error: 'cancelled'}));

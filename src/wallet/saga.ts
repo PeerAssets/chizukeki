@@ -1,17 +1,18 @@
 import { fork, all, put, takeLatest, call } from 'redux-saga/effects'
-import fetchJSONRoutine from '../store/fetch-routine'
+import fetchJSONRoutine, { poll } from '../store/fetch-routine'
 import { peercoin, Wallet as ExplorerWallet } from './explorerApi'
 import LocalWallet from './Wallet'
 
 import bitcore from '../lib/bitcore'
 
-const syncWallet = fetchJSONRoutine<
+const syncWallet = fetchJSONRoutine.withPolling<
   { privateKey: string, address: string },
   ExplorerWallet,
   Error
 >({
   type: 'SYNC_WALLET',
   fetchJSON: ({ address }) => peercoin.wallet(address),
+  pollingInterval: 20000,
 })
 
 const sendTransaction = fetchJSONRoutine<
@@ -20,7 +21,7 @@ const sendTransaction = fetchJSONRoutine<
   Error
 >({
   type: 'SEND_TRANSACTION',
-  fetchJSON: ({ wallet: { address, privateKey, unspentOutputs }, toAddress, amount }) => peercoin.sendRawTransaciton({
+  fetchJSON: ({ wallet: { address, privateKey, unspentOutputs }, toAddress, amount }) => peercoin.sendRawTransaction({
     changeAddress: address,
     toAddress,
     amount,
@@ -32,6 +33,7 @@ const sendTransaction = fetchJSONRoutine<
 export default function * (){
   yield all([
     fork(syncWallet.trigger),
+    fork(syncWallet.poll),
     fork(sendTransaction.trigger),
   ])
 }
