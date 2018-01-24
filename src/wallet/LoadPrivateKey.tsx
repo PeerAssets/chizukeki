@@ -19,6 +19,7 @@ import {
 } from 'native-base/src/index'
 
 import bitcore from '../lib/bitcore'
+import RoutineButton from '../generics/routine-button'
 import Wrapper from './Wrapper'
 
 namespace LoadPrivateKey {
@@ -70,26 +71,6 @@ function normalize({ privateKey, format }: State): LoadPrivateKey.Data {
   }
 }
 
-// TODO implicit coupling to routine
-let buttonText = {
-  STARTED: 'Syncing wallet activity',
-  DONE: 'Successfully synced!',
-  FAILED: 'There was a problem syncing'
-}
-function RoutineButton({ stage, onPress, ...props }){
-  let stageBased = stage === 'DONE'
-    ? { success: true }
-    : stage === 'FAILED'
-    ? { danger: true }
-    : { info: true, onPress }
-  return (
-    <Button {...stageBased } {...props}>
-      <ActivityIndicator animating={stage === 'STARTED' }/>
-      <Text>{buttonText[stage] || 'Import and Sync'}</Text>
-    </Button>
-  )
-}
-
 class LoadPrivateKey extends React.Component<
   { 
     syncStage?: string | undefined,
@@ -135,8 +116,13 @@ class LoadPrivateKey extends React.Component<
           </CardItem>
           <CardItem footer>
             <Body>
-              <RoutineButton stage={this.props.syncStage} block disabled={!this.state.privateKey}
-                onPress={() => this.props.loadPrivateKey(normalize(this.state))}/>
+              <RoutineButton block disabled={!this.state.privateKey}
+                onPress={() => this.props.loadPrivateKey(normalize(this.state))}
+                stage={this.props.syncStage} 
+                DEFAULT='Import and Sync'
+                STARTED='Syncing wallet activity'
+                DONE='Successfully synced!'
+                FAILED='There was a problem syncing' />
             </Body>
           </CardItem>
         </Card>

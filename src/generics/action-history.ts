@@ -1,21 +1,5 @@
 import { Reducer } from 'redux'
 
-type Creator<T, P> = (payload: P) => {
-  type: T, 
-  payload: P
-}
-
-function Creator<T, P>(type: T): Creator<T, P> {
-  return (payload: P) => ({ type, payload })
-}
-
-namespace Creator {
-  export type Empty<T> = () => { type: T }
-  export function Empty<T>(type: T): Empty<T> {
-    return () => ({ type })
-  }
-}
-
 type ActionHistory<ActionType> = {
   following: Array<ActionType>,
   history: Array<ActionType>,
@@ -80,4 +64,4 @@ namespace ActionHistory {
 }
 
 
-export { Creator, ActionHistory }
+export default ActionHistory

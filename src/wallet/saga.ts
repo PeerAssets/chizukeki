@@ -1,5 +1,5 @@
 import { fork, all, put, takeLatest, call } from 'redux-saga/effects'
-import fetchJSONRoutine, { poll } from '../store/fetch-routine'
+import fetchJSONRoutine from '../generics/fetch-routine'
 import { peercoin, Wallet as ExplorerWallet } from './explorerApi'
 import LocalWallet from './Wallet'
 

@@ -2,11 +2,10 @@ import * as React from 'react'
 import { bindActionCreators, Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import { Dimensions, Text, View } from 'react-native';
-import { ActionHistory } from '../store/actions'
+import ActionHistory from '../generics/action-history'
 import PrivateKey from './LoadPrivateKey'
 import * as Redux from './redux'
-import Wallet from './Wallet'
-
+import Wallet from './Wallet' 
 let { sendTransaction, sync } = Redux.routines
 
 type Props = {
@@ -27,6 +26,7 @@ function Container({ stages, isSyncing, actions, wallet }: Props){
   return Wallet.isLoaded(wallet) ?
     <Wallet {...wallet}
       isSyncing={isSyncing}
+      syncStage={stages.sync}
       toggleSync={isSyncing ? actions.stopSync : () => actions.sync(wallet) }
       sendTransaction={({ amount, toAddress }) => actions.sendTransaction({ amount, toAddress, wallet })}/> :
     <PrivateKey syncStage={stages.sync} loadPrivateKey={actions.sync} />

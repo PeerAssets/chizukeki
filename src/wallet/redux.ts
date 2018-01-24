@@ -1,7 +1,7 @@
 import PrivateKey from './LoadPrivateKey'
 import Wallet from './Wallet'
 
-import { ActionHistory } from '../store/actions'
+import ActionHistory from '../generics/action-history'
 import Saga, { syncWallet, sendTransaction } from './saga'
 import { AnyAction } from 'typescript-fsa';
 

@@ -6,6 +6,8 @@ import SendTransaction from './SendTransaction'
 import { Button, CardItem, Body, Text, Card, connectStyle, H2 } from 'native-base/src/index'
 import Wrapper from './Wrapper'
 
+import RoutineButton from '../generics/routine-button'
+
 import { Wallet as WalletData } from './explorerApi/common'
 
 class Toggleable extends React.Component<any> {
@@ -64,6 +66,7 @@ class Wallet extends React.Component<
   Partial<Wallet.Data> & {
     style?: any,
     isSyncing: boolean,
+    syncStage: string | undefined,
     toggleSync: () => void,
     sendTransaction: (s: SendTransaction.Data) => void
   },
@@ -73,7 +76,7 @@ class Wallet extends React.Component<
     transactions: Dimensions.get('window').width > 600
   }
   render() {
-    let { address, transactions = [], balance = 0, style, privateKey, isSyncing, toggleSync, sendTransaction } = this.props
+    let { address, transactions = [], balance = 0, style, privateKey, isSyncing, sendTransaction } = this.props
     return (
       <Wrapper>
         <View style={style.main}>
@@ -90,9 +93,12 @@ class Wallet extends React.Component<
                 <Button light disabled={!privateKey} style={style.column} onClick={() => privateKey && Clipboard.setString(privateKey)}>
                   <Text> Export </Text>
                 </Button>
-                <Button light style={style.column} onClick={toggleSync}>
-                  <Text> { isSyncing ? 'Syncing' : 'Syncing Paused' } </Text>
-                </Button>
+                <RoutineButton style={style.column}
+                  warning={!isSyncing}
+                  onPress={this.props.toggleSync}
+                  stage={this.props.syncStage}
+                  DEFAULT={ isSyncing ? 'Syncing Enabled' : 'Syncing Disabled' }
+                  FAILED='Recent Sync Failed' />
               </Body>
             </CardItem>
           </Card>
