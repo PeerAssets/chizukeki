@@ -10,29 +10,62 @@ import Wallet from './Wallet'
 let { sendTransaction, sync } = Redux.routines
 
 type Props = {
-  syncStage: typeof sync.currentStage 
+  wallet: Wallet.Data,
+  isSyncing: boolean,
+  stages: {
+    sync: typeof sync.currentStage,
+    sendTransaction: typeof sendTransaction.currentStage,
+  }
   actions: {
     sync: typeof sync.trigger
+    stopSync: typeof sync.stop
     sendTransaction: typeof sendTransaction.trigger
-  } 
-  wallet: Wallet.Data
+  }, 
 }
 
-function Container({ syncStage, actions, wallet }: Props){
+function Container({ stages, isSyncing, actions, wallet }: Props){
   return Wallet.isLoaded(wallet) ?
-    <Wallet {...wallet} sendTransaction={({ amount, toAddress }) => actions.sendTransaction({ amount, toAddress, wallet })}/> :
-    <PrivateKey syncStage={syncStage} loadPrivateKey={actions.sync} />
+    <Wallet {...wallet}
+      isSyncing={isSyncing}
+      toggleSync={isSyncing ? actions.stopSync : () => actions.sync(wallet) }
+      sendTransaction={({ amount, toAddress }) => actions.sendTransaction({ amount, toAddress, wallet })}/> :
+    <PrivateKey syncStage={stages.sync} loadPrivateKey={actions.sync} />
 }
+
+function routineStages(routines){
+  return actionHistory => Object.keys(routines)
+    .reduce((stages, key) => {
+      let routine = routines[key]
+      let latestRoutineAction = ActionHistory.filterWithPrefix(routine.trigger.type, actionHistory).latest
+      stages[key] = routine.stage(latestRoutineAction)
+      return stages
+    }, {})
+}
+
+let isSyncing = function isSyncing(routine){
+  let selectSyncControls = action => [ routine.stop.type, routine.trigger.type ].includes(action)
+  return actionHistory => {
+    let latest = ActionHistory.filter(selectSyncControls, actionHistory).latest
+    return latest === routine.trigger.type
+  }
+}(sync)
+
+let selectStages = routineStages({
+  sync,
+  sendTransaction
+})
 
 export default connect(
   ({ wallet: { actionHistory, wallet } }: { wallet: Redux.State }) => {
     return {
-      syncStage: sync.stage(ActionHistory.filterWithPrefix(sync.trigger.type, actionHistory).latest),
+      stages: selectStages(actionHistory),
+      isSyncing: isSyncing(actionHistory),
       wallet
     }
   },
   (dispatch: Dispatch<any>) => ({ actions: bindActionCreators({
     sync: sync.trigger,
+    stopSync: sync.stop,
     sendTransaction: Redux.routines.sendTransaction.trigger
   }, dispatch) })
 )(Container)

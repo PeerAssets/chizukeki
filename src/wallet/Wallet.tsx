@@ -38,7 +38,7 @@ function TransactionCount({ unspentOutputs, ...props }) {
 
 
 let styles = {
-  card: {
+  main: {
     flex: 3,
     minWidth: 350,
     margin: 7.5,
@@ -57,43 +57,48 @@ let styles = {
     alignItems: 'center',
     margin: 7.5,
     flex: 1,
-  },
-}
+  }, }
 
 @connectStyle('PeerKeeper.Wallet', styles)
 class Wallet extends React.Component<
-  Partial<Wallet.Data> & { style?: any, sendTransaction: (s: SendTransaction.Data) => void },
+  Partial<Wallet.Data> & {
+    style?: any,
+    isSyncing: boolean,
+    toggleSync: () => void,
+    sendTransaction: (s: SendTransaction.Data) => void
+  },
   { transactions: boolean }
 > {
   state = {
     transactions: Dimensions.get('window').width > 600
   }
   render() {
-    let { address, transactions = [], balance = 0, style, privateKey, sendTransaction } = this.props
+    let { address, transactions = [], balance = 0, style, privateKey, isSyncing, toggleSync, sendTransaction } = this.props
     return (
       <Wrapper>
-        <Card style={style.card}>
-          <CardItem header>
-            <Balance balance={balance} style={style.column} />
-          </CardItem>
-          <CardItem>
-            <Body style={style.body}>
-              <TransactionCount active={this.state.transactions}
-                unspentOutputs={transactions}
-                style={style.column}
-                toggle={() => this.setState({ transactions: !this.state.transactions })} />
-              <Button light disabled={!privateKey} style={style.column} onClick={() => privateKey && Clipboard.setString(privateKey)}>
-                <Text> Export </Text>
-              </Button>
-              <Button light disabled style={style.column}>
-                <Text> Sync </Text>
-              </Button>
-            </Body>
-          </CardItem>
-        </Card>
+        <View style={style.main}>
+          <Card>
+            <CardItem header>
+              <Balance balance={balance} style={style.column} />
+            </CardItem>
+            <CardItem>
+              <Body style={style.body}>
+                <TransactionCount active={this.state.transactions}
+                  unspentOutputs={transactions}
+                  style={style.column}
+                  toggle={() => this.setState({ transactions: !this.state.transactions })} />
+                <Button light disabled={!privateKey} style={style.column} onClick={() => privateKey && Clipboard.setString(privateKey)}>
+                  <Text> Export </Text>
+                </Button>
+                <Button light style={style.column} onClick={toggleSync}>
+                  <Text> { isSyncing ? 'Syncing' : 'Syncing Paused' } </Text>
+                </Button>
+              </Body>
+            </CardItem>
+          </Card>
+          <SendTransaction style={style.card} send={sendTransaction} syncStage='' />
+        </View>
         {this.state.transactions && <TransactionList transactions={transactions} />}
-
-        <SendTransaction style={style.card} send={sendTransaction} syncStage='' />
       </Wrapper>
     )
   }

@@ -1,5 +1,5 @@
 import { SagaIterator, delay } from 'redux-saga'
-import { takeLatest, put, call } from 'redux-saga/effects'
+import { take, cancel, fork, takeLatest, put, call, cancelled } from 'redux-saga/effects'
 import * as FSA from 'typescript-fsa'
 import expandedRoutine, { Routine, bindAsyncAction, Meta } from './routine'
 
@@ -30,23 +30,42 @@ type LoopPayload<Start, Success, Error> =
   | FSA.Success<Start, Success>
   | FSA.Failure<Start, Error>
 
-namespace poll {
+namespace pollSaga {
   export type Params<Start, Success, Error> = {
     routine: Routine<Start, Success, Error>,
     interval: number,
   }
 }
 
-function poll<Start, Success, Error>({ interval, routine }: poll.Params<Start, Success, Error>){
-  return function* pollRoutine() {
+function pollSaga<Start, Success, Error>({ interval, routine }: pollSaga.Params<Start, Success, Error>){
+  let stop = FSA.actionCreatorFactory()(routine.trigger.type + '_STOPPED')
+  function* pollSaga() {
     type LoopAction = Action<LoopPayload<Start, Success, Error>>
-    while (true) {
-      yield call(delay, interval)
-      yield takeLatest(
-        [routine.done, routine.failed],
-        (action: LoopAction) => routine.started(action.payload.params)
-      )
+    try {
+      while (true) {
+        yield call(delay, interval)
+        yield takeLatest(
+          [routine.done, routine.failed],
+          (action: LoopAction) => routine.trigger(action.payload.params)
+        )
+      }
+    } finally { /*if (yield cancelled()){ }*/ }
+  }
+  function* saga() {
+    while (yield take(routine.trigger)) {
+      // starts the task in the background
+      const polling = yield fork(pollSaga)
+
+      // wait for the user stop action
+      yield take(stop)
+
+      // user cancelled the sync
+      yield cancel(polling)
     }
+  }
+  return {
+    poll: saga,
+    stop
   }
 }
 namespace fetchJSONRoutine {
@@ -54,14 +73,15 @@ namespace fetchJSONRoutine {
     { pollingInterval: interval, ...params }: { pollingInterval: number } & Params<Start, Success, Error>
   ){
     let { routine, ...rest } = fetchJSONRoutine(params)
+    let { stop, poll } = pollSaga({ interval, routine })
+    routine.allTypes.push(stop.type)
+    let stoppableRoutine: typeof routine & { stop: typeof stop } = Object.assign(routine, { stop })
     return {
-      routine,
+      routine: stoppableRoutine,
+      poll,
       ...rest,
-      poll: poll({ interval, routine })
     }
   }
 }
-
-export { poll }
 
 export default fetchJSONRoutine
