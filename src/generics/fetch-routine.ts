@@ -20,7 +20,7 @@ function fetchJSONRoutine<Start, Success, Error>({
   const fetchSaga = bindAsyncAction(routine)(fetchJSON)
 
   function* trigger() {
-    yield takeLatest(routine.trigger, (action: Action<Start>) => fetchSaga(action.payload))
+    yield takeLatest([ routine.trigger, routine.started ], (action: Action<Start>) => fetchSaga(action.payload))
   }
 
   return { trigger, fetchSaga, routine }
@@ -39,15 +39,16 @@ namespace pollSaga {
 
 function pollSaga<Start, Success, Error>({ interval, routine }: pollSaga.Params<Start, Success, Error>){
   let stop = FSA.actionCreatorFactory()(routine.trigger.type + '_STOPPED')
+  type LoopAction = Action<LoopPayload<Start, Success, Error>>
+  function* restart(action: LoopAction){
+    yield call(delay, interval)
+    put(routine.started(action.payload.params))
+    console.log('put!')
+  }
   function* pollSaga() {
-    type LoopAction = Action<LoopPayload<Start, Success, Error>>
     try {
       while (true) {
-        yield call(delay, interval)
-        yield takeLatest(
-          [routine.done, routine.failed],
-          (action: LoopAction) => routine.trigger(action.payload.params)
-        )
+        yield takeLatest([routine.done.type, routine.failed.type], restart)
       }
     } finally { /*if (yield cancelled()){ }*/ }
   }

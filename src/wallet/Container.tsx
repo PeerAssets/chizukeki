@@ -25,10 +25,13 @@ type Props = {
 function Container({ stages, isSyncing, actions, wallet }: Props){
   return Wallet.isLoaded(wallet) ?
     <Wallet {...wallet}
-      isSyncing={isSyncing}
-      syncStage={stages.sync}
-      toggleSync={isSyncing ? actions.stopSync : () => actions.sync(wallet) }
-      sendTransaction={({ amount, toAddress }) => actions.sendTransaction({ amount, toAddress, wallet })}/> :
+      sendTransaction={({ amount, toAddress }) => actions.sendTransaction({ amount, toAddress, wallet })}
+      sync={{
+        stage: stages.sync,
+        enabled: isSyncing,
+        start: () => actions.sync(wallet),
+        stop: actions.stopSync
+      }} /> :
     <PrivateKey syncStage={stages.sync} loadPrivateKey={actions.sync} />
 }
 

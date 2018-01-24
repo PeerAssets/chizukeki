@@ -65,18 +65,27 @@ let styles = {
 class Wallet extends React.Component<
   Partial<Wallet.Data> & {
     style?: any,
-    isSyncing: boolean,
-    syncStage: string | undefined,
-    toggleSync: () => void,
     sendTransaction: (s: SendTransaction.Data) => void
+    sync: {
+      stage: string | undefined,
+      enabled: boolean,
+      start: () => any,
+      stop: () => any,
+    }
   },
   { transactions: boolean }
 > {
   state = {
     transactions: Dimensions.get('window').width > 600
   }
+  componentDidMount() {
+    let sync = this.props.sync
+    if(sync.enabled){
+      sync.start()
+    }
+  }
   render() {
-    let { address, transactions = [], balance = 0, style, privateKey, isSyncing, sendTransaction } = this.props
+    let { address, transactions = [], balance = 0, style, privateKey, sync, sendTransaction } = this.props
     return (
       <Wrapper>
         <View style={style.main}>
@@ -94,10 +103,10 @@ class Wallet extends React.Component<
                   <Text> Export </Text>
                 </Button>
                 <RoutineButton style={style.column}
-                  warning={!isSyncing}
-                  onPress={this.props.toggleSync}
-                  stage={this.props.syncStage}
-                  DEFAULT={ isSyncing ? 'Syncing Enabled' : 'Syncing Disabled' }
+                  warning={!sync.enabled}
+                  onPress={sync.enabled ? sync.stop : sync.start}
+                  stage={sync.stage}
+                  DEFAULT={ sync.enabled ? 'Syncing Enabled' : 'Syncing Disabled' }
                   FAILED='Recent Sync Failed' />
               </Body>
             </CardItem>

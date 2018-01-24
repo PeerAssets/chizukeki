@@ -11,7 +11,6 @@ function bindAsyncAction(
 ) {
   return (worker: (params: any, ...args: any[]) => Promise<any> | SagaIterator) => {
     return function* boundAsyncActionSaga(params: any, ...args: any[]): SagaIterator {
-      yield put(creator.started(params));
       try {
         const result = yield (call as any)(worker, params, ...args);
         yield put(creator.done({params, result}));

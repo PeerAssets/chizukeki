@@ -12,7 +12,7 @@ const syncWallet = fetchJSONRoutine.withPolling<
 >({
   type: 'SYNC_WALLET',
   fetchJSON: ({ address }) => peercoin.wallet(address),
-  pollingInterval: 20000,
+  pollingInterval: 200000,
 })
 
 const sendTransaction = fetchJSONRoutine<

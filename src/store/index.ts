@@ -4,7 +4,6 @@ import createSagaMiddleware from 'redux-saga'
 
 import { persistStore, persistCombineReducers } from 'redux-persist'
 import storage from 'redux-persist/es/storage' // handles web/native 
-import { hardSet } from 'redux-persist/lib/stateReconciler/hardSet'
 
 
 import { createHistory } from '../routing'
@@ -19,7 +18,6 @@ export const history = createHistory({ basename: process.env.PUBLIC_PATH || '/' 
  * */
 const reducer = persistCombineReducers({
   key: 'root',
-  stateReconciler: hardSet,
   storage
 }, {
   router: routerReducer,
