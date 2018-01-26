@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Dimensions, View, TouchableOpacity, ActivityIndicator, StyleProp } from 'react-native';
+import RoutineButton from '../generics/routine-button'
 import {
   Container,
   Segment,
@@ -27,6 +28,11 @@ namespace SendTransaction {
     toAddress: string,
     amount: number,
   }
+  export type Props = {
+    stage?: string | undefined,
+    style?: StyleProp<any>,
+    send: (data: Data) => void
+  }
 }
 
 type State = Partial<SendTransaction.Data>
@@ -38,32 +44,9 @@ function isFilled(s: SendTransaction.Data | State): s is SendTransaction.Data {
 
 // TODO implicit coupling to routine
 let buttonText = {
-  STARTED: 'sending',
-  DONE: 'Successfully synced!',
-  FAILED: 'Invalid Transaction'
-}
-function RoutineButton({ stage, onPress, ...props }){
-  let stageBased = stage === 'DONE'
-    ? { success: true }
-    : stage === 'FAILED'
-    ? { danger: true }
-    : { info: true, onPress }
-  return (
-    <Button {...stageBased } {...props}>
-      <ActivityIndicator animating={stage === 'STARTED' }/>
-      <Text>{buttonText[stage] || 'Send'}</Text>
-    </Button>
-  )
 }
 
-class SendTransaction extends React.Component<
-  { 
-    syncStage?: string | undefined,
-    style: StyleProp<any>,
-    send: (data: SendTransaction.Data) => void
-  },
-  State
-  > {
+class SendTransaction extends React.Component<SendTransaction.Props, State> {
   state = {
     toAddress: '',
     amount: undefined,
@@ -98,8 +81,14 @@ class SendTransaction extends React.Component<
         </CardItem>
         <CardItem footer>
           <Body>
-            <RoutineButton stage={this.props.syncStage} block disabled={!isFilled(this.state)}
-              onPress={() => isFilled(this.state) ? this.props.send(this.state) : null} />
+            <RoutineButton block disabled={!isFilled(this.state)}
+              icons={{ DEFAULT: 'send' }}
+              stage={this.props.stage}
+              onPress={() => isFilled(this.state) ? this.props.send(this.state) : null}
+              DEFAULT='Send Transaction' 
+              STARTED='Sending'
+              DONE='Sent!'
+              FAILED='Invalid Transaction' />
           </Body>
         </CardItem>
       </Card>

@@ -104,7 +104,7 @@ namespace normalize {
       txid: tx_hash,
       scriptPubKey: script,
       vout: tx_ouput_n,
-      amount: satoshis(value)
+      amount: value / 1e8
     }
   }
 
@@ -133,7 +133,7 @@ namespace normalize {
       {
         transactions: normalize.transactions(wallet.balance, txs),
         totalTransactions: txs.length,
-        unspentOutputs
+        unspentOutputs 
       }
     )
   }
@@ -201,6 +201,7 @@ class PeercoinExplorer {
     let hex = transaction.sign(signature).serialize()
     let response = await this.rawApiRequest('sendrawtransaction', { hex })
     if (response === 'There was an error. Check your console.'){
+      debugger;
       throw Error('Invalid Transaction')
     }
     let { id, outputs, inputs, ...raw }: {

@@ -6,13 +6,13 @@ import LocalWallet from './Wallet'
 import bitcore from '../lib/bitcore'
 
 const syncWallet = fetchJSONRoutine.withPolling<
-  { privateKey: string, address: string },
+  { privateKey?: string, address: string },
   ExplorerWallet,
   Error
 >({
   type: 'SYNC_WALLET',
   fetchJSON: ({ address }) => peercoin.wallet(address),
-  pollingInterval: 200000,
+  pollingInterval: 1 * 60 * 1000, // poll every minute
 })
 
 const sendTransaction = fetchJSONRoutine<

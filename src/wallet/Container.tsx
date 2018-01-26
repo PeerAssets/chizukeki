@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { bindActionCreators, Dispatch } from 'redux'
 import { connect } from 'react-redux'
-import { Dimensions, Text, View } from 'react-native';
 import ActionHistory from '../generics/action-history'
 import PrivateKey from './LoadPrivateKey'
 import * as Redux from './redux'
@@ -25,11 +24,14 @@ type Props = {
 function Container({ stages, isSyncing, actions, wallet }: Props){
   return Wallet.isLoaded(wallet) ?
     <Wallet {...wallet}
-      sendTransaction={({ amount, toAddress }) => actions.sendTransaction({ amount, toAddress, wallet })}
+      sendTransaction={{
+        stage: stages.sendTransaction,
+        send: ({ amount, toAddress }) => actions.sendTransaction({ amount, toAddress, wallet })
+      }}
       sync={{
         stage: stages.sync,
         enabled: isSyncing,
-        start: () => actions.sync(wallet),
+        start: () => actions.sync({ address: wallet.address }),
         stop: actions.stopSync
       }} /> :
     <PrivateKey syncStage={stages.sync} loadPrivateKey={actions.sync} />

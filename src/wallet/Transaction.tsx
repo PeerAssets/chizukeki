@@ -11,7 +11,7 @@ namespace WalletTransaction {
   export type Data = Wallet.Transaction
 }
 
-function WalletTransaction({ item: { amount, timestamp } }: { item: WalletTransaction.Data }) {
+function WalletTransaction({ item: { amount, timestamp, confirmations } }: { item: WalletTransaction.Data }) {
   let io = (inbound, outbound) => amount > 0 ? inbound : outbound
   let textProps = io({ success: true }, { dark: true })
   return (
@@ -29,6 +29,9 @@ function WalletTransaction({ item: { amount, timestamp } }: { item: WalletTransa
         </Left>
       </CardItem>
       <CardItem footer style={{maxWidth: '100%'}}>
+        <Text note style={{ maxWidth: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {confirmations} confirmations
+        </Text>
       {/*
         <Text note style={{ellipsizeMode: 'middle', maxWidth: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {io('from', 'to')} {address}
@@ -48,7 +51,7 @@ function TransactionList({ transactions }: { transactions: TransactionList.Data 
     <View style={styles.card}>
       <H2>Transactions</H2>
       <FlatList
-        data={transactions}
+        data={transactions.reverse()}
         renderItem={WalletTransaction} />
     </View>
   )

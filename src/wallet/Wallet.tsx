@@ -65,7 +65,7 @@ let styles = {
 class Wallet extends React.Component<
   Partial<Wallet.Data> & {
     style?: any,
-    sendTransaction: (s: SendTransaction.Data) => void
+    sendTransaction: SendTransaction.Props
     sync: {
       stage: string | undefined,
       enabled: boolean,
@@ -103,6 +103,7 @@ class Wallet extends React.Component<
                   <Text> Export </Text>
                 </Button>
                 <RoutineButton style={style.column}
+                  icons={{ DEFAULT: 'refresh', DONE: 'refresh' }}
                   warning={!sync.enabled}
                   onPress={sync.enabled ? sync.stop : sync.start}
                   stage={sync.stage}
@@ -111,7 +112,7 @@ class Wallet extends React.Component<
               </Body>
             </CardItem>
           </Card>
-          <SendTransaction style={style.card} send={sendTransaction} syncStage='' />
+          <SendTransaction style={style.card} {...sendTransaction} />
         </View>
         {this.state.transactions && <TransactionList transactions={transactions} />}
       </Wrapper>
@@ -123,7 +124,8 @@ namespace Wallet {
   export type Transaction = WalletData.Transaction
   export type PendingTransaction = WalletData.PendingTransaction
   export type Loading = PrivateKey.Data
-  export type Data = Loading & WalletData
+  export type Synced = WalletData
+  export type Data = Loading & Synced
   export function isLoaded(wallet: Loading | Data | undefined): wallet is Data {
     return Boolean(wallet && wallet.hasOwnProperty('_meta'))
   }

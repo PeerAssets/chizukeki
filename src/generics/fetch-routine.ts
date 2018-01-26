@@ -1,5 +1,5 @@
 import { SagaIterator, delay } from 'redux-saga'
-import { take, cancel, fork, takeLatest, put, call, cancelled } from 'redux-saga/effects'
+import { take, cancel, fork, all, takeLatest, put, call, cancelled } from 'redux-saga/effects'
 import * as FSA from 'typescript-fsa'
 import expandedRoutine, { Routine, bindAsyncAction, Meta } from './routine'
 
@@ -19,8 +19,24 @@ function fetchJSONRoutine<Start, Success, Error>({
 
   const fetchSaga = bindAsyncAction(routine)(fetchJSON)
 
+
+  function* triggerSaga(){
+    let action: FSA.Action<Start> = yield take(routine.trigger.type)
+    yield put(routine.started(action.payload))
+  }
+
+  function* start(){
+    yield takeLatest(
+      routine.started.type,
+      (action: Action<Start>) => fetchSaga(action.payload)
+    )
+  }
+
   function* trigger() {
-    yield takeLatest([ routine.trigger, routine.started ], (action: Action<Start>) => fetchSaga(action.payload))
+    yield all([
+      fork(start),
+      fork(triggerSaga)
+    ])
   }
 
   return { trigger, fetchSaga, routine }
@@ -42,15 +58,14 @@ function pollSaga<Start, Success, Error>({ interval, routine }: pollSaga.Params<
   type LoopAction = Action<LoopPayload<Start, Success, Error>>
   function* restart(action: LoopAction){
     yield call(delay, interval)
-    put(routine.started(action.payload.params))
-    console.log('put!')
+    yield put(routine.started(action.payload.params))
   }
   function* pollSaga() {
     try {
-      while (true) {
-        yield takeLatest([routine.done.type, routine.failed.type], restart)
-      }
-    } finally { /*if (yield cancelled()){ }*/ }
+      yield takeLatest([routine.done.type, routine.failed.type], restart)
+    } finally {
+      /*if (yield cancelled()){ }*/
+    }
   }
   function* saga() {
     while (yield take(routine.trigger)) {
