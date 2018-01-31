@@ -52,6 +52,7 @@ namespace normalize {
       let amount = Satoshis.toAmount(change)
       nTransactions.push({
         id,
+        fee: NaN, // todo cryptoid is a WIP
         confirmations,
         amount,
         balance,
@@ -61,7 +62,7 @@ namespace normalize {
     }
     return nTransactions
   }
-  export function wallet({
+  export function wallet(address: string, {
       addresses: [{
         total_received = 0,
         total_sent = 0,
@@ -75,6 +76,7 @@ namespace normalize {
     ].map(Satoshis.toAmount)
     return {
       ...walletMeta(),
+      address,
       unspentOutputs,
       balance,
       received,
@@ -120,7 +122,7 @@ class Cryptoid {
     let resp = await this.privateApiRequest('multiaddr', { active: address })
     let unspent = await this.listUnspent(address)
     if (resp) {
-      return normalize.wallet(resp as MultiAddress.Response, unspent)
+      return normalize.wallet(address, resp as MultiAddress.Response, unspent)
     } else {
       throw Error('could not sync with cryptoid')
     }

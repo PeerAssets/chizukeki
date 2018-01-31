@@ -1,6 +1,17 @@
+type BtcSatoshies = number
+namespace BtcSatoshies  {
+  export const inACoin = 1e8
+  export function fromAmount(amount: number): BtcSatoshies {
+    return Math.floor(amount * inACoin)
+  }
+  export function toAmount(amountInSatoshis: BtcSatoshies): number {
+    return amountInSatoshis / inACoin
+  }
+}
 
 type Satoshis = number
 namespace Satoshis {
+  export const btc = BtcSatoshies
   export const inACoin = 1e6
   export function fromAmount(amount: number): Satoshis {
     return Math.floor(amount * inACoin)
@@ -21,6 +32,7 @@ namespace Wallet {
   export type Transaction = {
     balance: number,
     amount: number,
+    fee: number,
     id: string,
     confirmations: number,
     timestamp: Date,
@@ -30,10 +42,11 @@ namespace Wallet {
       vin: Array<any>,
     }
   }
-  export type PendingTransaction = Pick<Transaction, 'id' | 'amount' | 'timestamp' | 'raw'>
-  export function empty(): Wallet {
+  export type PendingTransaction = Pick<Transaction, 'id' | 'amount' | 'timestamp' | 'raw' | 'fee'>
+  export function empty(address: string): Wallet {
     return Object.assign(
       walletMeta(), {
+        address,
         balance: 0,
         sent: 0,
         received: 0,
@@ -49,6 +62,7 @@ type Wallet = {
     created: Date,
     updated: Date,
   },
+  address: string,
   received: number,
   sent: number,
   balance: number,

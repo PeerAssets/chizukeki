@@ -26,7 +26,8 @@ function Container({ stages, isSyncing, actions, wallet }: Props){
     <Wallet {...wallet}
       sendTransaction={{
         stage: stages.sendTransaction,
-        send: ({ amount, toAddress }) => actions.sendTransaction({ amount, toAddress, wallet })
+        send: ({ amount, toAddress }) => actions.sendTransaction({ amount, toAddress, wallet }),
+        balance: wallet.balance
       }}
       sync={{
         stage: stages.sync,

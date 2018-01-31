@@ -51,7 +51,7 @@ function TransactionList({ transactions }: { transactions: TransactionList.Data 
     <View style={styles.card}>
       <H2>Transactions</H2>
       <FlatList
-        data={transactions.reverse()}
+        data={transactions}
         renderItem={WalletTransaction} />
     </View>
   )

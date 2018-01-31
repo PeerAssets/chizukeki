@@ -1,5 +1,6 @@
 import bitcore from '../../lib/bitcore'
 import { getJSON, getText, stringifyQuery, Satoshis, Wallet, walletMeta } from './common'
+window['bitcore'] = bitcore
 
 namespace ApiCalls {
   export type Coind = 
@@ -35,7 +36,13 @@ namespace RawTransaction {
   export type UTXO = {
     value: number,
     n: number,
-    scriptPubKey: any
+    scriptPubKey: {
+      addresses: Array<string>,
+      asm: string,
+      hex: string,
+      reqSigs: number,
+      type: string,
+    }
   }
   export type ToSend = {
     unspentOutputs: Array<Wallet.UTXO>,
@@ -45,6 +52,7 @@ namespace RawTransaction {
     privateKey: string,
     fee?: number
   }
+  export type Relative = RawTransaction & { type: 'CREDIT' | 'DEBIT', fee: number, inputTotal: number }
 }
 
 type RawTransaction = {
@@ -66,6 +74,7 @@ namespace TxInfo {
   }
   export type Output = {
     script: string,
+    address: string,
     amount: Satoshis
   }
 
@@ -90,7 +99,7 @@ namespace GetAddress {
     address: string,
     sent: number,
     received: number,
-    balance: number,
+    balance: string,
     last_txs: Array<Transaction>,
   }
 }
@@ -104,38 +113,52 @@ namespace normalize {
       txid: tx_hash,
       scriptPubKey: script,
       vout: tx_ouput_n,
-      amount: value / 1e8
+      amount: Satoshis.btc.toAmount(value)
     }
   }
 
-  export function transactions(balance: number, txs: Array<RawTransaction>){
+  // todo converting to/from satoshis to avoid precision errors is inefficient 
+  export function transactions({ address, balance }: Wallet, txs: Array<RawTransaction.Relative>){
     let nTransactions: Array<Wallet.Transaction> = []
-    for (let raw of txs){
-      let { txid: id, confirmations, time, vout } = raw
-      let amount = vout.reduce((a, { value }) => a + value, 0)
+    for (let raw of txs.reverse()){
+      let { txid: id, confirmations, time, vout, type, inputTotal, fee } = raw
+      let amount = type === 'CREDIT' ? 0 : -Satoshis.fromAmount(inputTotal - fee)
+      for (let out of vout){
+        if(out.scriptPubKey.addresses.includes(address)){
+          amount += Satoshis.fromAmount(out.value)
+        }
+      }
       nTransactions.push({
         id,
         confirmations,
-        amount,
+        amount: Satoshis.toAmount(amount),
+        fee,
         balance,
         timestamp: new Date(time * 1000),
         raw
       })
-      balance -= amount
+      balance -= Satoshis.toAmount(amount)
     }
     return nTransactions
   }
 
-  export function wallet({ last_txs, ...wallet }: GetAddress.Response, txs: Array<RawTransaction>, unspentOutputs: Array<Wallet.UTXO>): Wallet {
-    return Object.assign(
+  export function wallet(
+    { last_txs, balance, ...rest }: GetAddress.Response,
+    txs: Array<RawTransaction.Relative>,
+    unspentOutputs: Array<Wallet.UTXO>
+  ): Wallet {
+    let wallet: Wallet = Object.assign(
       walletMeta(),
-      wallet,
+      rest,
       {
-        transactions: normalize.transactions(wallet.balance, txs),
+        balance: Number(balance),
+        transactions: [],
         totalTransactions: txs.length,
         unspentOutputs 
       }
     )
+    wallet.transactions = normalize.transactions(wallet, txs)
+    return wallet
   }
 }
 
@@ -201,16 +224,17 @@ class PeercoinExplorer {
     let hex = transaction.sign(signature).serialize()
     let response = await this.rawApiRequest('sendrawtransaction', { hex })
     if (response === 'There was an error. Check your console.'){
-      debugger;
       throw Error('Invalid Transaction')
     }
-    let { id, outputs, inputs, ...raw }: {
-      id: string, outputs: Array<any>, inputs: Array<any>
+    let { hash: id, outputs, inputs, ...raw }: {
+      hash: string, outputs: Array<any>, inputs: Array<any>
     } = bitcore.Transaction(hex).toObject()
+    // TODO need to update available unspent transactions after send locally?
     return {
       id,
       timestamp: new Date(),
       amount,
+      fee,
       raw: { vout: outputs, vin: inputs, ...raw }
     }
   }
@@ -218,20 +242,33 @@ class PeercoinExplorer {
   transactionInfo = (id: string) => this.extendedRequest('txinfo', id)
   getAddress = (address: string) => this.extendedRequest<GetAddress.Response>('getaddress', address)
 
+  getRelativeRawTransaction = async (id: string, address: string) => {
+    let [raw, info] = await Promise.all([
+      this.getRawTransaction(id),
+      this.transactionInfo(id),
+    ])
+    let type: 'CREDIT' | 'DEBIT' = info.inputs.filter(i => i.addresses === address).length ?
+      'DEBIT' :
+      'CREDIT'
+    let inputTotal = info.inputs.reduce((total, i) => total + Satoshis.btc.toAmount(i.amount), 0)
+    let fee = inputTotal - Satoshis.btc.toAmount(info.total)
+    return Object.assign(raw, { type, fee, inputTotal })
+  }
+
   wallet = async (address: string) => {
     let resp = await this.getAddress(address)
     if(isError(resp)){
       if(resp.error === "address not found."){
-        return Wallet.empty()
+        return Wallet.empty(address)
       }
       throw Error(resp.error)
     } else {
       let transactions = await Promise.all(
-        resp.last_txs.map(txn => this.getRawTransaction(txn.addresses))
+        resp.last_txs.map(txn => this.getRelativeRawTransaction(txn.addresses, address))
       )
       let unspent = await defaultOnError(this.listUnspent(address), [])
       // TODO retry sync, background sync? redux-offline?
-      return normalize.wallet(resp, transactions.filter(t => !isError(t)) as Array<RawTransaction>, unspent)
+      return normalize.wallet(resp, transactions.filter(t => !isError(t)) as Array<RawTransaction.Relative>, unspent)
     }
   }
 

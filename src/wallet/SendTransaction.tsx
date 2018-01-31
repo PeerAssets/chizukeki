@@ -31,7 +31,8 @@ namespace SendTransaction {
   export type Props = {
     stage?: string | undefined,
     style?: StyleProp<any>,
-    send: (data: Data) => void
+    send: (data: Data) => void,
+    balance: number,
   }
 }
 
@@ -39,11 +40,6 @@ type State = Partial<SendTransaction.Data>
 
 function isFilled(s: SendTransaction.Data | State): s is SendTransaction.Data {
   return Boolean(s.toAddress && s.amount)
-}
-
-
-// TODO implicit coupling to routine
-let buttonText = {
 }
 
 class SendTransaction extends React.Component<SendTransaction.Props, State> {
@@ -81,11 +77,11 @@ class SendTransaction extends React.Component<SendTransaction.Props, State> {
         </CardItem>
         <CardItem footer>
           <Body>
-            <RoutineButton block disabled={!isFilled(this.state)}
+            <RoutineButton block disabled={(!isFilled(this.state)) || (this.state.amount > this.props.balance) }
               icons={{ DEFAULT: 'send' }}
               stage={this.props.stage}
               onPress={() => isFilled(this.state) ? this.props.send(this.state) : null}
-              DEFAULT='Send Transaction' 
+              DEFAULT={(this.state.amount || -1) > this.props.balance ? 'Insufficient Funds!' : 'Send Transaction'}
               STARTED='Sending'
               DONE='Sent!'
               FAILED='Invalid Transaction' />
