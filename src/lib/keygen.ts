@@ -68,7 +68,7 @@ function keyToBuffer(key: string){
 }
 
 export function lockKey(key: string, password: string, itFac = DEFAULT_LOGN, callback: Function | undefined = undefined){
-  let keyBuffer = keyToBuffer(key)
+  let keyBuffer = TextBuffer.from(key)
   return callback ?
     generateLockedKey(keyBuffer, password, itFac, callback) :
     new Promise((resolve, reject) => {
