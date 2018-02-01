@@ -1,10 +1,11 @@
+import * as encoding from 'text-encoding';
+
 const scrypt = require('scrypt-async')
 const bitcore = require('bitcore-lib')
 
 const CHECKSUM_BIT = 128
 const KEY_LENGTH = 32
 const DEFAULT_LOGN = 4
-
 
 /*
    Internal functions
@@ -48,18 +49,31 @@ export function generateRandomSeed(){
 export function generateLockedKey(seed, password, itFac, callback){
   return myScrypt(password, reduceSeed(seed, password.length), itFac, function(hash){
     return callback(
-    bitcore.util.buffer.bufferToHex(
-    putIterationFactor(putChecksumByte(cleanMetaByte(
-    seed), hash[0]), itFac)));
+      bitcore.util.buffer.bufferToHex(
+        putIterationFactor(
+          putChecksumByte(cleanMetaByte(seed), hash[0]),
+          itFac
+        )
+      )
+    )
   });
 }
 
+function keyToBuffer(key: string){
+  try {
+    return (new bitcore.HDPrivateKey(key)).toBuffer()
+  } catch (e) {
+    return (new bitcore.PrivateKey(key)).toBuffer()
+  }
+}
+
 export function lockKey(key: string, password: string, itFac = DEFAULT_LOGN, callback: Function | undefined = undefined){
+  let keyBuffer = keyToBuffer(key)
   return callback ?
-    generateLockedKey(key, password, itFac, callback) :
+    generateLockedKey(keyBuffer, password, itFac, callback) :
     new Promise((resolve, reject) => {
       try {
-        return generateLockedKey(key, password, itFac, resolve)
+        return generateLockedKey(keyBuffer, password, itFac, resolve)
       } catch (e) {
         reject(e)
       }
@@ -81,8 +95,7 @@ export function unlockKey(lockedKey, password, callback: Function | undefined = 
   if (hasChecksum(keyBuffer)) {
     return myScrypt(password, reduceSeed(keyBuffer, password.length), itFac, function(hash){
       var checksum;
-      checksum = readChecksumByte(
-      keyBuffer);
+      checksum = readChecksumByte(keyBuffer);
       if (hash[0] === checksum) {
         return myScrypt(password, keyBuffer, itFac, callback);
       } else {
