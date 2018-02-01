@@ -1,43 +1,34 @@
 import * as React from 'react'
-import Modal from 'react-native-simple-modal'
+import Modal from '../generics/modal.web'
 import { Text, Body, Input, Button, Item, Label } from 'native-base/src/index'
+import { View } from 'react-native';
 
 import { unlockKey } from '../lib/encrypt-key'
-
 
 import Wallet from './Wallet'
 
 class UnlockModal extends React.Component<{
-  unlock: (password: string) => void,
+  unlock: (password: string) => Promise<any>,
   close: () => void,
   open: boolean
 }, {
-  password: string
+  password: string,
+  error: string | undefined
 }>{
-  state = { password: '' }
+  state = { password: '', error: undefined }
+  close = async (something?: any) => {
+    this.setState({ password: '', error: undefined })
+    this.props.close()
+    return something
+  }
+  incorrect = ({ message }: Error) => {
+    this.setState({ error: message })
+  }
   render() {
-    let { unlock, close, open } = this.props
+    let { unlock, open } = this.props
     return (
-      <Modal
-        open={open}
-        offset={0}
-        overlayBackground={'rgba(0, 0, 0, 0.75)'}
-        animationDuration={200}
-        animationTension={40}
-        modalDidOpen={() => undefined}
-        modalDidClose={() => undefined}
-        closeOnTouchOutside={true}
-        containerStyle={{
-          justifyContent: 'center'
-        }}
-        modalStyle={{
-          borderRadius: 2,
-          margin: 20,
-          padding: 10,
-          backgroundColor: '#F5F5F5'
-        }}
-        disableOnBackPress={false}>
-        <Body style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%', flexWrap: 'wrap' }}>
+      <Modal open={open} onClose={this.close} >
+        <Body style={{ flexDirection: 'column', justifyContent: 'center', width: '100%', flexWrap: 'wrap' }}>
           <Item fixedLabel style={{ marginLeft: 15, minWidth: 300 }}>
             <Label>Password</Label>
             <Input
@@ -48,14 +39,14 @@ class UnlockModal extends React.Component<{
               value={this.state.password}
               onChangeText={password => this.setState({ password })} />
           </Item>
-          <Button info
-            onPress={() => unlock(this.state.password)}>
-            <Text>Unlock</Text>
-          </Button>
-          <Button danger
-            onPress={() => (this.setState({ password: '' }), close())}>
-            <Text>Cancel</Text>
-          </Button>
+          <View style={{ justifyContent: 'center', marginTop: 7.5, marginBottom: 7.5 }}>
+            {this.state.error !== undefined ? <Text danger>Unlock failed, please try again</Text> : null }
+          </View>
+          <View style={{ justifyContent: 'center' }}>
+            <Button info onPress={() => unlock(this.state.password).then(this.close).catch(this.incorrect)}>
+              <Text>Unlock</Text>
+            </Button>
+          </View>
         </Body>
       </Modal>
     )
@@ -68,15 +59,14 @@ class WrapActionable extends React.Component<WrapActionable.Props, {
   state = { open: false }
   unlock = async (password: string) => {
     let { action, lockedKey } = this.props
-    this.setState({ open: false })
     let privateKey = await unlockKey(lockedKey, password) 
     return action(privateKey)
   }
   render() {
     let { Component, action, actionProp } = this.props
     return [
-      <Component {...{ [actionProp]: () => this.setState({ open: true })} } />,
-      <UnlockModal
+      <Component key='component' {...{ [actionProp]: () => this.setState({ open: true })} } />,
+      <UnlockModal key='modal'
         unlock={this.unlock}
         open={this.state.open}
         close={() => this.setState({ open: false })} />

@@ -12,6 +12,8 @@ import { Wallet as WalletData } from './explorerApi/common'
 
 import { WrapActionable } from './UnlockModal'
 
+import Modal from '../generics/modal.web'
+
 class Toggleable extends React.Component<any> {
   render() {
     let { toggle = () => { }, active = false, children, ...props } = this.props
@@ -20,6 +22,38 @@ class Toggleable extends React.Component<any> {
         {children}
       </Button>
     )
+  }
+}
+
+class UnlockThenCopy extends React.Component<{ keys: Wallet.Keys }, { privateKey: string }> {
+  state = { privateKey: '' }
+  cache = (privateKey: string) => 
+    this.setState({ privateKey })
+  copy = () => {
+    let success = Clipboard.setString(this.state.privateKey)
+    this.setState({ privateKey: '' })
+    return success
+  }
+  render() {
+    return [
+      <Modal key='modal' open={this.state.privateKey} onClose={this.copy}>
+        <Text> Unlocked! </Text>
+        <Button success style={styles.column} onPress={this.copy}>
+          <Text> Copy Key to Clipboard </Text>
+        </Button>
+      </Modal>,
+      <WrapActionable.IfLocked
+        key='button'
+        keys={this.props.keys}
+        actionProp='onPress'
+        action={Wallet.Keys.areLocked(this.props.keys) ? this.cache : this.copy}
+        Component={({ onPress }) =>
+          <Button light style={styles.column} onPress={onPress}>
+            <Text> Export Key </Text>
+          </Button>
+        }
+      />
+    ]
   }
 }
 
@@ -101,16 +135,7 @@ class Wallet extends React.Component<
                   unspentOutputs={transactions}
                   style={style.column}
                   toggle={() => this.setState({ transactions: !this.state.transactions })} />
-                <WrapActionable.IfLocked
-                  keys={keys}
-                  actionProp='onPress'
-                  action={(privateKey: string) => (console.log(Clipboard.setString(privateKey), 'exported', privateKey)) }
-                  Component={({ onPress }) => 
-                    <Button light style={style.column} onPress={onPress}>
-                      <Text> Export </Text>
-                    </Button>
-                  }
-                />
+                <UnlockThenCopy keys={keys}/>
                 <RoutineButton style={style.column}
                   icons={{ DEFAULT: 'refresh', DONE: 'refresh' }}
                   warning={!sync.enabled}

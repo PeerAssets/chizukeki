@@ -65,7 +65,7 @@ module.exports = {
           nodeModule('native-base'),
           nodeModule('react-native-easy-grid'),
           nodeModule('react-native-drawer'),
-          nodeModule('react-native-simple-modal'),
+          nodeModule('react-native-modal'),
         ],
 
         use: [

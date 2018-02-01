@@ -1,5 +1,6 @@
 import bitcore from '../../lib/bitcore'
 import { getJSON, getText, stringifyQuery, Satoshis, Wallet, walletMeta } from './common'
+window['bitcore'] = bitcore
 
 namespace ApiCalls {
   export type Coind = 

@@ -169,6 +169,7 @@ class LoadPrivateKey extends React.Component<
                 <Icon active name='lock' />
                 <Input
                   placeholder={'add a password'}
+                  secureTextEntry
                   style={{ fontSize: 12, lineHeight: 14, textOverflow: 'ellipsis' }}
                   value={password || ''}
                   onChangeText={this.setPassword} />
