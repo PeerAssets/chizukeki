@@ -19,7 +19,7 @@ class UnlockModal extends React.Component<{
     let { unlock, close, open } = this.props
     return (
       <Modal
-        open={false}
+        open={open}
         offset={0}
         overlayBackground={'rgba(0, 0, 0, 0.75)'}
         animationDuration={200}

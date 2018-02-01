@@ -104,7 +104,7 @@ class Wallet extends React.Component<
                 <WrapActionable.IfLocked
                   keys={keys}
                   actionProp='onPress'
-                  action={() => Clipboard.setString(_Keys.areLocked(keys) ? keys.locked : keys.private)}
+                  action={(privateKey: string) => (console.log(Clipboard.setString(privateKey), 'exported', privateKey)) }
                   Component={({ onPress }) => 
                     <Button light style={style.column} onPress={onPress}>
                       <Text> Export </Text>
