@@ -2,9 +2,11 @@ import * as React from 'react'
 import { bindActionCreators, Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import ActionHistory from '../generics/action-history'
+import { lockKey } from '../lib/keygen'
 import PrivateKey from './LoadPrivateKey'
 import * as Redux from './redux'
 import Wallet from './Wallet' 
+import LoadPrivateKey from './LoadPrivateKey';
 let { sendTransaction, sync } = Redux.routines
 
 type Props = {
@@ -21,13 +23,26 @@ type Props = {
   }, 
 }
 
+
+function lockPrivateKey(sync: Props['actions']['sync']){
+  return async ({ privateKey, password, format, address }: LoadPrivateKey.Data) => {
+    if(password){
+      let locked = await lockKey(privateKey, password)
+      sync({ keys: { format, locked }, address })
+    } else {
+      sync({ keys: { format, private: privateKey }, address })
+    }
+  }
+}
+
+
 function Container({ stages, isSyncing, actions, wallet }: Props){
   return Wallet.isLoaded(wallet) ?
     <Wallet {...wallet}
       sendTransaction={{
         stage: stages.sendTransaction,
-        send: ({ amount, toAddress }) => actions.sendTransaction({ amount, toAddress, wallet }),
-        balance: wallet.balance
+        send: actions.sendTransaction,
+        wallet
       }}
       sync={{
         stage: stages.sync,
@@ -35,7 +50,7 @@ function Container({ stages, isSyncing, actions, wallet }: Props){
         start: () => actions.sync({ address: wallet.address }),
         stop: actions.stopSync
       }} /> :
-    <PrivateKey syncStage={stages.sync} loadPrivateKey={actions.sync} />
+    <PrivateKey syncStage={stages.sync} loadPrivateKey={lockPrivateKey(actions.sync)} />
 }
 
 function routineStages(routines){

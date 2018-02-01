@@ -23,6 +23,9 @@ import {
 import bitcore from '../lib/bitcore'
 import Wrapper from './Wrapper'
 
+import { WrapActionable } from './UnlockModal'
+import Wallet from './Wallet';
+
 namespace SendTransaction {
   export type Data = {
     toAddress: string,
@@ -31,8 +34,8 @@ namespace SendTransaction {
   export type Props = {
     stage?: string | undefined,
     style?: StyleProp<any>,
-    send: (data: Data) => void,
-    balance: number,
+    send: (data: Data & { wallet: Wallet.Unlocked }) => void,
+    wallet: Wallet.Data,
   }
 }
 
@@ -47,7 +50,25 @@ class SendTransaction extends React.Component<SendTransaction.Props, State> {
     toAddress: '',
     amount: undefined,
   }
+  send = (privateKey: string) => {
+    if(isFilled(this.state)){
+      let wallet = Object.assign({ privateKey }, this.props.wallet)
+      this.props.send({ wallet, ...this.state })
+    }
+  }
   render() {
+    let { wallet: { keys, balance } } = this.props
+    let SendButton = (props: { onPress: () => any }) =>
+      <RoutineButton block
+        disabled={(!isFilled(this.state)) || (this.state.amount > balance)}
+        icons={{ DEFAULT: 'send' }}
+        stage={this.props.stage}
+        DEFAULT={(this.state.amount || -1) > balance ? 'Insufficient Funds!' : 'Send Transaction'}
+        STARTED='Sending'
+        DONE='Sent!'
+        FAILED='Invalid Transaction'
+        {...props} />
+
     return (
       <Card style={this.props.style}>
         <CardItem header>
@@ -77,14 +98,12 @@ class SendTransaction extends React.Component<SendTransaction.Props, State> {
         </CardItem>
         <CardItem footer>
           <Body>
-            <RoutineButton block disabled={(!isFilled(this.state)) || (this.state.amount > this.props.balance) }
-              icons={{ DEFAULT: 'send' }}
-              stage={this.props.stage}
-              onPress={() => isFilled(this.state) ? this.props.send(this.state) : null}
-              DEFAULT={(this.state.amount || -1) > this.props.balance ? 'Insufficient Funds!' : 'Send Transaction'}
-              STARTED='Sending'
-              DONE='Sent!'
-              FAILED='Invalid Transaction' />
+            <WrapActionable.IfLocked
+              keys={keys}
+              actionProp='onPress'
+              action={this.send}
+              Component={SendButton}
+            />
           </Body>
         </CardItem>
       </Card>

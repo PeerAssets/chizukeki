@@ -3,6 +3,7 @@ const bitcore = require('bitcore-lib')
 
 const CHECKSUM_BIT = 128
 const KEY_LENGTH = 32
+const DEFAULT_LOGN = 4
 
 
 /*
@@ -43,7 +44,8 @@ function readIterationFactor (array){
 export function generateRandomSeed(){
   return bitcore.crypto.Random.getRandomBuffer(KEY_LENGTH);
 }
-function generateLockedKey(seed, password, itFac, callback){
+
+export function generateLockedKey(seed, password, itFac, callback){
   return myScrypt(password, reduceSeed(seed, password.length), itFac, function(hash){
     return callback(
     bitcore.util.buffer.bufferToHex(
@@ -51,10 +53,31 @@ function generateLockedKey(seed, password, itFac, callback){
     seed), hash[0]), itFac)));
   });
 }
-export function unlockKey(lockedKey, password, callback){
-  var keyBuffer, itFac;
-  keyBuffer = bitcore.util.buffer.hexToBuffer(lockedKey);
-  itFac = readIterationFactor(keyBuffer);
+
+export function lockKey(key: string, password: string, itFac = DEFAULT_LOGN, callback: Function | undefined = undefined){
+  return callback ?
+    generateLockedKey(key, password, itFac, callback) :
+    new Promise((resolve, reject) => {
+      try {
+        return generateLockedKey(key, password, itFac, resolve)
+      } catch (e) {
+        reject(e)
+      }
+    })
+}
+
+export function unlockKey(lockedKey, password, callback: Function | undefined = undefined){
+  if(!callback){
+    return new Promise((resolve, reject) => {
+      try {
+        return unlockKey(lockedKey, password, resolve)
+      } catch (e) {
+        reject(e)
+      }
+    })
+  }
+  let keyBuffer = bitcore.util.buffer.hexToBuffer(lockedKey)
+  let itFac = readIterationFactor(keyBuffer)
   if (hasChecksum(keyBuffer)) {
     return myScrypt(password, reduceSeed(keyBuffer, password.length), itFac, function(hash){
       var checksum;

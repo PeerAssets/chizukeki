@@ -80,7 +80,7 @@ class RoutineButton extends React.Component<Props, { alerting: boolean }> {
     })
 
     return (
-      <Button {...props} {...stageBased }>
+      <Button {...stageBased } {...props}>
         {this.stageSwitch(normalizeIcons(icons))}
         <Text>{this.stageSwitch({ STARTED, DONE, FAILED, DEFAULT })}</Text>
       </Button>

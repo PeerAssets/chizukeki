@@ -6,7 +6,7 @@ import LocalWallet from './Wallet'
 import bitcore from '../lib/bitcore'
 
 const syncWallet = fetchJSONRoutine.withPolling<
-  { privateKey?: string, address: string },
+  Partial<LocalWallet.Loading> & { address: string },
   ExplorerWallet,
   Error
 >({
@@ -16,7 +16,7 @@ const syncWallet = fetchJSONRoutine.withPolling<
 })
 
 const sendTransaction = fetchJSONRoutine<
-  { wallet: LocalWallet.Data, toAddress: string, amount: number },
+  { wallet: LocalWallet.Unlocked, toAddress: string, amount: number },
   any,
   Error
 >({

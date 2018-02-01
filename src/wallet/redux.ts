@@ -54,13 +54,13 @@ function applySync({ old, synced }: {
 function walletReducer(state: State = actionHistory, action: AnyAction): State {
   return syncWallet.routine.switch<State>(action, {
     started: payload => {
-      if(!payload.privateKey){
+      if(!payload.keys){
         return state
       }
       if(!state.wallet){
         return {
           ...state,
-          wallet: payload as Wallet.Data
+          wallet: payload as Wallet.Loading
         }
       }
       return state

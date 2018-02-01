@@ -18,25 +18,32 @@ import {
   variables
 } from 'native-base/src/index'
 
-import bitcore from '../lib/bitcore'
-import RoutineButton from '../generics/routine-button'
 import Wrapper from './Wrapper'
+
+import RoutineButton from '../generics/routine-button'
+import bitcore from '../lib/bitcore'
 
 namespace LoadPrivateKey {
   export type Data = {
     privateKey: string,
     address: string,
+    format: Format,
+    password: string | undefined
   }
 }
 
-type Format = 'wif' | 'raw'
+type Format = 'hd' | 'wif' | 'raw'
 
-let Touchable = (TouchableOpacity as any)
+const formatText = {
+  hd: 'HD Key',
+  raw: 'Private Key',
+  wif: 'WIF',
+}
 
 let choiceStyle = {
   height: '100%',
-  paddingLeft: 10,
-  paddingRight: 10,
+  paddingLeft: 5,
+  paddingRight: 5,
   borderColor: variables.segmentBackgroundColor
 }
 function SelectFormat({ selected, select, style }: { selected: Format, select: (f: Format) => void, style: any }) {
@@ -47,78 +54,130 @@ function SelectFormat({ selected, select, style }: { selected: Format, select: (
         onClick={() => select(format)}
         style={[choiceStyle, ...style]}
         {...props}>
-        <Text>{children}</Text>
+        <Text style={{ paddingLeft: 10, paddingRight: 10 }}>{children}</Text>
       </Button>
     )
   }
   return (
     <Segment>
-      <Choice first format='wif' selected={selected}>Wif</Choice>
+      <Choice first format='hd' selected={selected}>HD</Choice>
+      <Choice format='wif' selected={selected}>Wif</Choice>
       <Choice last format='raw' selected={selected}>Raw</Choice>
     </Segment>
   )
 }
 
-type State = Partial<LoadPrivateKey.Data> & { format: Format }
-
-function normalize({ privateKey, format }: State): LoadPrivateKey.Data {
-  let pKey = (format === 'wif') ?
-    bitcore.PrivateKey.fromWIF(privateKey) :
-    new bitcore.PrivateKey(privateKey)
-  return {
-    privateKey: pKey.toString(),
-    address: pKey.toAddress().toString(),
+function normalize(
+  { privateKey, format }: Pick<LoadPrivateKey.Data, 'privateKey' | 'format'>
+): Pick<LoadPrivateKey.Data, 'privateKey' | 'format' | 'address'> {
+  switch (format) {
+    case 'wif':
+      let pKey = bitcore.PrivateKey.fromWIF(privateKey)
+      return {
+        format,
+        privateKey: pKey.toString(),
+        address: pKey.toAddress().toString(),
+      }
+    case 'raw':
+      pKey = new bitcore.PrivateKey(privateKey)
+      return {
+        format,
+        privateKey: pKey.toString(),
+        address: pKey.toAddress().toString(),
+      }
+    case 'hd':
+      pKey = new bitcore.HDPrivateKey(privateKey)
+      return {
+        format,
+        privateKey: pKey.toString(),
+        address: pKey.privateKey.toAddress().toString(),
+      }
   }
 }
 
 class LoadPrivateKey extends React.Component<
-  { 
+  {
     syncStage?: string | undefined,
     loadPrivateKey: (data: LoadPrivateKey.Data) => void
-  },
-  State
+  }, {
+    data: LoadPrivateKey.Data,
+    error: Error | undefined
+  }
   > {
   state = {
-    privateKey: '',
-    address: undefined,
-    format: 'raw' as Format
+    error: undefined,
+    data: {
+      privateKey: '',
+      address: '',
+      format: 'raw' as Format,
+      password: undefined,
+    }
+  }
+  processState = ({
+    privateKey = this.state.data.privateKey,
+    format = this.state.data.format
+  }: { privateKey?: string, format?: Format }) => {
+    let data = this.state.data
+    try {
+      this.setState({
+        data: Object.assign(data, normalize({ privateKey, format })),
+        error: undefined
+      })
+    } catch (error) {
+      this.setState({ error, data: Object.assign(data, { privateKey, format }) })
+    }
+  }
+  setPassword = (password: string) => {
+    this.setState({
+      data: Object.assign(this.state.data, { password }),
+    })
   }
   render() {
-    let { privateKey, format } = this.state
+    let { privateKey, format, password } = this.state.data
     return (
       <Wrapper>
         <Card >
           <CardItem header>
-            <Body style={{ flexDirection: 'row', width: '100%', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-              <H2 style={{flexBasis: 200, paddingBottom: 15 }}>Import or Generate Private Key</H2>
+            <Body style={[styles.row, { paddingLeft: 0, paddingRight: 0 }]}>
+              <H2 style={{ flexBasis: 200, paddingBottom: 15 }}>Import or Generate Private Key</H2>
               <Button info
-                style={styles.selectFormat}
-                onPress={() => this.setState({ privateKey: new bitcore.PrivateKey().toString(), format: 'raw' })}>
-                <Text>Generate</Text>
+                style={styles.right}
+                onPress={() => this.processState({ privateKey: new bitcore.HDPrivateKey().toString(), format: 'hd' })}>
+                <Text>Generate HD Key</Text>
               </Button>
             </Body>
           </CardItem>
           <CardItem>
-            <Body style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%', flexWrap: 'wrap' }}>
+            <Body style={styles.row}>
+              <Item style={{ minWidth: 300 }}>
+                <Icon active name='key' />
+                <Input
+                  placeholder={`Paste ${formatText[format]} here or Generate a new one`}
+                  style={{ fontSize: 12, lineHeight: 14, textOverflow: 'ellipsis' }}
+                  value={privateKey}
+                  onChangeText={privateKey => this.processState({ privateKey })} />
+              </Item>
               <SelectFormat
                 selected={format}
-                select={format => this.setState({ format })}
-                style={styles.selectFormat} />
-              <Item style={{ marginLeft: 15, minWidth: 300 }}>
-                <Icon active name='lock' />
-                <Input
-                  placeholder={`Paste ${ format === 'raw' ? 'private' : format } key here or Generate a new one`}
-                  style={{ fontSize: 12, lineHeight: 14, textOverflow: 'ellipsis' }}
-                  value={this.state.privateKey}
-                  onChangeText={privateKey => this.setState({ privateKey })} />
-              </Item>
+                select={format => this.processState({ format })}
+                style={styles.right} />
             </Body>
           </CardItem>
           <CardItem footer>
-            <Body>
-              <RoutineButton block disabled={!this.state.privateKey}
-                onPress={() => this.props.loadPrivateKey(normalize(this.state))}
-                stage={this.props.syncStage} 
+            <Body style={styles.row}>
+              <Item style={{ minWidth: 300 }}>
+                <Icon active name='lock' />
+                <Input
+                  placeholder={'add a password'}
+                  style={{ fontSize: 12, lineHeight: 14, textOverflow: 'ellipsis' }}
+                  value={password || ''}
+                  onChangeText={this.setPassword} />
+              </Item>
+              <RoutineButton
+                style={[styles.right, { minWidth: 161 }]}
+                disabled={(!privateKey) || this.state.error}
+                onPress={() => this.props.loadPrivateKey(this.state.data)}
+                stage={this.props.syncStage}
                 DEFAULT='Import and Sync'
                 STARTED='Syncing wallet activity'
                 DONE='Successfully synced!'
@@ -132,8 +191,17 @@ class LoadPrivateKey extends React.Component<
 }
 
 const styles = {
-  selectFormat: {
-    flex: 1,
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    flexWrap: 'wrap',
+    paddingLeft: 30,
+    paddingRight: 30
+  },
+  right: {
+    alignSelf: 'flex-end',
+    justifyContent: 'center'
   }
 }
 

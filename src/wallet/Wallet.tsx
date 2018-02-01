@@ -10,6 +10,8 @@ import RoutineButton from '../generics/routine-button'
 
 import { Wallet as WalletData } from './explorerApi/common'
 
+import { WrapActionable } from './UnlockModal'
+
 class Toggleable extends React.Component<any> {
   render() {
     let { toggle = () => { }, active = false, children, ...props } = this.props
@@ -63,7 +65,7 @@ let styles = {
 
 @connectStyle('PeerKeeper.Wallet', styles)
 class Wallet extends React.Component<
-  Partial<Wallet.Data> & {
+  Wallet.Data & {
     style?: any,
     sendTransaction: SendTransaction.Props
     sync: {
@@ -85,7 +87,7 @@ class Wallet extends React.Component<
     }
   }
   render() {
-    let { address, transactions = [], balance = 0, style, privateKey, sync, sendTransaction } = this.props
+    let { address, transactions = [], balance = 0, style, keys, sync, sendTransaction } = this.props
     return (
       <Wrapper>
         <View style={style.main}>
@@ -99,9 +101,16 @@ class Wallet extends React.Component<
                   unspentOutputs={transactions}
                   style={style.column}
                   toggle={() => this.setState({ transactions: !this.state.transactions })} />
-                <Button light disabled={!privateKey} style={style.column} onClick={() => privateKey && Clipboard.setString(privateKey)}>
-                  <Text> Export </Text>
-                </Button>
+                <WrapActionable.IfLocked
+                  keys={keys}
+                  actionProp='onPress'
+                  action={() => Clipboard.setString(_Keys.areLocked(keys) ? keys.locked : keys.private)}
+                  Component={({ onPress }) => 
+                    <Button light style={style.column} onPress={onPress}>
+                      <Text> Export </Text>
+                    </Button>
+                  }
+                />
                 <RoutineButton style={style.column}
                   icons={{ DEFAULT: 'refresh', DONE: 'refresh' }}
                   warning={!sync.enabled}
@@ -120,12 +129,32 @@ class Wallet extends React.Component<
   }
 }
 
+type _Keys = _Keys.Locked | _Keys.Unlocked
+namespace _Keys {
+  type WithFormat = {
+    format: PrivateKey.Data['format'],
+  }
+  export type Locked = WithFormat & { locked: string }
+  export type Unlocked = WithFormat & { private: string }
+  export function areLocked(keys: _Keys): keys is Locked {
+    return keys.hasOwnProperty('locked')
+  }
+}
+
 namespace Wallet {
   export type Transaction = WalletData.Transaction
   export type PendingTransaction = WalletData.PendingTransaction
-  export type Loading = PrivateKey.Data
+
+  export type Keys = _Keys
+  export const Keys = _Keys
+  export type Loading = {
+    address: string,
+    keys: Keys
+  }
+
   export type Synced = WalletData
   export type Data = Loading & Synced
+  export type Unlocked = Data & { privateKey: string }
   export function isLoaded(wallet: Loading | Data | undefined): wallet is Data {
     return Boolean(wallet && wallet.hasOwnProperty('_meta'))
   }

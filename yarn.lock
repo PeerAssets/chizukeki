@@ -5448,6 +5448,10 @@ react-native-elements@*:
     prop-types "^15.5.10"
     react-timer-mixin "^0.13.3"
 
+react-native-simple-modal@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-simple-modal/-/react-native-simple-modal-7.0.0.tgz#402e4e51dd3c6a5f64b9cd8dfc0b364358fe956b"
+
 react-native-vector-icons@^4.4.2, react-native-vector-icons@~4.4.2:
   version "4.4.3"
   resolved "https://registry.yarnpkg.com/react-native-vector-icons/-/react-native-vector-icons-4.4.3.tgz#9e847b8c432a17e5e0ffd60ccf09f3112a18b9df"
