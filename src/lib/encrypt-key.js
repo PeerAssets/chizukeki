@@ -55,7 +55,7 @@ async function aesGcmDecrypt(ciphertext, password) {
 
   const ctStr = atob(ciphertext.slice(24));                                          // decode base64 ciphertext
   
-  const ctUint8 = new Uint8Array((ctStr.match(/./g)).map(ch => ch.charCodeAt(0))
+  const ctUint8 = new Uint8Array((ctStr.match(/[\s\S]/g)).map(ch => ch.charCodeAt(0))
   );     // ciphertext as Uint8Array
   // note: why doesn't ctUint8 = new TextEncoder().encode(ctStr) work?
 
@@ -66,6 +66,6 @@ async function aesGcmDecrypt(ciphertext, password) {
 }
 
 export {
-  aesGcmEncrypt as lock,
-  aesGcmDecrypt as unlock
+  aesGcmEncrypt as lockKey,
+  aesGcmDecrypt as unlockKey
 }

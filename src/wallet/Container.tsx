@@ -2,12 +2,19 @@ import * as React from 'react'
 import { bindActionCreators, Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import ActionHistory from '../generics/action-history'
-import { lockKey } from '../lib/keygen'
+import { lockKey } from '../lib/encrypt-key'
 import PrivateKey from './LoadPrivateKey'
 import * as Redux from './redux'
 import Wallet from './Wallet' 
 import LoadPrivateKey from './LoadPrivateKey';
 let { sendTransaction, sync } = Redux.routines
+
+/*
+import bitcore from '../lib/bitcore'
+import * as _key from '../lib/encrypt-key'
+window['bitcore'] = bitcore
+window['keys'] = _key
+*/
 
 type Props = {
   wallet: Wallet.Data,

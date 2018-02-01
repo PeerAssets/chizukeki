@@ -1,8 +1,5 @@
 import bitcore from '../../lib/bitcore'
-import * as keygen from '../../lib/keygen'
 import { getJSON, getText, stringifyQuery, Satoshis, Wallet, walletMeta } from './common'
-window['bitcore'] = bitcore
-window['keygen'] = keygen
 
 namespace ApiCalls {
   export type Coind = 

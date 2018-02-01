@@ -2,7 +2,7 @@ import * as React from 'react'
 import Modal from 'react-native-simple-modal'
 import { Text, Body, Input, Button, Item, Label } from 'native-base/src/index'
 
-import { unlockKey } from '../lib/keygen'
+import { unlockKey } from '../lib/encrypt-key'
 
 
 import Wallet from './Wallet'
