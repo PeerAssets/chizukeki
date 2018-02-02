@@ -1,7 +1,25 @@
 import deepmerge from 'deepmerge'
 import { getTheme, variables as nbVariables } from 'native-base/src/index'
 
+
 export default (variables = nbVariables) => {
+  let buttonStyles = {
+    '.iconLeft': {
+      'NativeBase.Spinner': {
+        marginRight: 0,
+        marginLeft: 16,
+      },
+    },
+  }
+
+  const spinnerStyles = {
+    '.inverse': {
+      color: variables.inverseSpinnerColor
+    },
+    '.inline': {
+      color: variables.textColor,
+    },
+  }
   let basicTextStyles = {
     '.light': {
       color: variables.brandLight,
@@ -13,8 +31,7 @@ export default (variables = nbVariables) => {
       color: variables.btnSuccessBg,
     },
     '.info': {
-      color: variables.btnInfoBg,
-    },
+      color: variables.btnInfoBg, },
     '.warning': {
       color: variables.btnWarningBg,
     },
@@ -28,6 +45,8 @@ export default (variables = nbVariables) => {
   return deepmerge(getTheme(variables), {
     "NativeBase.Text": basicTextStyles,
     "NativeBase.Icon": basicTextStyles,
-    "NativeBase.IconNB": basicTextStyles
+    "NativeBase.IconNB": basicTextStyles,
+    "NativeBase.Button": buttonStyles,
+    "NativeBase.Spinner": Object.assign(spinnerStyles, basicTextStyles)
   })
 }

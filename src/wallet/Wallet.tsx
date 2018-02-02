@@ -3,7 +3,7 @@ import { Dimensions, View, ViewStyle, Clipboard } from 'react-native'
 import PrivateKey from './LoadPrivateKey'
 import TransactionList from './Transaction'
 import SendTransaction from './SendTransaction'
-import { Button, CardItem, Body, Text, Card, connectStyle, H2 } from 'native-base/src/index'
+import { Button, CardItem, Body, Text, Card, connectStyle, H2, Icon } from 'native-base/src/index'
 import Wrapper from './Wrapper'
 
 import RoutineButton from '../generics/routine-button'
@@ -38,7 +38,7 @@ class UnlockThenCopy extends React.Component<{ keys: Wallet.Keys }, { privateKey
     return [
       <Modal key='modal' open={this.state.privateKey} onClose={this.copy}>
         <Text> Unlocked! </Text>
-        <Button success style={styles.column} onPress={this.copy}>
+        <Button iconLeft success style={styles.column} onPress={this.copy}>
           <Text> Copy Key to Clipboard </Text>
         </Button>
       </Modal>,
@@ -49,6 +49,7 @@ class UnlockThenCopy extends React.Component<{ keys: Wallet.Keys }, { privateKey
         action={Wallet.Keys.areLocked(this.props.keys) ? this.cache : this.copy}
         Component={({ onPress }) =>
           <Button light style={styles.column} onPress={onPress}>
+            <Icon name='eject'/>
             <Text> Export Key </Text>
           </Button>
         }

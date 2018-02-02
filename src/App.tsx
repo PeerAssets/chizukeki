@@ -26,8 +26,11 @@ export default class App extends React.Component<{}> {
           <ConnectedRouter history={history}>
             <StyleProvider style={theme(variables)}>
               <View style={styles.wrapper}>
+                {/*
+                TODO will background / logo be optional / configurable on deployment?
                 <Image source={require("./assets/logomask.png")}
                   style={styles.background} />
+                */}
                 <View style={styles.container}>
                   <Nav/>
                   <Route path="/" exact component={Wallet} />
@@ -45,7 +48,7 @@ export default class App extends React.Component<{}> {
 
 const styles = StyleSheet.create({
   wrapper: {
-    height: '100%',
+    minHeight: '100%',
     backgroundColor: '#DADADA'
   },
   background: {

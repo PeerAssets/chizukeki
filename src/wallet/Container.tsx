@@ -9,12 +9,6 @@ import Wallet from './Wallet'
 import LoadPrivateKey from './LoadPrivateKey';
 let { sendTransaction, sync } = Redux.routines
 
-/*
-import bitcore from '../lib/bitcore'
-import * as _key from '../lib/encrypt-key'
-window['bitcore'] = bitcore
-window['keys'] = _key
-*/
 
 type Props = {
   wallet: Wallet.Data,

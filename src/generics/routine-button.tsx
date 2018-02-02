@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { mapObjIndexed } from 'ramda'
-import { ActivityIndicator } from 'react-native'
-import { Text, Button, Icon, variables } from 'native-base/src/index'
+import { Text, Button, Icon, Spinner, variables } from 'native-base/src/index'
 import { Routine } from './routine';
 import { lang } from 'moment';
 
@@ -20,11 +19,11 @@ type Props = {
 }
 
 function ButtonIcon(name: string){
-  return <Icon {...{ name, size: 30, color: 'black' }}/>
+  return <Icon inline {...{ name, size: 30, color: 'black' }}/>
 }
 
 const defaultIcons = {
-  STARTED: <ActivityIndicator animating />,
+  STARTED: <Spinner size={30} color='white' />,
   DONE: ButtonIcon('check'),
   FAILED: ButtonIcon('close'),
   DEFAULT: undefined
@@ -69,8 +68,10 @@ class RoutineButton extends React.Component<Props, { alerting: boolean }> {
 
   render() {
     let {
-    stage, icons = {}, onPress, children, STARTED, DONE, FAILED, DEFAULT, ...props
-  } = this.props
+      stage, icons = {}, onPress, children,
+      STARTED, DONE, FAILED, DEFAULT,
+      ...props
+    } = this.props
 
     let stageBased = this.stageSwitch({
       DEFAULT: { info: true, onPress },
@@ -79,9 +80,10 @@ class RoutineButton extends React.Component<Props, { alerting: boolean }> {
       FAILED: this.dismissable('danger')
     })
 
+    let icon = this.stageSwitch(normalizeIcons(icons))
     return (
-      <Button {...stageBased } {...props}>
-        {this.stageSwitch(normalizeIcons(icons))}
+      <Button iconLeft={Boolean(icon)} {...stageBased } {...props}>
+        {icon}
         <Text>{this.stageSwitch({ STARTED, DONE, FAILED, DEFAULT })}</Text>
       </Button>
     )
