@@ -29,7 +29,7 @@ class UnlockModal extends React.Component<{
     return (
       <Modal open={open} onClose={this.close} >
         <Body style={{ flexDirection: 'column', justifyContent: 'center', width: '100%', flexWrap: 'wrap' }}>
-          <Item fixedLabel style={{ marginLeft: 15, minWidth: 300 }}>
+          <Item fixedLabel style={{ minWidth: 300 }}>
             <Label>Password</Label>
             <Input
               clearTextOnFocus
@@ -42,9 +42,12 @@ class UnlockModal extends React.Component<{
           <View style={{ justifyContent: 'center', marginTop: 7.5, marginBottom: 7.5 }}>
             {this.state.error !== undefined ? <Text danger>Unlock failed, please try again</Text> : null }
           </View>
-          <View style={{ justifyContent: 'center' }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', maxWidth: 175 }}>
             <Button info onPress={() => unlock(this.state.password).then(this.close).catch(this.incorrect)}>
               <Text>Unlock</Text>
+            </Button>
+            <Button danger onPress={this.close}>
+              <Text>Cancel</Text>
             </Button>
           </View>
         </Body>

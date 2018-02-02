@@ -49,7 +49,10 @@ namespace TransactionList {
 function TransactionList({ transactions }: { transactions: TransactionList.Data }) {
   return (
     <View style={styles.card}>
-      <H2>Transactions</H2>
+      <H2>
+        Transactions 
+        <Text note> ({transactions.length} total) </Text>
+      </H2>
       <FlatList
         data={transactions}
         renderItem={WalletTransaction} />

@@ -48,9 +48,9 @@ class UnlockThenCopy extends React.Component<{ keys: Wallet.Keys }, { privateKey
         actionProp='onPress'
         action={Wallet.Keys.areLocked(this.props.keys) ? this.cache : this.copy}
         Component={({ onPress }) =>
-          <Button light style={styles.column} onPress={onPress}>
+          <Button iconLeft light style={styles.column} onPress={onPress}>
             <Icon name='eject'/>
-            <Text> Export Key </Text>
+            <Text>Export Key</Text>
           </Button>
         }
       />
@@ -80,7 +80,8 @@ let styles = {
   main: {
     flex: 3,
     minWidth: 350,
-    margin: 7.5,
+    marginLeft: 15,
+    marginRight: 15,
     flexDirection: 'column',
     justifyContent: 'space-around',
     alignItems: 'center',
@@ -89,14 +90,15 @@ let styles = {
   body: {
     flexDirection: 'row',
     justifyContent: 'center',
-    minWidth: '350px'
+    width: '100%'
   },
   column: {
     justifyContent: 'center',
     alignItems: 'center',
     margin: 7.5,
     flex: 1,
-  }, }
+  }
+}
 
 @connectStyle('PeerKeeper.Wallet', styles)
 class Wallet extends React.Component<
@@ -109,12 +111,8 @@ class Wallet extends React.Component<
       start: () => any,
       stop: () => any,
     }
-  },
-  { transactions: boolean }
-> {
-  state = {
-    transactions: Dimensions.get('window').width > 600
   }
+> {
   componentDidMount() {
     let sync = this.props.sync
     if(sync.enabled){
@@ -126,30 +124,28 @@ class Wallet extends React.Component<
     return (
       <Wrapper>
         <View style={style.main}>
-          <Card>
+          <Card style={{ width: '100%' }}>
             <CardItem header>
               <Balance balance={balance} style={style.column} />
             </CardItem>
             <CardItem>
               <Body style={style.body}>
-                <TransactionCount active={this.state.transactions}
-                  unspentOutputs={transactions}
-                  style={style.column}
-                  toggle={() => this.setState({ transactions: !this.state.transactions })} />
                 <UnlockThenCopy keys={keys}/>
                 <RoutineButton style={style.column}
+                  autoDismiss={{ stage: 'DONE' }}
                   icons={{ DEFAULT: 'refresh', DONE: 'refresh' }}
                   warning={!sync.enabled}
                   onPress={sync.enabled ? sync.stop : sync.start}
                   stage={sync.stage}
-                  DEFAULT={ sync.enabled ? 'Syncing Enabled' : 'Syncing Disabled' }
-                  FAILED='Recent Sync Failed' />
+                  DEFAULT={ sync.enabled ? 'Syncing' : 'Sync Disabled' }
+                  LOADING='Syncing'
+                  FAILED='Sync Failed' />
               </Body>
             </CardItem>
           </Card>
           <SendTransaction style={style.card} {...sendTransaction} />
         </View>
-        {this.state.transactions && <TransactionList transactions={transactions} />}
+        <TransactionList transactions={transactions} />
       </Wrapper>
     )
   }

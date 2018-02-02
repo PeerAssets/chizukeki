@@ -10,6 +10,10 @@ type Props = {
   stage: string | undefined,
   onPress: () => any,
   icons?: Partial<Record<Stage, string | React.ReactElement <any> | undefined>>,
+  autoDismiss?: {
+    stage: 'DONE' | 'FAILED' | Array<'DONE'| 'FAILED'>,
+    after?: number
+  }
   STARTED?: string,
   DONE?: string,
   FAILED?: string,
@@ -36,9 +40,9 @@ function normalizeIcons(icons: Props['icons'] = {}){
   )
 }
 
-class RoutineButton extends React.Component<Props, { alerting: boolean }> {
+class RoutineButton extends React.Component<Props, { alerting: false | Stage }> {
   
-  state = { alerting: false }
+  state = { alerting: (false as false | Stage) }
 
   componentWillReceiveProps({ stage }){
     if(
@@ -47,7 +51,7 @@ class RoutineButton extends React.Component<Props, { alerting: boolean }> {
       this.props.stage &&
       (this.props.stage !== stage)
     ){
-      this.setState({ alerting: true })
+      this.setState({ alerting: stage })
     }
   }
 
@@ -66,12 +70,25 @@ class RoutineButton extends React.Component<Props, { alerting: boolean }> {
     return cases[stage] || cases.DEFAULT
   }
 
+  autoDismiss = (queryStage: 'DONE' | 'FAILED') => () => {
+    if(!this.props.autoDismiss){
+      return false
+    }
+    let { stage, after = 2500 } = this.props.autoDismiss
+    if(stage === queryStage || (Array.isArray(stage) && stage.includes(queryStage))){
+      return setTimeout(() => this.setState({ alerting: false }), after)
+    }
+  }
+
   render() {
     let {
       stage, icons = {}, onPress, children,
       STARTED, DONE, FAILED, DEFAULT,
       ...props
     } = this.props
+    if(this.state.alerting !== false){
+      stage = this.state.alerting
+    }
 
     let stageBased = this.stageSwitch({
       DEFAULT: { info: true, onPress },
@@ -79,6 +96,13 @@ class RoutineButton extends React.Component<Props, { alerting: boolean }> {
       DONE: this.dismissable('success'),
       FAILED: this.dismissable('danger')
     })
+
+    this.stageSwitch({
+      DEFAULT(){},
+      STARTED(){},
+      DONE: this.autoDismiss('DONE'),
+      FAILED: this.autoDismiss('FAILED'),
+    })()
 
     let icon = this.stageSwitch(normalizeIcons(icons))
     return (
