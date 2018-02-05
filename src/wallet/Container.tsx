@@ -26,7 +26,7 @@ type Props = {
 
 
 function lockPrivateKey(sync: Props['actions']['sync']){
-  return async ({ privateKey, password, format, address }: LoadPrivateKey.Data) => {
+  return async ({ privateKey, password, format, address }: LoadPrivateKey.Data, syncNeeded: boolean = true) => {
     if(password){
       let locked = await lockKey(privateKey, password)
       sync({ keys: { format, locked }, address })

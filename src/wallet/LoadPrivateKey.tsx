@@ -1,8 +1,8 @@
 import * as React from 'react'; import { Component } from 'react';
 import { Dimensions, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import {
+  Badge,
   Container,
-  Segment,
   Header,
   Content,
   Card,
@@ -22,123 +22,108 @@ import Wrapper from '../generics/Wrapper'
 import RoutineButton from '../generics/routine-button'
 import bitcore from '../lib/bitcore'
 
-namespace LoadPrivateKey {
-  export type Data = {
-    privateKey: string,
-    address: string,
-    format: Format,
-    password: string | undefined
-  }
-}
-
-type Format = 'hd' | 'wif' | 'raw'
-
+type Format = 'hd' | 'wif' | 'raw' 
 const formatText = {
   hd: 'HD Key',
   raw: 'Private Key',
   wif: 'WIF',
 }
-
-let choiceStyle = {
-  height: '100%',
-  paddingLeft: 5,
-  paddingRight: 5,
-  paddingTop: 2,
-  paddingBottom: 2,
-  flex: 1,
-  borderColor: variables.segmentBackgroundColor
-}
-function SelectFormat({ selected, select, style }: { selected: Format, select: (f: Format) => void, style: any }) {
-  function Choice({ selected, format, children, style = [], ...props }) {
-    return (
-      <Button
-        active={selected === format}
-        onClick={() => select(format)}
-        style={[choiceStyle, ...style]}
-        {...props}>
-        <Text style={{ paddingLeft: 5, paddingRight: 5, fontSize: 12 }}>{children}</Text>
-      </Button>
-    )
+function SelectedFormat({ selected, style }: { selected: Format, style: any }) {
+  let float = {
+    position: 'absolute',
+    right: -10,
+    top: -10,
   }
+  let fontSize = 12
   return (
-    <Segment style={{ flexDirection: 'row', height: 30, top: -30, position: 'absolute' }}>
-      <Choice first format='hd' selected={selected}>HD</Choice>
-      <Choice format='wif' selected={selected}>Wif</Choice>
-      <Choice last format='raw' selected={selected}>Raw</Choice>
-    </Segment>
+    <Badge success style={[ float, style ]}>
+      <Text style={{ fontSize }}>
+        <Icon name='check' style={{ fontSize, color: "#fff", lineHeight: 20 }} /> {formatText[selected]}
+      </Text>
+    </Badge>
   )
 }
 
-function normalize(
-  { privateKey, format }: Pick<LoadPrivateKey.Data, 'privateKey' | 'format'>
-): Pick<LoadPrivateKey.Data, 'privateKey' | 'format' | 'address'> {
-  if(!privateKey){
-    return  { format, privateKey, address: '' }
+function validator(format: Format, toKey: (key: string) => any, toAddress = key => key.toAddress()){
+  return (privateKey: string): false | Pick<LoadPrivateKey.Data, 'privateKey' | 'address' | 'format'> => {
+    try {
+      let pKey = toKey(privateKey)
+      return {
+        privateKey: pKey.toString() as string,
+        address: toAddress(pKey).toString() as string,
+        format
+      }
+    } catch (e) {
+      return false
+    }
   }
-  switch (format) {
-    case 'wif':
-      let pKey = bitcore.PrivateKey.fromWIF(privateKey)
-      return {
-        format,
-        privateKey: pKey.toString(),
-        address: pKey.toAddress().toString(),
-      }
-    case 'raw':
-      pKey = new bitcore.PrivateKey(privateKey)
-      return {
-        format,
-        privateKey: pKey.toString(),
-        address: pKey.toAddress().toString(),
-      }
-    case 'hd':
-      pKey = new bitcore.HDPrivateKey(privateKey)
-      return {
-        format,
-        privateKey: pKey.toString(),
-        address: pKey.privateKey.toAddress().toString(),
-      }
+}
+
+function deriveFormat(privateKey: string){
+  type D = false | Pick<LoadPrivateKey.Data, 'privateKey' | 'address' | 'format'>
+  let data: D = [
+    validator('hd', key => new bitcore.HDPrivateKey(key), key => key.privateKey.toAddress()),
+    validator('wif', key => bitcore.PrivateKey.fromWIF(key)),
+    validator('raw', key => new bitcore.PrivateKey(key)),
+  ].reduce(
+    (derived: D, derive): D => derived || derive(privateKey) || (false as false),
+    (false as D)
+  )
+  if(!data) {
+    return {
+      data: {
+        privateKey,
+        format: undefined,
+        address: undefined
+      },
+      error: 'Could Not parse Key. Must be either HD, WIF, or raw Private Key'
+    }
   }
+  return { data, error: undefined }
 }
 
 class LoadPrivateKey extends React.Component<
   {
     syncStage?: string | undefined,
-    loadPrivateKey: (data: LoadPrivateKey.Data) => void
+    loadPrivateKey: (data: LoadPrivateKey.Data, syncNeeded?: boolean) => void
   }, {
-    data: LoadPrivateKey.Data,
-    error: Error | undefined
+    pKeyInput: string,
+    data: Partial<LoadPrivateKey.Data>,
+    error: string | undefined
   }
   > {
   state = {
+    pKeyInput: '',
     error: undefined,
     data: {
       privateKey: '',
       address: '',
-      format: 'raw' as Format,
+      format: undefined,
       password: undefined,
     }
   }
-  processState = ({
-    privateKey = this.state.data.privateKey,
-    format = this.state.data.format
-  }: { privateKey?: string, format?: Format }) => {
-    let data = this.state.data
-    try {
-      this.setState({
-        data: Object.assign(data, normalize({ privateKey, format })),
-        error: undefined
-      })
-    } catch (error) {
-      this.setState({ error, data: Object.assign(data, { privateKey, format }) })
-    }
+  withData = (data: Partial<LoadPrivateKey.Data>) => 
+    Object.assign(this.state.data, data)
+  withSomeData = (data: Partial<LoadPrivateKey.Data>): Partial<LoadPrivateKey.Data> => 
+    Object.assign(this.state.data, data)
+  processKeyChange = (key: string) => {
+    let { data, error = undefined } = deriveFormat(key)
+    this.setState({ data: this.withSomeData(data), error, pKeyInput: key })
   }
   setPassword = (password: string) => {
-    this.setState({
-      data: Object.assign(this.state.data, { password }),
-    })
+    this.setState({ data: this.withData({ password }) })
   }
+  generateNew = () => this.props.loadPrivateKey(
+    this.withData(
+      deriveFormat(new bitcore.HDPrivateKey().toString()).data
+    ) as LoadPrivateKey.Data,
+    false
+  )
   render() {
-    let { privateKey, format, password } = this.state.data
+    let { pKeyInput, data, data: { privateKey, format, password } } = this.state
+    let load = LoadPrivateKey.isFilled(data) && (
+      () => LoadPrivateKey.isFilled(data) && this.props.loadPrivateKey(data)
+    )
     return (
       <Wrapper>
         <Card >
@@ -149,21 +134,16 @@ class LoadPrivateKey extends React.Component<
           </CardItem>
           <CardItem>
             <Body style={styles.row}>
-              <Item style={{ width: '100%', flexDirection: 'row', flexWrap: 'wrap' }}>
+              <Item style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap' }}>
                 <Icon active name='key' />
                 <Input
-                  placeholder={`Paste ${formatText[format]} here`}
+                  placeholder={`Paste WIF, HD Key, or Raw Private Key here`}
                   style={{ fontSize: 12, lineHeight: 14, textOverflow: 'ellipsis', minWidth: 200 }}
-                  value={privateKey}
-                  onChangeText={privateKey => this.processState({ privateKey })}/>
-                <Right>
-                  <SelectFormat
-                    selected={format}
-                    select={format => this.processState({ format })}
-                    style={styles.right} />
-                </Right>
+                  value={pKeyInput}
+                  onChangeText={privateKey => this.processKeyChange(privateKey)}/>
+                  { format && <SelectedFormat selected={format} style={styles.right} /> }
               </Item>
-              <Item style={{ minWidth: 300 }}>
+              <Item style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap' }}>
                 <Icon active name='lock' />
                 <Input
                   placeholder={'Add a password'}
@@ -177,17 +157,23 @@ class LoadPrivateKey extends React.Component<
           <CardItem footer>
             <Body style={styles.row}>
               <RoutineButton
-                style={[styles.right, { minWidth: 161 }]}
-                disabled={(!privateKey) || this.state.error}
-                onPress={() => this.props.loadPrivateKey(this.state.data)}
+                style={[{ justifyContent: 'center', width: '100%', paddingBottom: 6 + (26 / 2), borderBottomRightRadius: 0, borderBottomLeftRadius: 0 }]}
+                disabled={(!load) || this.state.error}
+                onPress={load || (() => {})}
                 stage={this.props.syncStage}
                 DEFAULT={`Import ${password ? 'Locked' : 'Unlocked'} Key and Sync`}
                 STARTED='Syncing wallet'
                 DONE='Successfully synced!'
                 FAILED='There was a Problem syncing!' />
-              <Text>or</Text>
-              <Button info
-                onPress={() => this.processState({ privateKey: new bitcore.HDPrivateKey().toString(), format: 'hd' })}>
+              <View style={{ zIndex: 2, width: '100%', flexDirection: 'row', justifyContent: 'center', height: 0, overflow: 'visible' }}>
+                <Badge light style={{ position: 'absolute', top: -(26 / 2), width: 26, height: 26, flexDirection: 'column', justifyContent: 'center', borderRadius: '50%' }}>
+                  <Text style={{ fontSize: 10, whiteSpace: 'nowrap' }}>or</Text>
+                </Badge>
+              </View>
+              <Button
+                primary
+                style={[{ justifyContent: 'center', width: '100%', paddingTop: 6 + (26 / 2), borderTopRightRadius: 0, borderTopLeftRadius: 0 }]}
+                onPress={this.generateNew}>
                 <Text>Generate new {password ? 'Locked' : 'Unlocked'} Wallet</Text>
               </Button>
             </Body>
@@ -198,10 +184,24 @@ class LoadPrivateKey extends React.Component<
   }
 }
 
+namespace LoadPrivateKey {
+  export type Data = {
+    privateKey: string,
+    address: string,
+    format: Format,
+    password: string | undefined
+  }
+  export function isFilled(d: Partial<Data>): d is Data {
+    let { privateKey, format, address } = d
+    return Boolean(privateKey && format && address)
+  }
+}
+
+
 const styles = {
   row: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     width: '100%',
     flexWrap: 'wrap',
     paddingLeft: 30,

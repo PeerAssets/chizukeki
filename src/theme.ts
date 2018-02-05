@@ -3,6 +3,15 @@ import { getTheme, variables as nbVariables } from 'native-base/src/index'
 
 
 export default (variables = nbVariables) => {
+  let badgeStyles = {
+    ".light": {
+      backgroundColor: variables.brandLight,
+      'NativeBase.Text': {
+        color: variables.brandDark,
+      }
+    },
+  }
+
   let buttonStyles = {
     '.iconLeft': {
       'NativeBase.Spinner': {
@@ -47,6 +56,7 @@ export default (variables = nbVariables) => {
     "NativeBase.Icon": basicTextStyles,
     "NativeBase.IconNB": basicTextStyles,
     "NativeBase.Button": buttonStyles,
+    "NativeBase.Badge": badgeStyles,
     "NativeBase.Spinner": Object.assign(spinnerStyles, basicTextStyles)
   })
 }
