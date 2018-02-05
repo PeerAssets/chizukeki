@@ -21,7 +21,10 @@ const sendTransaction = fetchJSONRoutine<
   Error
 >({
   type: 'SEND_TRANSACTION',
-  fetchJSON: ({ wallet: { address, privateKey, unspentOutputs }, toAddress, amount }) => peercoin.sendRawTransaction({
+  fetchJSON: ({
+    wallet: { address, privateKey, unspentOutputs },
+    toAddress, amount
+  }) => peercoin.sendRawTransaction({
     changeAddress: address,
     toAddress,
     amount,
