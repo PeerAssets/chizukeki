@@ -18,8 +18,7 @@ import {
   variables
 } from 'native-base/src/index'
 
-import Wrapper from './Wrapper'
-
+import Wrapper from '../generics/Wrapper'
 import RoutineButton from '../generics/routine-button'
 import bitcore from '../lib/bitcore'
 
@@ -180,9 +179,9 @@ class LoadPrivateKey extends React.Component<
                 onPress={() => this.props.loadPrivateKey(this.state.data)}
                 stage={this.props.syncStage}
                 DEFAULT='Import and Sync'
-                STARTED='Syncing wallet activity'
+                STARTED='Syncing wallet'
                 DONE='Successfully synced!'
-                FAILED='There was a problem syncing' />
+                FAILED='There was a Problem syncing!' />
             </Body>
           </CardItem>
         </Card>

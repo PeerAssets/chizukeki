@@ -8,7 +8,7 @@ import { AnyAction } from 'typescript-fsa';
 
 export type State = { wallet?: undefined | Wallet.Loading | Wallet.Data } & ActionHistory.Bind
 
-let actionHistory = ActionHistory.of([
+let actionHistory = () => ActionHistory.of([
   ...syncWallet.routine.allTypes,
   ...sendTransaction.routine.allTypes,
 ])
@@ -51,7 +51,11 @@ function applySync({ old, synced }: {
   )
 }
 
-function walletReducer(state: State = actionHistory, action: AnyAction): State {
+function logout(state: State){
+  return actionHistory()
+}
+
+function walletReducer(state: State = actionHistory(), action: AnyAction): State {
   return syncWallet.routine.switch<State>(action, {
     started: payload => {
       if(!payload.keys){
@@ -71,16 +75,16 @@ function walletReducer(state: State = actionHistory, action: AnyAction): State {
     }),
     failed: () => state
   }) ||
-    sendTransaction.routine.switch<State>(action, {
-      started: payload => state,
-      done: (payload) => ({
-        ...state,
-        // an unloaded wallet here shouldn't be possible
-        wallet: Wallet.isLoaded(state.wallet) ? applyTransaction(state.wallet, payload) : state.wallet,
-      }),
-      failed: () => state
-    }) ||
-    state
+  sendTransaction.routine.switch<State>(action, {
+    started: payload => state,
+    done: (payload) => ({
+      ...state,
+      // an unloaded wallet here shouldn't be possible
+      wallet: Wallet.isLoaded(state.wallet) ? applyTransaction(state.wallet, payload) : state.wallet,
+    }),
+    failed: () => state
+  }) ||
+  ((action.type === 'HARD_LOGOUT') ? logout(state) : state)
 }
 
 export const reducer = ActionHistory.bind(walletReducer)

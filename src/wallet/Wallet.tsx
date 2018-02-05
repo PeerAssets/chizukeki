@@ -4,15 +4,14 @@ import PrivateKey from './LoadPrivateKey'
 import TransactionList from './Transaction'
 import SendTransaction from './SendTransaction'
 import { Button, CardItem, Body, Text, Card, connectStyle, H2, Icon } from 'native-base/src/index'
-import Wrapper from './Wrapper'
 
+import Wrapper from '../generics/Wrapper'
 import RoutineButton from '../generics/routine-button'
+import Modal from '../generics/modal.web'
 
 import { Wallet as WalletData } from './explorerApi/common'
 
 import { WrapActionable } from './UnlockModal'
-
-import Modal from '../generics/modal.web'
 
 class Toggleable extends React.Component<any> {
   render() {

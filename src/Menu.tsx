@@ -6,7 +6,7 @@ import { withRouter } from 'react-router'
 
 import { Link } from './routing/router'
 
-import { Button, connectStyle, variables } from 'native-base/src/index'
+import { Button, connectStyle, variables, Right, Icon } from 'native-base/src/index'
 
 let tabStyles = {
   button: {
@@ -70,6 +70,11 @@ class Nav extends React.Component<{ location: { pathname: string }, style?: any 
       <View style={style.container}>
         <Tab name='Wallet' selected={location.pathname} />
         <Tab name='Decks' selected={location.pathname} />
+        <Right>
+          <Button info iconLeft style={style.button}>
+            <Link to='/logout' style={style.link}><Icon name='sign-out' color='white'/></Link>
+          </Button>
+        </Right>
       </View>
     )
   }
@@ -78,4 +83,3 @@ class Nav extends React.Component<{ location: { pathname: string }, style?: any 
 
 
 export default withRouter(Nav)
-

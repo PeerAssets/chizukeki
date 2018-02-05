@@ -51,7 +51,7 @@ function TransactionList({ transactions }: { transactions: TransactionList.Data 
     <View style={styles.card}>
       <H2>
         Transactions 
-        <Text note> ({transactions.length} total) </Text>
+        <Text note> {transactions.length} total </Text>
       </H2>
       <FlatList
         data={transactions}

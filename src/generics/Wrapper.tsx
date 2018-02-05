@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Dimensions, Text, View } from 'react-native';
 
-
 let styles = {
   container: {
     flexDirection: 'row',

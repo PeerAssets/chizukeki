@@ -22,7 +22,7 @@ namespace ActionHistory {
   export function push<ActionType extends string = string>(
     ah: ActionHistory<ActionType>, action: ActionType
   ){ if(ah.following.includes(action)){
-      ah.history.push(action)
+      ah.history = [...ah.history, action]
       ah.latest = action
     }
     return ah

@@ -37,6 +37,7 @@ function lockPrivateKey(sync: Props['actions']['sync']){
 }
 
 
+// TODO the LoadPrivateKey should maybe be broken into a seperate login subapp, but it's kinda entangled
 function Container({ stages, isSyncing, actions, wallet }: Props){
   return Wallet.isLoaded(wallet) ?
     <Wallet {...wallet}

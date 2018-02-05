@@ -4,12 +4,12 @@ import { Provider } from "react-redux"
 import { PersistGate } from 'redux-persist/es/integration/react'
 import { ConnectedRouter } from 'react-router-redux'
 
-import { Route } from './routing/router'
+import { Route, Redirect } from './routing/router'
+import DependentRoute from './routing/dependent-route'
 import configureStore, { history } from "./store"
 
 import Wallet from './wallet/Container'
 import Nav from './Menu'
-
 
 import { StyleProvider, variables } from 'native-base/src/index';
 import theme from './theme'
@@ -33,8 +33,17 @@ export default class App extends React.Component<{}> {
                 */}
                 <View style={styles.container}>
                   <Nav/>
-                  <Route path="/" exact component={Wallet} />
-                  <Route path="/wallet" exact component={Wallet} />
+
+                  <Route path="/login" exact component={Wallet} />
+                  <DependentRoute
+                    dependency={{pathname: 'login', prop: 'wallet' }}
+                    path="/wallet" exact component={Wallet} />
+
+                  <Route path="/logout" exact render={() => (
+                    store.dispatch({ type: 'HARD_LOGOUT' }),
+                    <Redirect to='/login'/>
+                  )}/>
+
                 </View>
               </View>
             </StyleProvider>
