@@ -1,14 +1,14 @@
 import * as React from 'react'
-import { View, Image, Text, StyleSheet  } from 'react-native'
+import { View, Image, Text, StyleSheet } from 'react-native'
 import { Provider } from "react-redux"
 import { PersistGate } from 'redux-persist/es/integration/react'
 import { ConnectedRouter } from 'react-router-redux'
 
 import { Route, Redirect } from './routing/router'
-import DependentRoute from './routing/dependent-route'
 import configureStore, { history } from "./store"
 
 import Wallet from './wallet/Container'
+import Login from './wallet/LoginContainer'
 import Nav from './Menu'
 
 import { StyleProvider, variables } from 'native-base/src/index';
@@ -32,13 +32,10 @@ export default class App extends React.Component<{}> {
                   style={styles.background} />
                 */}
                 <View style={styles.container}>
-                  <Nav/>
-
-                  <Route path="/login" exact component={Wallet} />
-                  <DependentRoute
-                    dependency={{ pathname: 'login', prop: 'wallet' }}
-                    path="/wallet" exact component={Wallet} />
-
+                  <Nav />
+                  <Route path="/" exact render={() => <Redirect to='/login'/>} />
+                  <Route path="/login" exact component={Login} />
+                  <Route path="/wallet" exact component={Wallet} />
                 </View>
               </View>
             </StyleProvider>

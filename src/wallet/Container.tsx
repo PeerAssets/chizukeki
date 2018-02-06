@@ -1,14 +1,15 @@
 import * as React from 'react'
 import { bindActionCreators, Dispatch } from 'redux'
 import { connect } from 'react-redux'
+
+import { Redirect } from '../routing/router'
 import ActionHistory from '../generics/action-history'
-import { lockKey } from '../lib/encrypt-key'
-import PrivateKey from './LoadPrivateKey'
+import { routineStages } from '../generics/utils'
+
 import * as Redux from './redux'
 import Wallet from './Wallet' 
-import LoadPrivateKey from './LoadPrivateKey';
-let { sendTransaction, sync } = Redux.routines
 
+let { sendTransaction, sync } = Redux.routines
 
 type Props = {
   wallet: Wallet.Data,
@@ -21,25 +22,16 @@ type Props = {
     sync: typeof sync.trigger
     stopSync: typeof sync.stop
     sendTransaction: typeof sendTransaction.trigger
-  }, 
-}
-
-
-function lockPrivateKey(sync: Props['actions']['sync']){
-  return async ({ privateKey, password, format, address }: LoadPrivateKey.Data, syncNeeded: boolean = true) => {
-    if(password){
-      let locked = await lockKey(privateKey, password)
-      sync({ keys: { format, locked }, address })
-    } else {
-      sync({ keys: { format, private: privateKey }, address })
-    }
   }
 }
 
 
-// TODO the LoadPrivateKey should maybe be broken into a seperate login subapp, but it's kinda entangled
 function Container({ stages, isSyncing, actions, wallet }: Props){
-  return Wallet.isLoaded(wallet) ?
+  // todo this still isn't very scaleable
+  if(!Wallet.isLoaded(wallet)){
+    return <Redirect to='/login'/>
+  }
+  return (
     <Wallet {...wallet}
       sendTransaction={{
         stage: stages.sendTransaction,
@@ -51,18 +43,8 @@ function Container({ stages, isSyncing, actions, wallet }: Props){
         enabled: isSyncing,
         start: () => actions.sync({ address: wallet.address }),
         stop: actions.stopSync
-      }} /> :
-    <PrivateKey syncStage={stages.sync} loadPrivateKey={lockPrivateKey(actions.sync)} />
-}
-
-function routineStages(routines){
-  return actionHistory => Object.keys(routines)
-    .reduce((stages, key) => {
-      let routine = routines[key]
-      let latestRoutineAction = ActionHistory.filterWithPrefix(routine.trigger.type, actionHistory).latest
-      stages[key] = routine.stage(latestRoutineAction)
-      return stages
-    }, {})
+      }} />
+  )
 }
 
 let isSyncing = function isSyncing(routine){
