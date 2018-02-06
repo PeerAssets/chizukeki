@@ -40,10 +40,10 @@ function* cleanup(){
 
 export default function * (){
   yield all([
-    fork(syncWallet.trigger),
-    fork(syncWallet.poll),
-    fork(sendTransaction.trigger),
-    fork(cleanup),
+    syncWallet.trigger(),
+    syncWallet.poll(),
+    sendTransaction.trigger(),
+    cleanup(),
   ])
 }
 

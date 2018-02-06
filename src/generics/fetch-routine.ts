@@ -19,11 +19,11 @@ function fetchJSONRoutine<Start, Success, Error>({
 
   const fetchSaga = bindAsyncAction(routine)(fetchJSON)
 
-
   function* triggerSaga(){
-    let action: FSA.Action<Start> = yield take(routine.trigger.type)
-    console.log('triggered', action)
-    yield put(routine.started(action.payload))
+    yield takeLatest(
+      routine.trigger.type,
+      (action: Action<Start>) => put(routine.started(action.payload))
+    )
   }
 
   function* start(){
@@ -35,8 +35,8 @@ function fetchJSONRoutine<Start, Success, Error>({
 
   function* trigger() {
     yield all([
-      fork(start),
-      fork(triggerSaga)
+      start(),
+      triggerSaga()
     ])
   }
 
