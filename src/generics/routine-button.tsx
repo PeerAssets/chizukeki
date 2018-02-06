@@ -3,20 +3,27 @@ import { mapObjIndexed } from 'ramda'
 import { Text, Button, Icon, Spinner, variables } from 'native-base/src/index'
 import { Routine } from './routine';
 import { lang } from 'moment';
+import { Dimensions } from 'react-native';
 
 type Stage = 'STARTED' | 'DONE' | 'FAILED' | 'DEFAULT'
 
+type DismissProps = Array<{
+  stage?: Stage,
+  stages?: Array<Stage>,
+  auto?: boolean,
+  onAutoDismiss?: () => any,
+  onPressDismiss?: () => any,
+  after?: number
+}>
+
 type Props = {
-  stage: string | undefined,
-  onPress: () => any,
-  icons?: Partial<Record<Stage, string | React.ReactElement <any> | undefined>>,
-  autoDismiss?: {
-    stage: 'DONE' | 'FAILED' | Array<'DONE'| 'FAILED'>,
-    after?: number
-  }
-  STARTED?: string,
-  DONE?: string,
-  FAILED?: string,
+  stage: string | undefined
+  onPress: () => any
+  icons?: Partial<Record<Stage, string | React.ReactElement <any> | undefined>>
+  dismiss?: DismissProps
+  STARTED?: string
+  DONE?: string
+  FAILED?: string
   DEFAULT: string
 
   [key: string]: any
@@ -55,11 +62,6 @@ class RoutineButton extends React.Component<Props, { alerting: false | Stage }> 
     }
   }
 
-  dismissable = (attr: string) => ({
-    [attr]: true,
-    onPress: () => this.setState({ alerting: false })
-  })
-
   stageSwitch = (cases: Record<Stage, any>) => {
     let stage: Stage = (
       (!this.props.stage) ||
@@ -70,15 +72,39 @@ class RoutineButton extends React.Component<Props, { alerting: false | Stage }> 
     return cases[stage] || cases.DEFAULT
   }
 
-  autoDismiss = (queryStage: 'DONE' | 'FAILED') => () => {
-    if(!this.props.autoDismiss){
-      return false
-    }
-    let { stage, after = 2500 } = this.props.autoDismiss
-    if(stage === queryStage || (Array.isArray(stage) && stage.includes(queryStage))){
-      return setTimeout(() => this.setState({ alerting: false }), after)
+  dismissProps(queryStage: Stage) {
+    for (let {
+      stage,
+      stages = [],
+      auto = false,
+      after = 2500,
+      onAutoDismiss = () => { },
+      onPressDismiss = () => { }
+    } of this.props.dismiss || []) {
+      if (stage === queryStage || stages.includes(queryStage)) {
+        let dismiss = () => this.setState({ alerting: false })
+        if((this.props.stage === queryStage) && auto){
+          setTimeout(() => {
+            if (this.state.alerting) {
+              dismiss()
+              onAutoDismiss()
+            }
+          }, after)
+        }
+        return {
+          onPress: () => {
+            dismiss()
+            onPressDismiss()
+          }
+        }
+      }
     }
   }
+  dismissable = (stage: Stage, attr: string) => ({
+    [attr]: true,
+    ...this.dismissProps(stage)
+  })
+
 
   render() {
     let {
@@ -93,16 +119,9 @@ class RoutineButton extends React.Component<Props, { alerting: false | Stage }> 
     let stageBased = this.stageSwitch({
       DEFAULT: { info: true, onPress },
       STARTED: { info: true, onPress },
-      DONE: this.dismissable('success'),
-      FAILED: this.dismissable('danger')
+      DONE: this.dismissable('DONE', 'success'),
+      FAILED: this.dismissable('FAILED', 'danger')
     })
-
-    this.stageSwitch({
-      DEFAULT(){},
-      STARTED(){},
-      DONE: this.autoDismiss('DONE'),
-      FAILED: this.autoDismiss('FAILED'),
-    })()
 
     let icon = this.stageSwitch(normalizeIcons(icons))
     return (

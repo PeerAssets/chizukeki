@@ -78,9 +78,8 @@ function TransactionCount({ unspentOutputs, ...props }) {
 let styles = {
   main: {
     flex: 3,
-    minWidth: 350,
-    marginLeft: 15,
-    marginRight: 15,
+    minWidth: 325,
+    marginTop: -5,
     flexDirection: 'column',
     justifyContent: 'space-around',
     alignItems: 'center',
@@ -131,7 +130,7 @@ class Wallet extends React.Component<
               <Body style={style.body}>
                 <UnlockThenCopy keys={keys}/>
                 <RoutineButton style={style.column}
-                  autoDismiss={{ stage: 'DONE' }}
+                  dismiss={[{ stage: 'DONE', auto: true, onPressDismiss: sync.enabled ? sync.stop : sync.start }]}
                   icons={{ DEFAULT: 'refresh', DONE: 'refresh' }}
                   warning={!sync.enabled}
                   onPress={sync.enabled ? sync.stop : sync.start}
@@ -142,7 +141,7 @@ class Wallet extends React.Component<
               </Body>
             </CardItem>
           </Card>
-          <SendTransaction style={style.card} {...sendTransaction} />
+          <SendTransaction {...sendTransaction} />
         </View>
         <TransactionList transactions={transactions} />
       </Wrapper>
