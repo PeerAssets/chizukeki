@@ -62,17 +62,17 @@ class Tab extends React.Component<{ name: string, link?: string, selected: strin
 }
 
 @connectStyle('PeerKeeper.Nav.Tab', navStyles)
-class Nav extends React.Component<{ location: { pathname: string }, style?: any }> {
+class Nav extends React.Component<{ location: { pathname: string }, style?: any, logout: () => any }> {
   constructor(props){ super(props) }
   render() {
-    let { style, location } = this.props
+    let { style, location, logout } = this.props
     return (
       <View style={style.container}>
         <Tab name='Wallet' selected={location.pathname} />
         <Tab name='Decks' selected={location.pathname} />
         <Right>
-          <Button info iconLeft style={style.button}>
-            <Link to='/logout' style={style.link}><Icon name='sign-out' color='white'/></Link>
+          <Button info style={style.button}>
+            <Link onPress={logout} to='/login' style={style.link}><Icon name='sign-out' color='white'/></Link>
           </Button>
         </Right>
       </View>
@@ -80,6 +80,7 @@ class Nav extends React.Component<{ location: { pathname: string }, style?: any 
   }
 }
 
-
-
-export default withRouter(Nav)
+export default connect(
+  ({ router }: { router: any })=> router,
+  dispatch => ({ logout: () => dispatch({ type: 'HARD_LOGOUT' }) })
+)(Nav)

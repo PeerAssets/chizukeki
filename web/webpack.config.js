@@ -25,7 +25,7 @@ module.exports = {
 
   resolve: {
     symlinks: false,
-    extensions: [ ".js", ".jsx", ".ts", ".tsx", ".web.js", ".web.jsx" ],
+    extensions: [ "*", ".js", ".jsx", ".ts", ".tsx", ".web.ts", ".web.tsx", ".web.js", ".web.jsx" ],
     alias: {
       'react-native$': 'react-native-web',
       'react-router-native': 'react-router',
@@ -55,7 +55,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /.jsx?|\.tsx?$/,
+        test: /.jsx?|\.tsx?/,
         // Add every directory that needs to be compiled by Babel during the build
         include: [
           path.join(__dirname, '../index.web.tsx'),

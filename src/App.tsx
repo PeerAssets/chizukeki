@@ -36,13 +36,8 @@ export default class App extends React.Component<{}> {
 
                   <Route path="/login" exact component={Wallet} />
                   <DependentRoute
-                    dependency={{pathname: 'login', prop: 'wallet' }}
+                    dependency={{ pathname: 'login', prop: 'wallet' }}
                     path="/wallet" exact component={Wallet} />
-
-                  <Route path="/logout" exact render={() => (
-                    store.dispatch({ type: 'HARD_LOGOUT' }),
-                    <Redirect to='/login'/>
-                  )}/>
 
                 </View>
               </View>

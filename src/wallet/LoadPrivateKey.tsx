@@ -103,7 +103,7 @@ class LoadPrivateKey extends React.Component<
     }
   }
   withData = (data: Partial<LoadPrivateKey.Data>) => 
-    Object.assign(this.state.data, data)
+    Object.assign({}, this.state.data, data)
   withSomeData = (data: Partial<LoadPrivateKey.Data>): Partial<LoadPrivateKey.Data> => 
     Object.assign(this.state.data, data)
   processKeyChange = (key: string) => {

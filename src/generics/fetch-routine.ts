@@ -22,6 +22,7 @@ function fetchJSONRoutine<Start, Success, Error>({
 
   function* triggerSaga(){
     let action: FSA.Action<Start> = yield take(routine.trigger.type)
+    console.log('triggered', action)
     yield put(routine.started(action.payload))
   }
 
