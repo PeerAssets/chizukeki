@@ -9,6 +9,7 @@ import { routineStages } from '../generics/utils'
 import * as Redux from './redux'
 import Assets from './Assets' 
 
+/*
 let { sendTransaction, sync } = Redux.routines
 
 type Props = {
@@ -48,9 +49,7 @@ export default connect(
     }
   },
   (dispatch: Dispatch<any>) => ({ actions: bindActionCreators({
-    sync: sync.trigger,
-    stopSync: sync.stop,
-    sendTransaction: Redux.routines.sendTransaction.trigger
   }, dispatch) })
-)(Container)
+)(Assets)
 
+*/

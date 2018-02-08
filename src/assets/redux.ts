@@ -35,7 +35,7 @@ function assetReducer(state: State = { decks: [], ...actionHistory() }, action: 
   state
 }
 
-export const reducer = ActionHistory.bind(assetReducer)
+export const reducer = ActionHistory.bind<string, State>(assetReducer)
 export const saga = Saga
 export const routines = {
   syncDecks: syncDecks.routine,

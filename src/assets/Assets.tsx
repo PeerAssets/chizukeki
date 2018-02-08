@@ -7,7 +7,9 @@ import RoutineButton from '../generics/routine-button'
 import Modal from '../generics/modal.web'
 
 import DeckList from './DeckList'
+export default DeckList
 
+/*
 let styles = {
   main: {
     flex: 3,
@@ -37,12 +39,6 @@ class Assets extends React.Component<
     style?: any,
   }
 > {
-  componentDidMount() {
-    let sync = this.props.sync
-    if(sync.enabled){
-      sync.start()
-    }
-  }
   render() {
     let { address, transactions = [], balance = 0, style, keys, sync, sendTransaction } = this.props
     return (
@@ -54,7 +50,6 @@ class Assets extends React.Component<
             </CardItem>
             <CardItem>
               <Body style={style.body}>
-                <UnlockThenCopy keys={keys}/>
                 <RoutineButton style={style.column}
                   dismiss={[{ stage: 'DONE', auto: true, onPressDismiss: sync.enabled ? sync.stop : sync.start }]}
                   icons={{ DEFAULT: 'refresh', DONE: 'refresh' }}
@@ -80,3 +75,4 @@ namespace Assets {
 }
 
 export default Assets
+*/
