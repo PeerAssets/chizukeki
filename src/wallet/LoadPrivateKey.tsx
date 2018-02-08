@@ -134,7 +134,7 @@ class LoadPrivateKey extends React.Component<
           </CardItem>
           <CardItem>
             <Body style={styles.row}>
-              <Item style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+              <Item style={{ width: '100%', flexDirection: 'row', flexWrap: 'wrap' }}>
                 <Icon active name='key' />
                 <Input
                   placeholder={`Paste WIF, HD Key, or Raw Private Key here`}
@@ -143,8 +143,8 @@ class LoadPrivateKey extends React.Component<
                   onChangeText={privateKey => this.processKeyChange(privateKey)}/>
                   { format && <SelectedFormat selected={format} style={styles.right} /> }
               </Item>
-              <Item style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-                <Icon active name='lock' />
+              <Item style={{ width: '100%', flexDirection: 'row', flexWrap: 'wrap' }}>
+                <Icon active name='lock' style={{ width: 32, textAlign: 'center' }} />
                 <Input
                   placeholder={'Add a password'}
                   secureTextEntry
@@ -204,8 +204,8 @@ const styles = {
     justifyContent: 'space-around',
     width: '100%',
     flexWrap: 'wrap',
-    paddingLeft: 30,
-    paddingRight: 30
+    paddingLeft: 15,
+    paddingRight: 15
   },
   right: {
     alignSelf: 'flex-end',

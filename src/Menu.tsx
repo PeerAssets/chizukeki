@@ -9,24 +9,21 @@ import { Link } from './routing/router'
 import { Button, connectStyle, variables, Right, Icon } from 'native-base/src/index'
 
 let tabStyles = {
-  button: {
-    height: '100%',
-    borderRadius: 0,
-    padding: 0,
-  },
   link: {
     color: variables.btnInfoColor,
     textDecorationLine: 'none',
     textDecoration: 'none',
-    paddingLeft: 15,
-    paddingRight: 15,
     height: '100%',
     justifyContent: 'center',
     flexDirection: 'column',
-    display: 'flex'
+    display: 'flex',
+    paddingLeft: 15,
+    paddingRight: 15,
+    backgroundColor: variables.btnInfoBg
   },
   selected: {
     color: variables.btnPrimaryColor,
+    backgroundColor: variables.btnPrimaryBg
   },
 }
 
@@ -54,9 +51,9 @@ class Tab extends React.Component<{ name: string, link?: string, selected: strin
     let { name, link = `/${this.props.name.toLowerCase()}`, style, selected } = this.props
     let linkStyle = Object.assign({}, style.link, selected === link ? style.selected : {})
     return (
-      <Button {...selected === link ? { primary: true } : { info: true }} style={style.button}>
-        <Link to={link} style={linkStyle}>{name}</Link>
-      </Button>
+      <Link to={link} style={linkStyle}>
+        <Text>{name}</Text>
+      </Link>
     )
   }
 }
@@ -71,9 +68,9 @@ class Nav extends React.Component<{ location: { pathname: string }, style?: any,
         <Tab name='Wallet' selected={location.pathname} />
         <Tab name='Assets' selected={location.pathname} />
         <Right>
-          <Button info style={style.button}>
-            <Link onPress={logout} to='/login' style={style.link}><Icon name='sign-out' color='white'/></Link>
-          </Button>
+          <Link onPress={logout} to='/login' style={style.link}>
+            <Icon name='sign-out' style={{color:'white'}} />
+          </Link>
         </Right>
       </View>
     )
