@@ -1,12 +1,35 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>react native</title>
-  </head>
-  <body>
-    <div id="root"></div>
-  <script type="text/javascript" src="/chizukeki/bundle.js"></script></body>
-</html>
+Html Webpack Plugin:
+<pre>
+  ReferenceError: include is not defined
+  
+  - index.ejs:9 eval
+    [.]/[html-webpack-plugin]/lib/loader.js!./web/index.ejs:9:6
+  
+  - index.ejs:14 module.exports
+    [.]/[html-webpack-plugin]/lib/loader.js!./web/index.ejs:14:3
+  
+  - index.js:264 
+    [wallet]/[html-webpack-plugin]/index.js:264:16
+  
+  - util.js:16 tryCatcher
+    [wallet]/[bluebird]/js/release/util.js:16:23
+  
+  - promise.js:512 Promise._settlePromiseFromHandler
+    [wallet]/[bluebird]/js/release/promise.js:512:31
+  
+  - promise.js:569 Promise._settlePromise
+    [wallet]/[bluebird]/js/release/promise.js:569:18
+  
+  - promise.js:606 Promise._settlePromiseCtx
+    [wallet]/[bluebird]/js/release/promise.js:606:10
+  
+  - async.js:138 Async._drainQueue
+    [wallet]/[bluebird]/js/release/async.js:138:12
+  
+  - async.js:143 Async._drainQueues
+    [wallet]/[bluebird]/js/release/async.js:143:10
+  
+  - async.js:17 Immediate.Async.drainQueues
+    [wallet]/[bluebird]/js/release/async.js:17:14
+  
+</pre>
