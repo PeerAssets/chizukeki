@@ -7,6 +7,9 @@
     <title><%= htmlWebpackPlugin.options.title %></title>
   </head>
   <body>
+    <% if (process.env.PUBLIC_PATH === '/chizukeki' ){ %>
+      <%- include('gh-pages-redirect-handling') %>
+    <% } %>
     <div id="root"></div>
   </body>
 </html>
