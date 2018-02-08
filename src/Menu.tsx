@@ -69,7 +69,7 @@ class Nav extends React.Component<{ location: { pathname: string }, style?: any,
     return (
       <View style={style.container}>
         <Tab name='Wallet' selected={location.pathname} />
-        <Tab name='Decks' selected={location.pathname} />
+        <Tab name='Assets' selected={location.pathname} />
         <Right>
           <Button info style={style.button}>
             <Link onPress={logout} to='/login' style={style.link}><Icon name='sign-out' color='white'/></Link>

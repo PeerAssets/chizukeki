@@ -1,4 +1,4 @@
-import { fork, all, put, call, take } from 'redux-saga/effects'
+import { fork, all, put, call, takeLatest } from 'redux-saga/effects'
 import fetchJSONRoutine from '../generics/fetch-routine'
 import { peercoin, Wallet as ExplorerWallet } from './explorerApi'
 import LocalWallet from './Wallet'
@@ -34,8 +34,7 @@ const sendTransaction = fetchJSONRoutine<
 })
 
 function* cleanup(){
-  let action = yield take('HARD_LOGOUT')
-  yield put(syncWallet.routine.stop())
+  yield takeLatest('HARD_LOGOUT', () => put(syncWallet.routine.stop()))
 }
 
 export default function * (){

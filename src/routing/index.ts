@@ -2,10 +2,11 @@
  * export the appropriate routing and history components for the environment
  */
 import { Platform } from 'react-native'
-import createBrowserHistory from 'history/createBrowserHistory'
-import createMemoryHistory from 'history/createMemoryHistory'
 
 import Routing, { Router } from './router'
+
+import createBrowserHistory from 'history/createBrowserHistory'
+import createMemoryHistory from 'history/createMemoryHistory'
 
 let createHistory: typeof createBrowserHistory | typeof createMemoryHistory  
 

@@ -7,9 +7,10 @@ import { ConnectedRouter } from 'react-router-redux'
 import { Route, Redirect } from './routing/router'
 import configureStore, { history } from "./store"
 
+import Nav from './Menu'
 import Wallet from './wallet/Container'
 import Login from './wallet/LoginContainer'
-import Nav from './Menu'
+import DeckList from './assets/DeckList'
 
 import { StyleProvider, variables } from 'native-base/src/index';
 import theme from './theme'
@@ -36,6 +37,7 @@ export default class App extends React.Component<{}> {
                   <Route path="/" exact render={() => <Redirect to='/login'/>} />
                   <Route path="/login" exact component={Login} />
                   <Route path="/wallet" exact component={Wallet} />
+                  <Route path="/assets" exact component={DeckList} />
                 </View>
               </View>
             </StyleProvider>

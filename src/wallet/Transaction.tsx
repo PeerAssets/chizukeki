@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Dimensions, View, TouchableOpacity, ViewStyle } from 'react-native'
+import { View } from 'react-native'
 import { Button, Card, Left, CardItem, Body, Text, H2, Icon } from 'native-base/src/index'
 
 import FlatList from 'react-native-web-lists/src/FlatList'
@@ -48,7 +48,7 @@ namespace TransactionList {
 
 function TransactionList({ transactions }: { transactions: TransactionList.Data }) {
   return (
-    <View style={styles.card}>
+    <View style={styles.container}>
       <H2>
         Transactions 
         <Text note> {transactions.length} total </Text>
@@ -61,26 +61,14 @@ function TransactionList({ transactions }: { transactions: TransactionList.Data 
 }
 
 let styles = {
-  card: {
+  container: {
     flex: 2,
     minWidth: 200,
     margin: 7.5,
   },
-  transaction: {
-    flexDirection: 'row',
-    padding: 16,
-    alignItems: 'center'
-  },
   main: {
     paddingLeft: 10,
     flex: 9,
-  },
-  top: {
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-  },
-  timestamp: {
-    textAlignVertical: 'top',
   }
 }
 

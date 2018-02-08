@@ -7,6 +7,7 @@
 // * Patches bitcore-lib.Transaction to include peercoin's timestamp.
 
 var bitcore = require('bitcore-lib');
+import addPeerassets from './bitcore-peerassets'
 
 //
 // Set peercoin as default network
@@ -88,4 +89,17 @@ bitcore.Transaction.prototype.fromBufferReader = function(reader) {
   return this;
 };
 
-export default bitcore
+
+// from peerassets.js
+bitcore.Transaction.prototype.getUnspentOutput = function(outputIndex) {
+  var output = this.outputs[outputIndex];
+  return new Transaction.UnspentOutput({
+    outputIndex: outputIndex,
+    satoshis: output.satoshis,
+    script: output.script,
+    txId: this.id,
+    address: output.script.toAddress().toString()
+  });
+}
+
+export default addPeerassets(bitcore)
