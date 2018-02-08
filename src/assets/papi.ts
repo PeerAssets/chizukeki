@@ -1,3 +1,4 @@
+import configure from '../configure'
 
 async function getJSON<T = any>(url: string, emptyErrorMessage?: void | string) {
   let response = await fetch(url)

@@ -1,4 +1,5 @@
 import { Buffer } from 'buffer'
+
 var pb = require('./peerassets_pb');
 
 var minTagFee = 10000; // 0.01PPC

@@ -16,22 +16,6 @@ namespace Deck {
   }
 }
 
-let dummyDecks = [{
-  name: 'Some Stupid Deck',
-  id: 'aaabbbcccdddeeeFFFXXXDDD',
-  issuer: 'Benjahman Frankfurt',
-  issueMode: 'BIG',
-  precision: 2,
-  subscribed: false,
-}, {
-  name: 'Money 2.0',
-  id: 'bbbaaadddcccFFFeeeDDDXXX',
-  issuer: 'Benfurt Frankjahman',
-  issueMode: 'smol',
-  precision: 0,
-  subscribed: true,
-}]
-
 let smallNoteStyle = {maxWidth: '50%', overflow: 'hidden', ellipsizeMode: 'middle', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}
 function Deck({ item: deck }: { item: Deck.Data }) {
   return (
@@ -60,7 +44,7 @@ namespace DeckList {
   export type Data = { decks: Array<Deck.Data> }
 }
 
-function DeckList({ decks = dummyDecks }: DeckList.Data) {
+function DeckList({ decks }: DeckList.Data) {
   return (
     <View style={styles.container}>
       <H2>

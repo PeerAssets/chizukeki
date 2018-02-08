@@ -1,4 +1,5 @@
 import bitcore from '../../lib/bitcore'
+import configure from '../../configure'
 import { getJSON, getText, stringifyQuery, Satoshis, Wallet, walletMeta } from './common'
 
 namespace ApiCalls {
@@ -123,7 +124,7 @@ namespace normalize {
       let { txid: id, confirmations, time, vout, type, inputTotal, fee } = raw
       let amount = type === 'CREDIT' ? 0 : -Satoshis.fromAmount(inputTotal - fee)
       for (let out of vout){
-        if(out.scriptPubKey.addresses.includes(address)){
+        if(out.scriptPubKey.addresses && out.scriptPubKey.addresses.includes(address)){
           amount += Satoshis.fromAmount(out.value)
         }
       }
@@ -186,7 +187,7 @@ async function defaultOnError<T>(p: Promise<T>, def: T){
 }
 
 class PeercoinExplorer {
-  explorerUrl = 'https://explorer.peercoin.net'
+  explorerUrl = `https://explorer.peercoin.net${ configure.fromEnv().NETWORK === 'TESTNET' ? ':8000' : '' }`
   rawApiRequest(call: ApiCalls.Coind, query: object){
     return getText(`${this.explorerUrl}/api/${call}?${stringifyQuery(query)}`)
   }

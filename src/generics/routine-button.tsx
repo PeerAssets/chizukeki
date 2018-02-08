@@ -73,16 +73,17 @@ class RoutineButton extends React.Component<Props, { alerting: false | Stage }> 
   }
 
   dismissProps(queryStage: Stage) {
-    for (let {
-      stage,
-      stages = [],
-      auto = false,
-      after = 2500,
-      onAutoDismiss = () => { },
-      onPressDismiss = () => { }
-    } of this.props.dismiss || []) {
+    let dismiss = () => this.setState({ alerting: false })
+    for (let config of this.props.dismiss || []) {
+      let {
+        stage,
+        stages = [],
+        auto = false,
+        after = 2500,
+        onAutoDismiss = () => {},
+        onPressDismiss = () => {}
+      } = config
       if (stage === queryStage || stages.includes(queryStage)) {
-        let dismiss = () => this.setState({ alerting: false })
         if((this.props.stage === queryStage) && auto){
           setTimeout(() => {
             if (this.state.alerting) {
@@ -99,7 +100,9 @@ class RoutineButton extends React.Component<Props, { alerting: false | Stage }> 
         }
       }
     }
+    return { onPress: dismiss }
   }
+
   dismissable = (stage: Stage, attr: string) => ({
     [attr]: true,
     ...this.dismissProps(stage)

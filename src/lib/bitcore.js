@@ -9,6 +9,8 @@
 var bitcore = require('bitcore-lib');
 import addPeerassets from './bitcore-peerassets'
 
+import configure from '../configure'
+
 //
 // Set peercoin as default network
 //
@@ -102,4 +104,4 @@ bitcore.Transaction.prototype.getUnspentOutput = function(outputIndex) {
   });
 }
 
-export default addPeerassets(bitcore)
+export default addPeerassets(bitcore, configure.fromEnv().ASSETS)
