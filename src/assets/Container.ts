@@ -39,17 +39,11 @@ let selectStages = routineStages({
   sync,
   sendTransaction
 })
+*/
 
 export default connect(
-  ({ wallet: { actionHistory, wallet } }: { wallet: Redux.State }) => {
-    return {
-      stages: selectStages(actionHistory),
-      isSyncing: isSyncing(actionHistory),
-      wallet
-    }
+  ({ assets }: { assets: Redux.State }) => {
+    return { decks: assets.decks }
   },
-  (dispatch: Dispatch<any>) => ({ actions: bindActionCreators({
-  }, dispatch) })
+  (dispatch: Dispatch<any>) => {}//({ actions: bindActionCreators({ }, dispatch) })
 )(Assets)
-
-*/

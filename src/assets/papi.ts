@@ -29,7 +29,7 @@ namespace Deck {
 type Deck = Deck.Summary | Deck.Full
 
 class Papi {
-  explorerUrl = 'http://172.104.159.149:5555/api/v1/'
+  explorerUrl = 'http://172.104.159.149:5555/api/v1'
   apiRequest<T = any>(call: ApiCalls, ...path){
     return getJSON<T>(`${this.explorerUrl}/${ call }/${ path.join('/') }`)
   }

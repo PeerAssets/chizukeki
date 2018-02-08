@@ -10,7 +10,7 @@ import configureStore, { history } from "./store"
 import Nav from './Menu'
 import Wallet from './wallet/Container'
 import Login from './wallet/LoginContainer'
-import DeckList from './assets/DeckList'
+import DeckList from './assets/Container'
 
 import { StyleProvider, variables } from 'native-base/src/index';
 import theme from './theme'

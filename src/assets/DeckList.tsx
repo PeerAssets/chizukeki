@@ -32,34 +32,35 @@ let dummyDecks = [{
   subscribed: true,
 }]
 
+let smallNoteStyle = {maxWidth: '50%', overflow: 'hidden', ellipsizeMode: 'middle', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}
 function Deck({ item: deck }: { item: Deck.Data }) {
   return (
     <Card>
       <CardItem header>
         <Body style={{justifyContent: 'space-between', flexWrap: 'wrap', flexDirection: 'row'}}>
           <Text>{deck.name}</Text>
-          <View>
-            <Text note style={{alignSelf: 'flex-end'}}>{deck.issuer}</Text>
-            <Text note style={{alignSelf: 'flex-end'}}>mode: {deck.issueMode}</Text>
-          </View>
+          <Button iconLeft transparent {...{ [deck.subscribed ? 'success' : 'dark']: true }} style={{ marginRight: -30, marginTop: -20 }}>
+            <Icon {...deck.subscribed ? { active: true } : {}} name='eye' size={30} color={'black'} />
+            <Text style={{ paddingLeft: 5, paddingRight: 0 }}>{deck.subscribed ? 'subscribed' : 'subscribe'} </Text>
+          </Button>
         </Body>
       </CardItem>
-      <CardItem footer style={{justifyContent: 'space-between'}}>
-        <Text note style={{maxWidth: '50%', overflow: 'hidden', ellipsizeMode: 'middle', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>{deck.id}</Text>
-        <Button iconLeft transparent {...{ [deck.subscribed ? 'success' : 'dark']: true }}>
-          <Icon {...deck.subscribed ? { active: true } : {}} name='eye' size={30} color={'black'} />
-          <Text>{deck.subscribed ? 'subscribed' : 'subscribe'} </Text>
-        </Button>
+      <CardItem footer style={{alignItems: 'flex-start', flexDirection: 'column'}}>
+        <Text note style={smallNoteStyle}>
+          id: {deck.id}
+        </Text>
+        <Text note style={smallNoteStyle}>issuer: {deck.issuer}</Text>
+        <Text note>mode: {deck.issueMode}</Text>
       </CardItem>
     </Card>
   )
 }
 
 namespace DeckList {
-  export type Data = Array<Deck.Data>
+  export type Data = { decks: Array<Deck.Data> }
 }
 
-function DeckList({ decks = dummyDecks }: { decks: DeckList.Data }) {
+function DeckList({ decks = dummyDecks }: DeckList.Data) {
   return (
     <View style={styles.container}>
       <H2>

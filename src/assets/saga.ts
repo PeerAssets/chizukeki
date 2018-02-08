@@ -3,7 +3,7 @@ import fetchJSONRoutine from '../generics/fetch-routine'
 import papi, { Deck } from './papi'
 
 const syncDecks = fetchJSONRoutine<
-  undefined,
+  {},
   Array<Deck.Summary>,
   Error
 >({
