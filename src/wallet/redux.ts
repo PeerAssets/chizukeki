@@ -29,7 +29,7 @@ function applyTransaction(
 }
 
 function preservePendingTransactions(
-  old: Array<Wallet.Transaction | Wallet.PendingTransaction>,
+  old: Array<Wallet.Transaction>,
   synced: Array<Wallet.Transaction>
 ){
   let syncedIds = synced.map(t => t.id)
@@ -44,11 +44,11 @@ function applySync({ old, synced }: {
   old: Wallet.Loading | Wallet.Data,
   synced: Wallet.Synced,
 }): Wallet.Data {
-  return Object.assign(
-    old,
-    synced,
-    { transactions: preservePendingTransactions(Wallet.isLoaded(old) ? old.transactions : [], synced.transactions) }
-  )
+  return {
+    ...old,
+    ...synced,
+    transactions: preservePendingTransactions(Wallet.isLoaded(old) ? old.transactions : [], synced.transactions)
+  }
 }
 
 function logout(state: State){
