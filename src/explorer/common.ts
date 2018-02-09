@@ -1,4 +1,4 @@
-import { Satoshis, HTTP } from '../../lib/utils'
+import { Satoshis, HTTP } from '../lib/utils'
 
 namespace Wallet {
   export type UTXO = {

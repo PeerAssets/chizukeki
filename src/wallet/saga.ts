@@ -1,6 +1,6 @@
 import { fork, all, put, call, takeLatest } from 'redux-saga/effects'
 import fetchJSONRoutine from '../generics/fetch-routine'
-import { peercoin, Wallet as ExplorerWallet } from './explorerApi'
+import { peercoin, Wallet as ExplorerWallet } from '../explorer'
 import LocalWallet from './Wallet'
 
 import bitcore from '../lib/bitcore'

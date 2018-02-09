@@ -1,10 +1,9 @@
-import { createStore, Reducer, applyMiddleware, combineReducers } from 'redux';
+import { createStore, Reducer, applyMiddleware } from 'redux';
 import { routerReducer, routerMiddleware } from 'react-router-redux'
 import createSagaMiddleware from 'redux-saga'
 
-import { persistStore, persistReducer } from 'redux-persist'
+import { persistStore, persistReducer, persistCombineReducers } from 'redux-persist'
 import storage from 'redux-persist/es/storage' // handles web/native 
-
 
 import { createHistory } from '../routing'
 
@@ -15,24 +14,22 @@ import * as Assets from '../assets/redux'
 
 export const history = (createHistory as any)({ basename: process.env.PUBLIC_PATH || '/' })
 
-let persist = (key, reducer: Reducer<any>) => persistReducer({
+let persist = (key: string, reducer: Reducer<any>) => persistReducer({
   key,
   storage,
   blacklist: ['actionHistory']
 }, reducer)
-let persisted = (reducers: { [key: string]: Reducer<any>}) =>
-  Object.entries(reducers).reduce((p, [key, reducer ]) => 
-    (p[key] = persist(key, reducer), p)
-  , {})
 
 /* Persist to either device or localStorage
  * */
-const reducer = combineReducers({
+const reducer = persistCombineReducers({
+  key: 'root',
+  storage,
+  blacklist: ['wallet', 'assets']
+}, {
   router: routerReducer,
-  ...persisted({
-    wallet: Wallet.reducer,
-    assets: Assets.reducer,
-  })
+  wallet: persist('wallet', Wallet.reducer),
+  assets: persist('assets', Assets.reducer),
 })
 
 const saga = createSagaMiddleware()

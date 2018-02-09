@@ -16,7 +16,6 @@ namespace Deck {
   }
 }
 
-let smallNoteStyle = {maxWidth: '50%', overflow: 'hidden', ellipsizeMode: 'middle', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}
 function Deck({ item: deck }: { item: Deck.Data }) {
   return (
     <Card>
@@ -29,11 +28,13 @@ function Deck({ item: deck }: { item: Deck.Data }) {
           </Button>
         </Body>
       </CardItem>
-      <CardItem footer style={{alignItems: 'flex-start', flexDirection: 'column'}}>
-        <Text note style={smallNoteStyle}>
+      <CardItem footer style={{alignItems: 'flex-start', flexDirection: 'column', width: '50%'}}>
+        <Text note bounded ellipsizeMode='middle' numberOfLines={1} >
           id: {deck.id}
         </Text>
-        <Text note style={smallNoteStyle}>issuer: {deck.issuer}</Text>
+        <Text note bounded ellipsizeMode='middle' numberOfLines={1} >
+          issuer: {deck.issuer}
+        </Text>
         <Text note>mode: {deck.issueMode}</Text>
       </CardItem>
     </Card>

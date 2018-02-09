@@ -5,7 +5,7 @@ import { Button, Card, Left, CardItem, Body, Text, H2, Icon } from 'native-base/
 import FlatList from 'react-native-web-lists/src/FlatList'
 import moment from 'moment'
 
-import { Wallet } from './explorerApi/common'
+import { Wallet } from '../explorer'
 
 namespace WalletTransaction {
   export type Data = Wallet.Transaction
@@ -29,11 +29,11 @@ function WalletTransaction({ item: { amount, timestamp, confirmations } }: { ite
         </Left>
       </CardItem>
       <CardItem footer style={{maxWidth: '100%'}}>
-        <Text note style={{ maxWidth: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        <Text bounded note>
           {confirmations} confirmations
         </Text>
       {/*
-        <Text note style={{ellipsizeMode: 'middle', maxWidth: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        <Text bounded note  ellipsizeMode='middle' numberOfLines={1}>
           {io('from', 'to')} {address}
         </Text>
       */}

@@ -9,7 +9,7 @@ import Wrapper from '../generics/Wrapper'
 import RoutineButton from '../generics/routine-button'
 import Modal from '../generics/modal.web'
 
-import { Wallet as WalletData } from './explorerApi/common'
+import { Wallet as WalletData } from '../explorer'
 
 import { WrapActionable } from './UnlockModal'
 

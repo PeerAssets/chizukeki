@@ -56,35 +56,5 @@ namespace HTTP {
   }
 }
 
-namespace Transaction {
-  export type UTXO = {
-    txid: string,
-    scriptPubKey: string,
-    vout: number,
-    amount: number,
-    // unused address, confirmations
-  }
-  export type Params = {
-    unspentOutputs: UTXO | Array<UTXO>,
-    toAddress: string,
-    amount: number,
-    changeAddress: string,
-    fee?: number
-  }
-  export function from({
-    unspentOutputs,
-    toAddress,
-    amount,
-    changeAddress,
-    fee = 0.01
-  }: Transaction.Params) {
-    return new bitcore.Transaction()
-      .from(arrayify<UTXO>(unspentOutputs).map(Satoshis.toBitcoreUtxo))
-      .to(toAddress, Satoshis.fromAmount(amount))
-      .change(changeAddress)
-      .fee(Satoshis.fromAmount(fee))
-  }
-}
 
-
-export { Satoshis, HTTP, Transaction }
+export { Satoshis, HTTP, arrayify }

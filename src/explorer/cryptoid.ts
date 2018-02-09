@@ -1,4 +1,6 @@
-import { getJSON, stringifyQuery, Satoshis, Wallet, walletMeta } from './common'
+import { HTTP, Satoshis } from '../lib/utils'
+import { Wallet, walletMeta } from './common'
+let { getJSON, stringifyQuery } = HTTP
 
 namespace ApiCalls {
   export type Public =

@@ -1,5 +1,15 @@
+import { Platform } from 'react-native'
 import deepmerge from 'deepmerge'
 import { getTheme, variables as nbVariables } from 'native-base/src/index'
+
+let textStyles = {
+  '.bounded': {
+    maxWidth: '100%',
+    whiteSpace: 'nowrap',
+    //overflow: 'hidden',
+    //textOverflow: 'ellipsis',
+  }
+}
 
 
 export default (variables = nbVariables) => {
@@ -52,7 +62,7 @@ export default (variables = nbVariables) => {
     },
   }
   return deepmerge(getTheme(variables), {
-    "NativeBase.Text": basicTextStyles,
+    "NativeBase.Text": Object.assign(textStyles, basicTextStyles),
     "NativeBase.Icon": basicTextStyles,
     "NativeBase.IconNB": basicTextStyles,
     "NativeBase.Button": buttonStyles,

@@ -1,6 +1,6 @@
-import bitcore from '../../lib/bitcore'
-import { HTTP, Transaction, Satoshis } from '../../lib/utils'
-import configure from '../../configure'
+import bitcore from '../lib/bitcore'
+import { HTTP, Satoshis } from '../lib/utils'
+import configure from '../configure'
 
 import { Wallet, walletMeta } from './common'
 
@@ -217,10 +217,14 @@ class PeercoinExplorer {
   getRawTransaction = (txid: string) => this.apiRequest<RawTransaction>('getrawtransaction', { txid, decrypt: 1 })
 
   sendRawTransaction = async (
-    {  privateKey, ...transactionParams }: RawTransaction.ToSend
+    { unspentOutputs, toAddress, amount, changeAddress, privateKey, fee = 0.01, }: RawTransaction.ToSend
   ): Promise<Wallet.PendingTransaction> => {
     let signature = new bitcore.PrivateKey(privateKey)
-    let transaction = Transaction.from(transactionParams)
+    let transaction = new bitcore.Transaction()
+      .from(unspentOutputs.map(Satoshis.toBitcoreUtxo))
+      .to(toAddress, Satoshis.fromAmount(amount))
+      .change(changeAddress)
+      .fee(Satoshis.fromAmount(fee))
     let hex = transaction.sign(signature).serialize()
     let response = await this.rawApiRequest('sendrawtransaction', { hex })
     if (response === 'There was an error. Check your console.'){

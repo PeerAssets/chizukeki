@@ -112,7 +112,7 @@ class RoutineButton extends React.Component<Props, { alerting: false | Stage }> 
   render() {
     let {
       stage, icons = {}, onPress, children,
-      STARTED, DONE, FAILED, DEFAULT,
+      STARTED, DONE, FAILED, DEFAULT, LOADING: _,
       ...props
     } = this.props
     if(this.state.alerting !== false){

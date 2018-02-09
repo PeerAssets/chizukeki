@@ -1,3 +1,4 @@
+import { Satoshis, arrayify } from './utils'
 import { Buffer } from 'buffer'
 
 var pb = require('./peerassets_pb');
@@ -25,6 +26,8 @@ function getDeckSpawnTagHash(PPCtestnet = false, PAtest = false) {
 }
 
 function extendBitcore(bitcore, configuration = { minTagFee, txnFee, deckSpawnTagHash: getDeckSpawnTagHash() }) {
+  minTagFee = Satoshis.fromAmount(minTagFee)
+  txnFee = Satoshis.fromAmount(txnFee)
   bitcore.assets = {
     ISSUE_MODE: pb.DeckSpawn.MODE,
     configuration,
@@ -35,7 +38,7 @@ function extendBitcore(bitcore, configuration = { minTagFee, txnFee, deckSpawnTa
     createDeckSpawnTransaction(utxo, shortName, numberOfDecimals, issueModes) {
       let { minTagFee, txnFee, deckSpawnTagHash } = this.configuration
       let deckSpawnTxn = new bitcore.Transaction()
-        .from(utxo)                           // vin[0]: Owner signature
+        .from(arrayify(utxo).map(Satoshis.toBitcoreUtxo))                           // vin[0]: Owner signature
         .to(deckSpawnTagHash, minTagFee)      // vout[0]: Deck spawn P2TH
         .addData(this.createDeckSpawnMessage(shortName, numberOfDecimals, issueModes))  // vout[1]: Asset data
         // free format from here, typically a change Output
