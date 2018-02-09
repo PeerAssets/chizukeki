@@ -25,7 +25,7 @@ function getDeckSpawnTagHash(PPCtestnet = false, PAtest = false) {
 }
 
 function extendBitcore(bitcore, configuration = { minTagFee, txnFee, deckSpawnTagHash: getDeckSpawnTagHash() }) {
-  bitcore.peerassets = {
+  bitcore.assets = {
     ISSUE_MODE: pb.DeckSpawn.MODE,
     configuration,
 
