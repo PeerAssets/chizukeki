@@ -30,7 +30,7 @@ type Props = {
 }
 
 function ButtonIcon(name: string){
-  return <Icon inline {...{ name, size: 30, color: 'black' }}/>
+  return <Icon styleNames='inline' {...{ name, size: 30, color: 'black' }}/>
 }
 
 const defaultIcons = {
@@ -103,8 +103,8 @@ class RoutineButton extends React.Component<Props, { alerting: false | Stage }> 
     return { onPress: dismiss }
   }
 
-  dismissable = (stage: Stage, attr: string) => ({
-    [attr]: true,
+  dismissable = (stage: Stage, styleNames: string) => ({
+    styleNames,
     ...this.dismissProps(stage)
   })
 
@@ -113,22 +113,25 @@ class RoutineButton extends React.Component<Props, { alerting: false | Stage }> 
     let {
       stage, icons = {}, onPress, children,
       STARTED, DONE, FAILED, DEFAULT, LOADING: _,
+      styleNames = '',
       ...props
     } = this.props
     if(this.state.alerting !== false){
       stage = this.state.alerting
     }
 
+    let icon = this.stageSwitch(normalizeIcons(icons))
+    styleNames = `${styleNames} ${icon ? 'iconLeft' : ''}`
+
     let stageBased = this.stageSwitch({
-      DEFAULT: { info: true, onPress },
-      STARTED: { info: true, onPress },
-      DONE: this.dismissable('DONE', 'success'),
-      FAILED: this.dismissable('FAILED', 'danger')
+      DEFAULT: { styleNames: `${styleNames} info`, onPress },
+      STARTED: { styleNames: `${styleNames} info`, onPress },
+      DONE: this.dismissable('DONE', `${styleNames} success`),
+      FAILED: this.dismissable('FAILED', `${styleNames} danger`)
     })
 
-    let icon = this.stageSwitch(normalizeIcons(icons))
     return (
-      <Button iconLeft={Boolean(icon)} {...stageBased } {...props}>
+      <Button {...stageBased } {...props}>
         {icon}
         <Text>{this.stageSwitch({ STARTED, DONE, FAILED, DEFAULT })}</Text>
       </Button>

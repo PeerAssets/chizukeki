@@ -16,7 +16,7 @@ function WalletTransaction({ item: { amount, timestamp, confirmations } }: { ite
   let textProps = io({ success: true }, { dark: true })
   return (
     <Card>
-      <CardItem header>
+      <CardItem styleNames='header'>
         <Left>
           <Icon {...textProps} name={`arrow-circle-o-${io('down', 'up')}`} size={30} color={'black'} />
           <Body>
@@ -24,12 +24,12 @@ function WalletTransaction({ item: { amount, timestamp, confirmations } }: { ite
               {io('+', '-')}
               {amount.toString()} PPC
             </Text>
-            <Text note>{moment(timestamp).fromNow()}</Text>
+            <Text styleNames='note'>{moment(timestamp).fromNow()}</Text>
           </Body>
         </Left>
       </CardItem>
-      <CardItem footer style={{maxWidth: '100%'}}>
-        <Text bounded note>
+      <CardItem styleNames='footer' style={{maxWidth: '100%'}}>
+        <Text styleNames='bounded note'>
           {confirmations} confirmations
         </Text>
       {/*
@@ -49,11 +49,12 @@ namespace TransactionList {
 function TransactionList({ transactions }: { transactions: TransactionList.Data }) {
   return (
     <View style={styles.container}>
-      <H2>
-        Transactions 
-        <Text note> {transactions.length} total </Text>
-      </H2>
+      <Text>
+        <H2>Transactions</H2>
+        <Text styleNames='note'> {transactions.length} total </Text>
+      </Text>
       <FlatList
+        enableEmptySections // silence error, shouldn't be necessary when react-native-web implements FlatList
         data={transactions}
         renderItem={WalletTransaction} />
     </View>

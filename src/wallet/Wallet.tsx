@@ -17,7 +17,7 @@ class Toggleable extends React.Component<any> {
   render() {
     let { toggle = () => { }, active = false, children, ...props } = this.props
     return (
-      <Button {...active ? { primary: true } : { light: true }} {...props} onClick={toggle}>
+      <Button styleNames={active ? 'primary' : 'light'} {...props} onClick={toggle}>
         {children}
       </Button>
     )
@@ -35,9 +35,9 @@ class UnlockThenCopy extends React.Component<{ keys: Wallet.Keys }, { privateKey
   }
   render() {
     return [
-      <Modal key='modal' open={this.state.privateKey} onClose={this.copy}>
+      <Modal key='modal' open={Boolean(this.state.privateKey)} onClose={this.copy}>
         <Text> Unlocked! </Text>
-        <Button iconLeft success style={styles.column} onPress={this.copy}>
+        <Button styleNames='iconLeft success' style={styles.column} onPress={this.copy}>
           <Text> Copy Key to Clipboard </Text>
         </Button>
       </Modal>,
@@ -47,7 +47,7 @@ class UnlockThenCopy extends React.Component<{ keys: Wallet.Keys }, { privateKey
         actionProp='onPress'
         action={Wallet.Keys.areLocked(this.props.keys) ? this.cache : this.copy}
         Component={({ onPress }) =>
-          <Button iconLeft light style={styles.column} onPress={onPress}>
+          <Button styleNames='iconLeft light' style={styles.column} onPress={onPress}>
             <Icon name='eject'/>
             <Text>Export Key</Text>
           </Button>
@@ -61,7 +61,7 @@ function Balance({ balance, ...props }) {
   return (
     <View {...props}>
       <H2>{balance.toLocaleString('en')} PPC</H2>
-      <Text note>balance</Text>
+      <Text styleNames='note'>balance</Text>
     </View>
   )
 }
@@ -123,7 +123,7 @@ class Wallet extends React.Component<
       <Wrapper>
         <View style={style.main}>
           <Card style={{ width: '100%' }}>
-            <CardItem header>
+            <CardItem styleNames='header'>
               <Balance balance={balance} style={style.column} />
             </CardItem>
             <CardItem>
@@ -132,7 +132,7 @@ class Wallet extends React.Component<
                 <RoutineButton style={style.column}
                   dismiss={[{ stage: 'DONE', auto: true, onPressDismiss: sync.enabled ? sync.stop : sync.start }]}
                   icons={{ DEFAULT: 'refresh', DONE: 'refresh' }}
-                  warning={!sync.enabled}
+                  styleNames={!sync.enabled ? 'warning': ''}
                   onPress={sync.enabled ? sync.stop : sync.start}
                   stage={sync.stage}
                   DEFAULT={ sync.enabled ? 'Syncing' : 'Sync Disabled' }

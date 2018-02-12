@@ -127,7 +127,7 @@ class LoadPrivateKey extends React.Component<
     return (
       <Wrapper>
         <Card >
-          <CardItem header>
+          <CardItem styleNames='header'>
             <Body style={[styles.row, { paddingLeft: 0, paddingRight: 0 }]}>
               <H2 style={{ flexBasis: 200, paddingBottom: 15 }}>Import or Generate Private Key</H2>
             </Body>
@@ -135,7 +135,7 @@ class LoadPrivateKey extends React.Component<
           <CardItem>
             <Body style={styles.row}>
               <Item style={{ width: '100%', flexDirection: 'row', flexWrap: 'wrap' }}>
-                <Icon active name='key' />
+                <Icon styleNames='active' name='key' />
                 <Input
                   placeholder={`Paste WIF, HD Key, or Raw Private Key here`}
                   style={{ fontSize: 12, lineHeight: 14, textOverflow: 'ellipsis', minWidth: 200 }}
@@ -144,7 +144,7 @@ class LoadPrivateKey extends React.Component<
                   { format && <SelectedFormat selected={format} style={styles.right} /> }
               </Item>
               <Item style={{ width: '100%', flexDirection: 'row', flexWrap: 'wrap' }}>
-                <Icon active name='lock' style={{ width: 32, textAlign: 'center' }} />
+                <Icon styleNames='active' name='lock' style={{ width: 32, textAlign: 'center' }} />
                 <Input
                   placeholder={'Add a password'}
                   secureTextEntry
@@ -154,7 +154,7 @@ class LoadPrivateKey extends React.Component<
               </Item>
             </Body>
           </CardItem>
-          <CardItem footer>
+          <CardItem styleNames='footer'>
             <Body style={styles.row}>
               <RoutineButton
                 style={[{ justifyContent: 'center', width: '100%', paddingBottom: 6 + (26 / 2), borderBottomRightRadius: 0, borderBottomLeftRadius: 0 }]}
@@ -166,12 +166,12 @@ class LoadPrivateKey extends React.Component<
                 DONE='Successfully synced!'
                 FAILED='There was a Problem syncing!' />
               <View style={{ zIndex: 2, width: '100%', flexDirection: 'row', justifyContent: 'center', height: 0, overflow: 'visible' }}>
-                <Badge light style={{ position: 'absolute', top: -(26 / 2), width: 26, height: 26, flexDirection: 'column', justifyContent: 'center', borderRadius: '50%' }}>
+                <Badge styleNames='light' style={{ position: 'absolute', top: -(26 / 2), width: 26, height: 26, flexDirection: 'column', justifyContent: 'center', borderRadius: '50%' }}>
                   <Text style={{ fontSize: 10, whiteSpace: 'nowrap' }}>or</Text>
                 </Badge>
               </View>
               <Button
-                primary
+                styleNames='primary'
                 style={[{ justifyContent: 'center', width: '100%', paddingTop: 6 + (26 / 2), borderTopRightRadius: 0, borderTopLeftRadius: 0 }]}
                 onPress={this.generateNew}>
                 <Text>Generate new {password ? 'Locked' : 'Unlocked'} Wallet</Text>

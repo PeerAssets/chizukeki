@@ -44,7 +44,7 @@
     "jest": "21.2.1",
     "lodash": "^4.17.4",
     "moment": "^2.20.1",
-    "native-base": "^2.3.5",
+    "native-base": "https://github.com/micimize/native-base#145d603fbb7e31339c2faaad46921c8a4fc79bf4",
     "prop-types": "^15.6.0",
     "ramda": "^0.25.0",
     "react": "16.0.0",

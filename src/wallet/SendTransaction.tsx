@@ -59,7 +59,7 @@ class SendTransaction extends React.Component<SendTransaction.Props, State> {
   render() {
     let { wallet: { keys, balance } } = this.props
     let SendButton = (props: { onPress: () => any }) =>
-      <RoutineButton block
+      <RoutineButton styleNames='block'
         disabled={(!isFilled(this.state)) || (this.state.amount > balance)}
         icons={{ DEFAULT: 'send' }}
         stage={this.props.stage}
@@ -71,21 +71,21 @@ class SendTransaction extends React.Component<SendTransaction.Props, State> {
 
     return (
       <Card style={this.props.style}>
-        <CardItem header>
+        <CardItem styleNames='header'>
           <Body style={{ flexDirection: 'row', width: '100%', flexWrap: 'wrap', justifyContent: 'space-between' }}>
             <H2 style={{ flexBasis: 200, paddingBottom: 15 }}>Send a Transaction</H2>
           </Body>
         </CardItem>
         <CardItem>
           <Body style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%', flexWrap: 'wrap' }}>
-            <Item fixedLabel style={{ marginLeft: 15, minWidth: 300 }}>
+            <Item styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300 }}>
               <Label>To address</Label>
               <Input
                 style={{ lineHeight: 14, textOverflow: 'ellipsis' }}
                 value={this.state.toAddress}
                 onChangeText={toAddress => this.setState({ toAddress })} />
             </Item>
-            <Item fixedLabel style={{ marginLeft: 15, minWidth: 300 }}>
+            <Item styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300 }}>
               <Label>PPC</Label>
               <Input
                 keyboardType='numeric'
@@ -96,7 +96,7 @@ class SendTransaction extends React.Component<SendTransaction.Props, State> {
             </Item>
           </Body>
         </CardItem>
-        <CardItem footer>
+        <CardItem styleNames='footer'>
           <Body>
             <WrapActionable.IfLocked
               keys={keys}

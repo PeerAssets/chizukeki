@@ -19,23 +19,24 @@ namespace Deck {
 function Deck({ item: deck }: { item: Deck.Data }) {
   return (
     <Card>
-      <CardItem header>
+      <CardItem styleNames='header'>
         <Body style={{justifyContent: 'space-between', flexWrap: 'wrap', flexDirection: 'row'}}>
           <Text>{deck.name}</Text>
-          <Button iconLeft transparent {...{ [deck.subscribed ? 'success' : 'dark']: true }} style={{ marginRight: -30, marginTop: -20 }}>
-            <Icon {...deck.subscribed ? { active: true } : {}} name='eye' size={30} color={'black'} />
+          <Button styleNames={`iconLeft transparent ${deck.subscribed ? 'success' : 'dark'}`}
+              style={{ marginRight: -30, marginTop: -20 }}>
+            <Icon styleNames={deck.subscribed ? 'active' : ''} name='eye' size={30} color='black' />
             <Text style={{ paddingLeft: 5, paddingRight: 0 }}>{deck.subscribed ? 'subscribed' : 'subscribe'} </Text>
           </Button>
         </Body>
       </CardItem>
-      <CardItem footer style={{alignItems: 'flex-start', flexDirection: 'column', width: '50%'}}>
-        <Text note bounded ellipsizeMode='middle' numberOfLines={1} >
+      <CardItem styleNames='footer' style={{alignItems: 'flex-start', flexDirection: 'column', width: '50%'}}>
+        <Text styleNames='note bounded' ellipsizeMode='middle' numberOfLines={1} >
           id: {deck.id}
         </Text>
-        <Text note bounded ellipsizeMode='middle' numberOfLines={1} >
+        <Text styleNames='note bounded' ellipsizeMode='middle' numberOfLines={1} >
           issuer: {deck.issuer}
         </Text>
-        <Text note>mode: {deck.issueMode}</Text>
+        <Text styleNames='note'>mode: {deck.issueMode}</Text>
       </CardItem>
     </Card>
   )
@@ -48,11 +49,12 @@ namespace DeckList {
 function DeckList({ decks }: DeckList.Data) {
   return (
     <View style={styles.container}>
-      <H2>
-        Decks
-        <Text note> {decks.length} total </Text>
-      </H2>
+      <Text>
+        <H2>Decks</H2>
+        <Text styleNames='note'> {decks.length} total </Text>
+      </Text>
       <FlatList
+        enableEmptySections // silence error, shouldn't be necessary when react-native-web implements FlatList
         data={decks}
         renderItem={Deck} />
     </View>
