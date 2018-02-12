@@ -45,5 +45,5 @@ export default connect(
   ({ assets }: { assets: Redux.State }) => {
     return { decks: assets.decks }
   },
-  (dispatch: Dispatch<any>) => {}//({ actions: bindActionCreators({ }, dispatch) })
+  (dispatch: Dispatch<any>) => ({})//({ actions: bindActionCreators({ }, dispatch) })
 )(Assets)

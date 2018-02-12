@@ -24,16 +24,25 @@ class Toggleable extends React.Component<any> {
   }
 }
 
-class UnlockThenCopy extends React.Component<{ keys: Wallet.Keys }, { privateKey: string }> {
-  state = { privateKey: '' }
+class UnlockThenCopy extends React.Component<{ keys: Wallet.Keys }, { privateKey: string, alerting: boolean }> {
+  state = { privateKey: '', alerting: false }
   cache = (privateKey: string) => 
     this.setState({ privateKey })
   copy = () => {
-    let success = Clipboard.setString(this.state.privateKey)
+    let keys = this.props.keys
+    let privateKey = Wallet.Keys.areLocked(keys) ? 
+      this.state.privateKey :
+      keys.private
+    let success = Clipboard.setString(PrivateKey.toString(privateKey, keys.format))
     this.setState({ privateKey: '' })
+    this.setState({ alerting: true })
+    setTimeout(() => {
+      this.setState({ alerting: false })
+    }, 2500)
     return success
   }
   render() {
+    let alerting = this.state.alerting
     return [
       <Modal key='modal' open={Boolean(this.state.privateKey)} onClose={this.copy}>
         <Text> Unlocked! </Text>
@@ -46,11 +55,20 @@ class UnlockThenCopy extends React.Component<{ keys: Wallet.Keys }, { privateKey
         keys={this.props.keys}
         actionProp='onPress'
         action={Wallet.Keys.areLocked(this.props.keys) ? this.cache : this.copy}
-        Component={({ onPress }) =>
-          <Button styleNames='iconLeft light' style={styles.column} onPress={onPress}>
-            <Icon name='eject'/>
-            <Text>Export Key</Text>
-          </Button>
+        Component={alerting ? 
+          ({ onPress }) => (
+            <Button styleNames='iconLeft success' style={styles.column}
+                onPress={() => this.setState({ alerting: false })}>
+              <Icon name='check' />
+              <Text>Key Copied!</Text>
+            </Button>
+          ) :
+          ({ onPress }) => (
+            <Button styleNames='iconLeft light' style={styles.column} onPress={onPress}>
+              <Icon name='eject' />
+              <Text>Export Key</Text>
+            </Button>
+          )
         }
       />
     ]

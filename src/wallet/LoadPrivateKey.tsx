@@ -195,6 +195,16 @@ namespace LoadPrivateKey {
     let { privateKey, format, address } = d
     return Boolean(privateKey && format && address)
   }
+  // todo after import WIF is a normal privateKey
+  export function toString(privateKey: string, format: Format): string {
+    switch(format){
+      case 'hd':
+        return privateKey
+      case 'wif':
+      case 'raw':
+        return new bitcore.PrivateKey(privateKey).toWIF()
+    }
+  }
 }
 
 
