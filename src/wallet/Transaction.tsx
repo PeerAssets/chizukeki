@@ -13,7 +13,7 @@ namespace WalletTransaction {
 
 function WalletTransaction({ item: { amount, timestamp, confirmations } }: { item: WalletTransaction.Data }) {
   let io = (inbound, outbound) => amount > 0 ? inbound : outbound
-  let textProps = io({ success: true }, { dark: true })
+  let textProps = { styleNames: io('success', 'dark') }
   return (
     <Card>
       <CardItem styleNames='header'>

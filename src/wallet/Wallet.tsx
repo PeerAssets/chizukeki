@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Dimensions, View, ViewStyle, Clipboard } from 'react-native'
+import { View, Clipboard } from 'react-native'
 import PrivateKey from './LoadPrivateKey'
 import TransactionList from './Transaction'
 import SendTransaction from './SendTransaction'
@@ -12,17 +12,6 @@ import Modal from '../generics/modal.web'
 import { Wallet as WalletData } from '../explorer'
 
 import { WrapActionable } from './UnlockModal'
-
-class Toggleable extends React.Component<any> {
-  render() {
-    let { toggle = () => { }, active = false, children, ...props } = this.props
-    return (
-      <Button styleNames={active ? 'primary' : 'light'} {...props} onClick={toggle}>
-        {children}
-      </Button>
-    )
-  }
-}
 
 class UnlockThenCopy extends React.Component<{ keys: Wallet.Keys }, { privateKey: string, alerting: boolean }> {
   state = { privateKey: '', alerting: false }
@@ -83,15 +72,6 @@ function Balance({ balance, ...props }) {
     </View>
   )
 }
-
-function TransactionCount({ unspentOutputs, ...props }) {
-  return (
-    <Toggleable {...props}>
-      <Text>{unspentOutputs.length} transactions</Text>
-    </Toggleable>
-  )
-}
-
 
 let styles = {
   main: {

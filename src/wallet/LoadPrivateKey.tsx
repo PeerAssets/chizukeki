@@ -36,7 +36,7 @@ function SelectedFormat({ selected, style }: { selected: Format, style: any }) {
   }
   let fontSize = 12
   return (
-    <Badge success style={[ float, style ]}>
+    <Badge styleNames='success' style={[ float, style ]}>
       <Text style={{ fontSize }}>
         <Icon name='check' style={{ fontSize, color: "#fff", lineHeight: 20 }} /> {formatText[selected]}
       </Text>

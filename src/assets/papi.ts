@@ -39,7 +39,7 @@ class Papi {
     return decks.map(({ issue_mode, ...rest }) => ({ issueMode: issue_mode, ...rest }))
   }
   deckDetails = async (deck: Deck.Summary): Promise<Deck.Full> => {
-    let balances = await this.apiRequest('decks', deck.id)
+    let balances = await this.apiRequest<{ [address: string]: number }>('decks', deck.id)
     let supply = Object.values(balances).reduce((sum, balance) => sum + balance, 0)
     return Object.assign({}, deck, { balances, supply })
   }

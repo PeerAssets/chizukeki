@@ -214,6 +214,20 @@ class PeercoinExplorer {
     return unspent_outputs.map(normalize.unspentOutput)
   }
 
+  normalizeTransaction = ({ hex }: { hex: string } & { [attr: string]: any }) => {
+    let { outputs, inputs, ...raw }: {
+      hash: string, outputs: Array<any>, inputs: Array<any>
+    } = bitcore.Transaction(hex).toObject()
+    // TODO need to update available unspent transactions after send locally?
+    return {
+      id: raw.hash,
+      timestamp: new Date(),
+      amount,
+      fee,
+      raw: { vout: outputs, vin: inputs, ...raw }
+    }
+  }
+
   getRawTransaction = (txid: string) => this.apiRequest<RawTransaction>('getrawtransaction', { txid, decrypt: 1 })
 
   sendRawTransaction = async (
@@ -230,12 +244,12 @@ class PeercoinExplorer {
     if (response === 'There was an error. Check your console.'){
       throw Error('Invalid Transaction')
     }
-    let { hash: id, outputs, inputs, ...raw }: {
+    let { outputs, inputs, ...raw }: {
       hash: string, outputs: Array<any>, inputs: Array<any>
     } = bitcore.Transaction(hex).toObject()
     // TODO need to update available unspent transactions after send locally?
     return {
-      id,
+      id: raw.hash,
       timestamp: new Date(),
       amount,
       fee,

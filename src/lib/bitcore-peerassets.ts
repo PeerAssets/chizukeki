@@ -38,8 +38,8 @@ function extendBitcore(bitcore, configuration = { minTagFee, txnFee, deckSpawnTa
     createDeckSpawnTransaction(utxo, shortName, numberOfDecimals, issueModes) {
       let { minTagFee, txnFee, deckSpawnTagHash } = this.configuration
       let deckSpawnTxn = new bitcore.Transaction()
-        .from(arrayify(utxo).map(Satoshis.toBitcoreUtxo))                           // vin[0]: Owner signature
-        .to(deckSpawnTagHash, minTagFee)      // vout[0]: Deck spawn P2TH
+        .from(arrayify(utxo).map(Satoshis.toBitcoreUtxo))                               // vin[0]: Owner signature
+        .to(deckSpawnTagHash, minTagFee)                                                // vout[0]: Deck spawn P2TH
         .addData(this.createDeckSpawnMessage(shortName, numberOfDecimals, issueModes))  // vout[1]: Asset data
         // free format from here, typically a change Output
         .to(utxo.address, utxo.satoshis - minTagFee - txnFee);  // vout[2]
