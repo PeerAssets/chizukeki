@@ -6,12 +6,15 @@ import Saga, { syncWallet, sendTransaction } from './saga'
 import { AnyAction } from 'typescript-fsa';
 
 
-export type State = { wallet?: undefined | Wallet.Loading | Wallet.Data } & ActionHistory.Bind
+export type State = { wallet: null | Wallet.Loading | Wallet.Data } & ActionHistory.Bind
 
-let actionHistory = () => ActionHistory.of([
-  ...syncWallet.routine.allTypes,
-  ...sendTransaction.routine.allTypes,
-])
+let initialState = () => ({
+  wallet: null,
+  ...ActionHistory.of([
+    ...syncWallet.routine.allTypes,
+    ...sendTransaction.routine.allTypes,
+  ])
+})
 
 function applyTransaction(
   { balance, transactions, ...wallet }: Wallet.Data,
@@ -52,10 +55,10 @@ function applySync({ old, synced }: {
 }
 
 function logout(state: State){
-  return actionHistory()
+  return initialState()
 }
 
-function walletReducer(state: State = actionHistory(), action: AnyAction): State {
+function walletReducer(state: State, action: AnyAction): State {
   return syncWallet.routine.switch<State>(action, {
     started: payload => {
       if(!payload.keys){
@@ -87,7 +90,7 @@ function walletReducer(state: State = actionHistory(), action: AnyAction): State
   ((action.type === 'HARD_LOGOUT') ? logout(state) : state)
 }
 
-export const reducer = ActionHistory.bind(walletReducer)
+export const reducer = ActionHistory.bind(walletReducer, initialState())
 export const saga = Saga
 export const routines = {
   sync: syncWallet.routine,

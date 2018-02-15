@@ -77,7 +77,7 @@ class Nav extends React.Component<{ location: { pathname: string }, style?: any,
   }
 }
 
-export default connect(
-  ({ router }: { router: any })=> router,
+export default withRouter(connect(
+  () => ({}),
   dispatch => ({ logout: () => dispatch({ type: 'HARD_LOGOUT' }) })
-)(Nav)
+)(Nav) as any)

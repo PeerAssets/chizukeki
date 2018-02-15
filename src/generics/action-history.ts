@@ -21,9 +21,13 @@ namespace ActionHistory {
   }
   export function push<ActionType extends string = string>(
     ah: ActionHistory<ActionType>, action: ActionType
-  ){ if(ah.following.includes(action)){
-      ah.history = [...ah.history, action]
-      ah.latest = action
+  ){
+    if(ah.following.includes(action)){
+      return {
+        history: [...ah.history, action],
+        latest: action,
+        following: ah.following
+      }
     }
     return ah
   }
@@ -53,13 +57,14 @@ namespace ActionHistory {
   export function bind<
     ActionType extends string = string,
     S extends Bind<ActionType> = Bind<ActionType>
-  >(reducer: Reducer<S>){
-    return (_state: S, action): S => {
+  >(reducer: Reducer<S>, initialState?: S){
+    let wrapped = (_state: S, action): S => {
       // we call the reducer first in case initialState was provided there
       let state = reducer(_state, action)
-      state.actionHistory = push(state.actionHistory, action.type)
-      return state
+      let actionHistory = push(state.actionHistory, action.type)
+      return Object.assign({}, state, { actionHistory })
     }
+    return initialState ? (_state: S = initialState, action) => wrapped(_state, action) : wrapped
   }
 }
 

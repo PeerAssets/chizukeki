@@ -1,4 +1,5 @@
 import configure from '../configure'
+import { HTTP } from '../explorer/common'
 
 async function getJSON<T = any>(url: string, emptyErrorMessage?: void | string) {
   let response = await fetch(url)
@@ -11,6 +12,7 @@ async function getJSON<T = any>(url: string, emptyErrorMessage?: void | string) 
 }
 
 type ApiCalls = 'decks'
+type Resource = 'decks' | 'cards' | 'balances'
 
 namespace Deck {
   export type Summary = {
@@ -20,6 +22,7 @@ namespace Deck {
     issueMode: string
     precision: number
     subscribed: boolean
+    spawnTransaction?: any
   }
   export type Full = Summary & {
     supply: number
@@ -30,9 +33,22 @@ namespace Deck {
 type Deck = Deck.Summary | Deck.Full
 
 class Papi {
-  explorerUrl = 'http://172.104.159.149:5555/api/v1'
+  explorerUrl = 'http://localhost:5555/' //'http://172.104.159.149:5555/'
+  version = 1
+  get apiUrl(){
+    return `${this.explorerUrl}/api/v${this.version}/`
+  }
+  get restlessUrl(){
+    return `${this.explorerUrl}/restless/v${this.version}/`
+  }
   apiRequest<T = any>(call: ApiCalls, ...path){
     return getJSON<T>(`${this.explorerUrl}/${ call }/${ path.join('/') }`)
+  }
+  restlessRequest<T = any>(resource: Resource, queryOrId: string | object = {}){
+    let path = typeof(queryOrId) === 'string' ?
+      queryOrId :
+      `q=${ HTTP.stringifyQuery(queryOrId) }`
+    return getJSON<T>(`${this.explorerUrl}/${path}`)
   }
   decks = async (): Promise<Array<Deck.Summary>> => {
     let decks = await this.apiRequest('decks')
@@ -42,6 +58,11 @@ class Papi {
     let balances = await this.apiRequest<{ [address: string]: number }>('decks', deck.id)
     let supply = Object.values(balances).reduce((sum, balance) => sum + balance, 0)
     return Object.assign({}, deck, { balances, supply })
+  }
+  balances = async (address: string) => {
+    let filters = [{ name: "account", "op":"like", "val": `${address}%`}]
+    let { objects: balances } = await this.restlessRequest('balances', { filters, results_per_page: 100 })
+    return balances
   }
 } 
 

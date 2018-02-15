@@ -5,15 +5,10 @@ import { Button, Card, Left, Right, CardItem, Body, Text, H2, Icon } from 'nativ
 import FlatList from 'react-native-web-lists/src/FlatList'
 import moment from 'moment'
 
+import * as Papi from './papi'
+
 namespace Deck {
-  export type Data = {
-    id: string
-    name: string
-    issuer: string
-    issueMode: string
-    precision: number
-    subscribed: boolean
-  }
+  export type Data = Papi.Deck 
 }
 
 function Deck({ item: deck }: { item: Deck.Data }) {

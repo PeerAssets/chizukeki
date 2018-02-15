@@ -23,7 +23,7 @@ import bitcore from '../lib/bitcore'
 import Wrapper from '../generics/Wrapper'
 
 import { WrapActionable } from '../wallet/UnlockModal'
-import Wallet from '../wallet/wallet'
+import Wallet from '../wallet/Wallet'
 
 type Recipient = { address: string, amount: number }
 

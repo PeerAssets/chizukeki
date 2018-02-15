@@ -99,7 +99,7 @@ class LoadPrivateKey extends React.Component<
       privateKey: '',
       address: '',
       format: undefined,
-      password: undefined,
+      password: '',
     }
   }
   withData = (data: Partial<LoadPrivateKey.Data>) => 
@@ -149,7 +149,7 @@ class LoadPrivateKey extends React.Component<
                   placeholder={'Add a password'}
                   secureTextEntry
                   style={{ fontSize: 12, lineHeight: 14, textOverflow: 'ellipsis' }}
-                  value={password || ''}
+                  value={password}
                   onChangeText={this.setPassword} />
               </Item>
             </Body>
@@ -161,20 +161,21 @@ class LoadPrivateKey extends React.Component<
                 disabled={(!load) || this.state.error}
                 onPress={load || (() => {})}
                 stage={this.props.syncStage}
-                DEFAULT={`Import ${password ? 'Locked' : 'Unlocked'} Key and Sync`}
+                DEFAULT='Import Key and Sync'
                 STARTED='Syncing wallet'
                 DONE='Successfully synced!'
                 FAILED='There was a Problem syncing!' />
-              <View style={{ zIndex: 2, width: '100%', flexDirection: 'row', justifyContent: 'center', height: 0, overflow: 'visible' }}>
+              <View style={{ zIndex: 2, width: '100%', flexDirection: 'row', justifyContent: 'center', height: 1, overflow: 'visible' }}>
                 <Badge styleNames='light' style={{ position: 'absolute', top: -(26 / 2), width: 26, height: 26, flexDirection: 'column', justifyContent: 'center', borderRadius: '50%' }}>
                   <Text style={{ fontSize: 10, whiteSpace: 'nowrap' }}>or</Text>
                 </Badge>
               </View>
               <Button
                 styleNames='primary'
+                disabled={!password}
                 style={[{ justifyContent: 'center', width: '100%', paddingTop: 6 + (26 / 2), borderTopRightRadius: 0, borderTopLeftRadius: 0 }]}
                 onPress={this.generateNew}>
-                <Text>Generate new {password ? 'Locked' : 'Unlocked'} Wallet</Text>
+                <Text>Generate new Wallet</Text>
               </Button>
             </Body>
           </CardItem>
@@ -189,11 +190,11 @@ namespace LoadPrivateKey {
     privateKey: string,
     address: string,
     format: Format,
-    password: string | undefined
+    password: string
   }
   export function isFilled(d: Partial<Data>): d is Data {
-    let { privateKey, format, address } = d
-    return Boolean(privateKey && format && address)
+    let { privateKey, format, address, password } = d
+    return Boolean(privateKey && format && address && password)
   }
   // todo after import WIF is a normal privateKey
   export function toString(privateKey: string, format: Format): string {

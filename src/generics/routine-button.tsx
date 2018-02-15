@@ -124,10 +124,10 @@ class RoutineButton extends React.Component<Props, { alerting: false | Stage }> 
     styleNames = `${styleNames} ${icon ? 'iconLeft' : ''}`
 
     let stageBased = this.stageSwitch({
-      DEFAULT: { styleNames: `${styleNames} info`, onPress },
-      STARTED: { styleNames: `${styleNames} info`, onPress },
-      DONE: this.dismissable('DONE', `${styleNames} success`),
-      FAILED: this.dismissable('FAILED', `${styleNames} danger`)
+      DEFAULT: { styleNames: `info ${styleNames}`, onPress },
+      STARTED: { styleNames: `info ${styleNames}`, onPress },
+      DONE: this.dismissable('DONE', `success ${styleNames}`),
+      FAILED: this.dismissable('FAILED', `danger ${styleNames}`)
     })
 
     return (

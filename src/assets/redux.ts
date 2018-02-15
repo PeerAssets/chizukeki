@@ -1,9 +1,9 @@
 import ActionHistory from '../generics/action-history'
-import Saga, { syncDecks, getDeckDetails } from './saga'
+import Saga, { syncDecks, getDeckDetails, syncBalances } from './saga'
 import { Deck } from './papi'
 import { AnyAction } from 'typescript-fsa';
 
-export type State = { decks: Array<Deck> } & ActionHistory.Bind
+export type State = { decks: Array<Deck>, balances: Array<any> } & ActionHistory.Bind
 
 let actionHistory = () => ActionHistory.of(syncDecks.routine.allTypes)
 
@@ -15,7 +15,7 @@ function handleSync(
   return synced.map(s => Object.assign({}, oldMap[s.id] || {}, s))
 }
 
-function assetReducer(state: State = { decks: [], ...actionHistory() }, action: AnyAction): State {
+function assetReducer(state: State = { decks: [], balances: [], ...actionHistory() }, action: AnyAction): State {
   return syncDecks.routine.switch<State>(action, {
     started: payload => state,
     done: (payload) => ({
@@ -29,6 +29,14 @@ function assetReducer(state: State = { decks: [], ...actionHistory() }, action: 
     done: (payload) => ({
       ...state,
       decks: state.decks.map(deck => deck.id === payload.id ? payload : deck)
+    }),
+    failed: () => state
+  }) ||
+  syncBalances.routine.switch<State>(action, {
+    started: payload => state,
+    done: ({ balances }) => ({
+      ...state,
+      balances
     }),
     failed: () => state
   }) ||

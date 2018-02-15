@@ -173,7 +173,7 @@ namespace Wallet {
   export type Synced = WalletData
   export type Data = Loading & Synced
   export type Unlocked = Data & { privateKey: string }
-  export function isLoaded(wallet: Loading | Data | undefined): wallet is Data {
+  export function isLoaded(wallet: Loading | Data | null): wallet is Data {
     return Boolean(wallet && wallet.hasOwnProperty('_meta'))
   }
 }
