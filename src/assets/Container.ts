@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { Redirect } from '../routing/router'
 import ActionHistory from '../generics/action-history'
 import { routineStages } from '../generics/utils'
-import { State as Wallet } from '../wallet/redux'
+import Wallet from '../wallet/Wallet'
 
 import * as Redux from './redux'
 import Assets from './Assets' 
@@ -17,8 +17,9 @@ let selectStages = routineStages({
   //getDeckDetails
 })
 
+type RootState = { assets: Redux.State,  wallet: { wallet: Wallet.Data } }
 export default connect(
-  ({ assets: { decks, balances }, wallet: { wallet } }: { assets: Redux.State } & { wallet: Wallet }) => {
+  ({ assets: { decks, balances }, wallet: { wallet } }: RootState) => {
     return { decks, balances, wallet }
   },
   (dispatch: Dispatch<any>) => ({

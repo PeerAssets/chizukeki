@@ -3,6 +3,8 @@ import fetchJSONRoutine from '../generics/fetch-routine'
 import { peercoin } from '../explorer'
 import papi, { Deck } from './papi'
 
+import Summary from './Summary'
+
 function getSpawnIfOwned(address: string){
   return async (deck: Deck.Summary) => {
     if (deck.issuer === address) {
@@ -49,13 +51,13 @@ const sendAssets = fetchJSONRoutine<
 
 const syncBalances = fetchJSONRoutine<
   { address: string, decks: Array<Deck> },
-  { balances: Array<any> },
+  { balances: Array<Summary.Balance> },
   Error
 >({
   type: 'SYNC_ASSET_BALANCES',
   fetchJSON: async ({ address, decks }) => {
-    let balances: Array<any> = await papi.balances(address)
-    let unissued: Array<any> = []
+    let rawBalances: Array<any> = await papi.balances(address)
+    let unissued: Array<Summary.Balance> = []
     let deckIdMap = decks.reduce((map, deck) => {
       if(deck.issuer === address){
         unissued.push({ deck, type: 'UNISSUED' })
@@ -63,13 +65,14 @@ const syncBalances = fetchJSONRoutine<
       map[deck.id.substr(0, 10)] = deck
       return map
     }, {})
-    balances.map(({ value, short_id, ...balance }) => (
-      balance.type = value > 0 ? 'RECIEVED' : 'ISSUED',
-      balance.deck = deckIdMap[short_id],
-      unissued = unissued.filter(i => i.deck.id !== balance.deck.id),
-      balance
-    ))
-    return { balances: balances.concat(unissued) }
+    let balances = unissued.concat(rawBalances.map(
+      ({ value, short_id, ...balance }) => (
+        balance.type = value > 0 ? 'RECIEVED' : 'ISSUED',
+        balance.deck = deckIdMap[short_id],
+        unissued = unissued.filter(i => i.deck.id !== balance.deck.id),
+        balance as Summary.Balance
+      )))
+    return { balances }
   },
 })
 

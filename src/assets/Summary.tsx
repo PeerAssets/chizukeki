@@ -63,25 +63,26 @@ function divideByOwnership(balances: Array<Summary.Balance>){
 
 function Balance({ type, value, deck: { name }, ...props }: Summary.Balance) {
   return (
-    <CardItem styleNames={`asset ${type.toLowerCase()}`}>
+    <CardItem styleNames={`balance ${type.toLowerCase()}`}>
       <Text styleNames='name'>{name}</Text>
-      <Text styleNames='balance'>
-        { type.toLowerCase() } {
-          value !== undefined && Math.abs(value).toLocaleString('en')
-        }
+      <Text styleNames='value'>
+        { value !== undefined ? Math.abs(value).toLocaleString('en') : '-' }
+      </Text>
+      <Text styleNames='type'>
+        { type.toLowerCase() }
       </Text>
     </CardItem>
   )
 }
 
 
-@connectStyle('PeerKeeper.assets.Summary', styles)
+@connectStyle('PeerKeeper.AssetsSummary', styles)
 class Summary extends React.Component<Summary.Props, {}> {
   render() {
     let { UNISSUED, ISSUED, RECIEVED } = divideByOwnership(this.props.balances)
     return (
       <View style={this.props.style.main}>
-        <Card style={{ width: '100%' }}>
+        <Card styleNames='summary' style={{ width: '100%' }}>
           <CardItem styleNames='header'>
             <H2>Assets</H2>
           </CardItem>
@@ -93,5 +94,6 @@ class Summary extends React.Component<Summary.Props, {}> {
     )
   }
 }
+
 
 export default Summary

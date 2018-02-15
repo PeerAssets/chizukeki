@@ -1,31 +1,33 @@
+import { AnyAction } from 'typescript-fsa';
 import ActionHistory from '../generics/action-history'
+
 import Saga, { syncDecks, getDeckDetails, syncBalances } from './saga'
 import { Deck } from './papi'
-import { AnyAction } from 'typescript-fsa';
+import Assets from './Assets'
 
-export type State = { decks: Array<Deck>, balances: Array<any> } & ActionHistory.Bind
+export type State = Assets.Data & ActionHistory.Bind
 
 let actionHistory = () => ActionHistory.of(syncDecks.routine.allTypes)
 
 function handleSync(
-  old: State['decks'],
-  synced: State['decks']
+  old: Array<Deck>,
+  synced: Array<Deck>
 ){
   let oldMap = old.reduce((m, o) => Object.assign(m, { [o.id]: o }), {})
   return synced.map(s => Object.assign({}, oldMap[s.id] || {}, s))
 }
 
-function logout({ decks }){
-  return { decks, balances: [], ...actionHistory() }
+function logout({ decks }: State){
+  return { decks, balances: null, ...actionHistory() }
 }
 
 
-function assetReducer(state: State = { decks: [], balances: [], ...actionHistory() }, action: AnyAction): State {
+function assetReducer(state: State = { decks: null, balances: null, ...actionHistory() }, action: AnyAction): State {
   return syncDecks.routine.switch<State>(action, {
     started: payload => state,
     done: (payload) => ({
       ...state,
-      decks: handleSync(state.decks, payload)
+      decks: state.decks ? handleSync(state.decks, payload) : payload
     }),
     failed: () => state
   }) ||
@@ -33,7 +35,7 @@ function assetReducer(state: State = { decks: [], balances: [], ...actionHistory
     started: payload => state,
     done: (payload) => ({
       ...state,
-      decks: state.decks.map(deck => deck.id === payload.id ? payload : deck)
+      decks: (state.decks || <Array<Deck>>[]).map(deck => deck.id === payload.id ? payload : deck)
     }),
     failed: () => state
   }) ||

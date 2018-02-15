@@ -24,7 +24,7 @@ function Deck({ item: deck }: { item: Deck.Data }) {
           </Button>
         </Body>
       </CardItem>
-      <CardItem styleNames='footer' style={{alignItems: 'flex-start', flexDirection: 'column', width: '50%'}}>
+      <CardItem styleNames='footer' style={{alignItems: 'flex-start', flexDirection: 'column', width: '100%'}}>
         <Text styleNames='note bounded' ellipsizeMode='middle' numberOfLines={1} >
           id: {deck.id}
         </Text>

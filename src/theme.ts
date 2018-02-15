@@ -1,3 +1,4 @@
+import color from 'color'
 import { Platform } from 'react-native'
 import deepmerge from 'deepmerge'
 import { getTheme, variables as nbVariables } from 'native-base/src/index'
@@ -8,6 +9,60 @@ let textStyles = {
     whiteSpace: 'nowrap',
     //overflow: 'hidden',
     //textOverflow: 'ellipsis',
+  }
+}
+
+let summaryStyles = variables => {
+  let typeBackgrounds = (background) => ({
+    'NativeBase.Text': {
+      '.name': {
+        backgroundColor: color(background).lighten(0.5).hex(),
+      },
+      '.value': {
+        backgroundColor: color(background).lighten(0.25).hex(),
+      },
+      '.type': {
+        backgroundColor: background,
+      }
+    }
+  })
+  return {
+    'NativeBase.Card': {
+      'NativeBase.CardItem': {
+        '.balance': {
+          paddingTop: 0,
+          paddingBottom: 10,
+          paddingLeft: 15,
+          paddingRight: 15,
+          'NativeBase.Text': {
+            paddingTop: 5,
+            paddingBottom: 5,
+            '.name': {
+              flex: 2,
+              fontSize: 'bold',
+              paddingLeft: 10,
+              borderTopLeftRadius: 3,
+              borderBottomLeftRadius: 3,
+            },
+            '.value': {
+              flex: 1,
+              textAlign: 'center'
+            },
+            '.type': {
+              flex: 1,
+              color: variables.brandLight,
+              borderTopRightRadius: 3,
+              borderBottomRightRadius: 3,
+              textAlign: 'center',
+              paddingRight: 10,
+            },
+          },
+        },
+        '.unissued': typeBackgrounds(variables.btnWarningBg),
+        '.issued': typeBackgrounds(variables.btnSuccessBg),
+        '.received': typeBackgrounds(variables.btnInfoBg),
+      }
+    }
   }
 }
 
@@ -50,7 +105,8 @@ export default (variables = nbVariables) => {
       color: variables.btnSuccessBg,
     },
     '.info': {
-      color: variables.btnInfoBg, },
+      color: variables.btnInfoBg,
+    },
     '.warning': {
       color: variables.btnWarningBg,
     },
@@ -67,6 +123,8 @@ export default (variables = nbVariables) => {
     "NativeBase.IconNB": basicTextStyles,
     "NativeBase.Button": buttonStyles,
     "NativeBase.Badge": badgeStyles,
-    "NativeBase.Spinner": Object.assign(spinnerStyles, basicTextStyles)
+    "NativeBase.Spinner": Object.assign(spinnerStyles, basicTextStyles),
+
+    'PeerKeeper.AssetsSummary': summaryStyles(variables)
   })
 }

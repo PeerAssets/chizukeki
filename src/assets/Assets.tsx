@@ -25,12 +25,12 @@ let styles = {
 
 @connectStyle('PeerKeeper.Assets', styles)
 class Assets extends React.Component<Assets.Props, {}> {
-  componentDidMount(){
+  componentWillReceiveProps(nextProps: Assets.Props){
     let { actions, decks, balances, wallet } = this.props
-    if((!decks.length) && wallet){
+    if((!decks) && wallet){
       actions.syncDecks({ address: wallet.address })
     }
-    if(decks.length && !balances.length){
+    if(decks && (!balances)){
       actions.syncBalances({ address: wallet.address, decks })
     }
   }
@@ -38,18 +38,20 @@ class Assets extends React.Component<Assets.Props, {}> {
     let { decks, balances } = this.props
     return (
       <Wrapper>
-        <Summary balances={balances} />
-        <DeckList decks={decks} />
+        <Summary balances={balances || []} />
+        <DeckList decks={decks || []} />
       </Wrapper>
     )
   }
 }
 
 namespace Assets {
-  export type Data = DeckList.Data & Summary.Props & {
-    wallet: Wallet.Data
+  export type Data = {
+    decks: DeckList.Data['decks'] | null
+    balances: Summary.Props['balances'] | null
   }
   export type Props = Data & {
+    wallet: Wallet.Data
     actions: {
       // TODO strange type errors when properly typed
       syncDecks: any

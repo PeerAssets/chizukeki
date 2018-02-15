@@ -41,7 +41,7 @@ class Papi {
     return `${this.explorerUrl}/restless/v${this.version}`
   }
   apiRequest<T = any>(call: ApiCalls, ...path){
-    return getJSON<T>(`${this.explorerUrl}/${ call }/${ path.join('/') }`)
+    return getJSON<T>(`${this.apiUrl}/${ call }/${ path.join('/') }`)
   }
   restlessRequest<T = any>(resource: Resource, queryOrId: string | object = {}){
     let path = typeof(queryOrId) === 'string' ?
