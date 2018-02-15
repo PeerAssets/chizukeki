@@ -46,6 +46,9 @@ function SelectedFormat({ selected, style }: { selected: Format, style: any }) {
 
 function validator(format: Format, toKey: (key: string) => any, toAddress = key => key.toAddress()){
   return (privateKey: string): false | Pick<LoadPrivateKey.Data, 'privateKey' | 'address' | 'format'> => {
+    if(!privateKey.length){
+      return false
+    }
     try {
       let pKey = toKey(privateKey)
       return {
@@ -63,8 +66,8 @@ function deriveFormat(privateKey: string){
   type D = false | Pick<LoadPrivateKey.Data, 'privateKey' | 'address' | 'format'>
   let data: D = [
     validator('hd', key => new bitcore.HDPrivateKey(key), key => key.privateKey.toAddress()),
-    validator('wif', key => bitcore.PrivateKey.fromWIF(key)),
     validator('raw', key => new bitcore.PrivateKey(key)),
+    validator('wif', key => bitcore.PrivateKey.fromWIF(key)),
   ].reduce(
     (derived: D, derive): D => derived || derive(privateKey) || (false as false),
     (false as D)

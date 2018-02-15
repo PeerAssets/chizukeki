@@ -6,7 +6,7 @@ import papi, { Deck } from './papi'
 function getSpawnIfOwned(address: string){
   return async (deck: Deck.Summary) => {
     if (deck.issuer === address) {
-      let spawnTransaction = await peercoin.getRelativeRawTransaction
+      let spawnTransaction = await peercoin.getRelativeRawTransaction(deck.id, address)
       deck.spawnTransaction = spawnTransaction
     }
     return deck
@@ -55,14 +55,21 @@ const syncBalances = fetchJSONRoutine<
   type: 'SYNC_ASSET_BALANCES',
   fetchJSON: async ({ address, decks }) => {
     let balances: Array<any> = await papi.balances(address)
-    let deckIdMap = decks.reduce((map, deck) => (
-      map[deck.id.substr(0, 10)] = deck, map
-    ), {})
+    let unissued: Array<any> = []
+    let deckIdMap = decks.reduce((map, deck) => {
+      if(deck.issuer === address){
+        unissued.push({ deck, type: 'UNISSUED' })
+      }
+      map[deck.id.substr(0, 10)] = deck
+      return map
+    }, {})
     balances.map(({ value, short_id, ...balance }) => (
+      balance.type = value > 0 ? 'RECIEVED' : 'ISSUED',
       balance.deck = deckIdMap[short_id],
+      unissued = unissued.filter(i => i.deck.id !== balance.deck.id),
       balance
     ))
-    return { balances }
+    return { balances: balances.concat(unissued) }
   },
 })
 
@@ -71,6 +78,7 @@ export default function * (){
   yield all([
     syncDecks.trigger(),
     getDeckDetails.trigger(),
+    syncBalances.trigger(),
     sendAssets.trigger()
   ])
 }

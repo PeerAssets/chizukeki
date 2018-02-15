@@ -12,10 +12,12 @@ import Wallet from '../wallet/wallet'
 import { Deck } from './papi'
 
 namespace Summary {
+  export type BalanceType = 'UNISSUED' | 'ISSUED' | 'RECIEVED'
   export type Balance = {
-    value: number,
-    deck: Deck,
-    account: string
+    type: BalanceType
+    value?: number
+    account?: string
+    deck: Deck
   }
   export type Props = {
     balances: Array<Balance>
@@ -48,27 +50,26 @@ let styles = {
 
 
 function divideByOwnership(balances: Array<Summary.Balance>){
-  let divided: Record<'owned' | 'recieved', Array<Summary.Balance>> = {
-    owned: [],
-    recieved: [],
+  let divided: Record<Summary.BalanceType, Array<Summary.Balance>> = {
+    UNISSUED: [],
+    ISSUED: [],
+    RECIEVED: [],
   }
   for (let balance of balances){
-    if(balance.value >= 0){
-      divided.recieved.push(balance)
-    } else {
-      divided.owned.push(balance)
-    }
+    divided[balance.type].push(balance)
   }
   return divided
 }
 
-function Balance({ value, deck: { name }, ...props }: Summary.Balance) {
-  let io = (inbound, outbound) => value >= 0 ? inbound : outbound
+function Balance({ type, value, deck: { name }, ...props }: Summary.Balance) {
   return (
-    <CardItem styleName={`asset ${io('recieved', 'issued')}`}>
-      <Text styleName='name'>{name}</Text>
-      <Text styleName='balance'>{Math.abs(value).toLocaleString('en')}</Text>
-      {io(false, <Badge><Text>Your Issuance</Text></Badge>)}
+    <CardItem styleNames={`asset ${type.toLowerCase()}`}>
+      <Text styleNames='name'>{name}</Text>
+      <Text styleNames='balance'>
+        { type.toLowerCase() } {
+          value !== undefined && Math.abs(value).toLocaleString('en')
+        }
+      </Text>
     </CardItem>
   )
 }
@@ -77,20 +78,20 @@ function Balance({ value, deck: { name }, ...props }: Summary.Balance) {
 @connectStyle('PeerKeeper.assets.Summary', styles)
 class Summary extends React.Component<Summary.Props, {}> {
   render() {
-    let { owned, recieved } = divideByOwnership(this.props.balances)
+    let { UNISSUED, ISSUED, RECIEVED } = divideByOwnership(this.props.balances)
     return (
       <View style={this.props.style.main}>
         <Card style={{ width: '100%' }}>
           <CardItem styleNames='header'>
             <H2>Assets</H2>
           </CardItem>
-          {owned.map((o, key) => <Balance key={key} {...o} />)}
-          {recieved.map((o, key) => <Balance key={key} {...o} />)}
+          {UNISSUED.map((o, key) => <Balance key={key} {...o} />)}
+          {ISSUED.map((o, key) => <Balance key={key} {...o} />)}
+          {RECIEVED.map((o, key) => <Balance key={key} {...o} />)}
         </Card>
       </View>
     )
   }
 }
-
 
 export default Summary

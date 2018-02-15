@@ -10,7 +10,7 @@ import configureStore, { history } from "./store"
 import Nav from './Menu'
 import Wallet from './wallet/Container'
 import Login from './wallet/LoginContainer'
-import LoggedIn from './wallet/LoggedIn'
+import AuthenticatedRoute from './wallet/AuthenticatedRoute'
 import Assets from './assets/Container'
 
 import { StyleProvider, variables } from 'native-base/src/index';
@@ -35,11 +35,9 @@ export default class App extends React.Component<{}> {
                 */}
                 <View style={styles.container}>
                   <Nav />
-                  <LoggedIn>
-                    <Route path="/" exact render={() => <Redirect to='/wallet' />} />
-                    <Route path="/wallet" exact component={Wallet} />
-                    <Route path="/assets" exact component={Assets} />
-                  </LoggedIn>
+                  <AuthenticatedRoute path="/" exact component={() => <Redirect to='/wallet' />} />
+                  <AuthenticatedRoute path="/wallet" exact component={Wallet} />
+                  <AuthenticatedRoute path="/assets" exact component={Assets} />
                   <Route path="/login" exact component={Login} />
                 </View>
               </View>

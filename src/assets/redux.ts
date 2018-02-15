@@ -15,6 +15,11 @@ function handleSync(
   return synced.map(s => Object.assign({}, oldMap[s.id] || {}, s))
 }
 
+function logout({ decks }){
+  return { decks, balances: [], ...actionHistory() }
+}
+
+
 function assetReducer(state: State = { decks: [], balances: [], ...actionHistory() }, action: AnyAction): State {
   return syncDecks.routine.switch<State>(action, {
     started: payload => state,
@@ -40,12 +45,13 @@ function assetReducer(state: State = { decks: [], balances: [], ...actionHistory
     }),
     failed: () => state
   }) ||
-  state
+  ((action.type === 'HARD_LOGOUT') ? logout(state) : state)
 }
 
 export const reducer = ActionHistory.bind<string, State>(assetReducer)
 export const saga = Saga
 export const routines = {
   syncDecks: syncDecks.routine,
-  getDeckDetails: getDeckDetails.routine
+  getDeckDetails: getDeckDetails.routine,
+  syncBalances: syncBalances.routine
 }

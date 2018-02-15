@@ -26,9 +26,12 @@ let styles = {
 @connectStyle('PeerKeeper.Assets', styles)
 class Assets extends React.Component<Assets.Props, {}> {
   componentDidMount(){
-    let { actions, decks, wallet } = this.props
+    let { actions, decks, balances, wallet } = this.props
     if((!decks.length) && wallet){
       actions.syncDecks({ address: wallet.address })
+    }
+    if(decks.length && !balances.length){
+      actions.syncBalances({ address: wallet.address, decks })
     }
   }
   render() {
@@ -48,7 +51,9 @@ namespace Assets {
   }
   export type Props = Data & {
     actions: {
-      syncDecks: any // TODO strange type errors when properly typed
+      // TODO strange type errors when properly typed
+      syncDecks: any
+      syncBalances: any
     }
     style?: any
   }
