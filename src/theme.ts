@@ -58,6 +58,13 @@ let summaryStyles = variables => {
             },
           },
         },
+        '.focused': {
+          'NativeBase.Text': {
+            '.name': {
+              fontSize: 20
+            }
+          },
+        },
         '.unissued': typeBackgrounds(variables.btnWarningBg),
         '.issued': typeBackgrounds(variables.btnSuccessBg),
         '.received': typeBackgrounds(variables.btnInfoBg),
@@ -125,6 +132,7 @@ export default (variables = nbVariables) => {
     "NativeBase.Badge": badgeStyles,
     "NativeBase.Spinner": Object.assign(spinnerStyles, basicTextStyles),
 
-    'PeerKeeper.AssetsSummary': summaryStyles(variables)
+    'PeerKeeper.Assets': summaryStyles(variables),
+    'PeerKeeper.Asset': summaryStyles(variables)
   })
 }

@@ -2,14 +2,15 @@ import * as React from 'react'
 import { View } from 'react-native'
 import { Button, CardItem, Body, Text, Card, connectStyle, H2, H3, Icon, Badge } from 'native-base/src/index'
 
-import Send from './SendAsset'
+
+import { Link } from '../routing/router'
 import Wrapper from '../generics/Wrapper'
 import RoutineButton from '../generics/routine-button'
 import Modal from '../generics/modal.web'
-
 import Wallet from '../wallet/wallet'
 
 import { Deck } from './papi'
+import Send from './SendAsset'
 
 namespace Summary {
   export type BalanceType = 'UNISSUED' | 'ISSUED' | 'RECIEVED'
@@ -18,6 +19,7 @@ namespace Summary {
     value?: number
     account?: string
     deck: Deck
+    styleNames?: string
   }
   export type Props = {
     balances: Array<Balance>
@@ -61,27 +63,28 @@ function divideByOwnership(balances: Array<Summary.Balance>){
   return divided
 }
 
-function Balance({ type, value, deck: { name }, ...props }: Summary.Balance) {
+function Balance({ type, value, deck: { id, name }, styleNames = '' }: Summary.Balance) {
   return (
-    <CardItem styleNames={`balance ${type.toLowerCase()}`}>
-      <Text styleNames='name'>{name}</Text>
-      <Text styleNames='value'>
-        { value !== undefined ? Math.abs(value).toLocaleString('en') : '-' }
-      </Text>
-      <Text styleNames='type'>
-        { type.toLowerCase() }
-      </Text>
-    </CardItem>
+    <Link to={`/assets/${id}`}>
+      <CardItem styleNames={`balance ${type.toLowerCase()} ${styleNames}`}>
+        <Text styleNames='name'>{name}</Text>
+        <Text styleNames='value'>
+          {value !== undefined ? Math.abs(value).toLocaleString('en') : '-'}
+        </Text>
+        <Text styleNames='type'>
+          {type.toLowerCase()}
+        </Text>
+      </CardItem>
+    </Link>
   )
 }
 
 
-@connectStyle('PeerKeeper.AssetsSummary', styles)
 class Summary extends React.Component<Summary.Props, {}> {
   render() {
     let { UNISSUED, ISSUED, RECIEVED } = divideByOwnership(this.props.balances)
     return (
-      <View style={this.props.style.main}>
+      <View style={styles.main as any}>
         <Card styleNames='summary' style={{ width: '100%' }}>
           <CardItem styleNames='header'>
             <H2>Assets</H2>
@@ -95,5 +98,7 @@ class Summary extends React.Component<Summary.Props, {}> {
   }
 }
 
+
+export { Balance }
 
 export default Summary

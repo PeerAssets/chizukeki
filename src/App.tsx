@@ -12,6 +12,7 @@ import Wallet from './wallet/Container'
 import Login from './wallet/LoginContainer'
 import AuthenticatedRoute from './wallet/AuthenticatedRoute'
 import Assets from './assets/Container'
+import Asset from './assets/AssetContainer'
 
 import { StyleProvider, variables } from 'native-base/src/index';
 import theme from './theme'
@@ -38,6 +39,7 @@ export default class App extends React.Component<{}> {
                   <AuthenticatedRoute path="/" exact component={() => <Redirect to='/wallet' />} />
                   <AuthenticatedRoute path="/wallet" exact component={Wallet} />
                   <AuthenticatedRoute path="/assets" exact component={Assets} />
+                  <AuthenticatedRoute path="/assets/:id" exact component={Asset} />
                   <Route path="/login" exact component={Login} />
                 </View>
               </View>

@@ -110,6 +110,8 @@ class Wallet extends React.Component<
   }
 > {
   componentDidMount() {
+    // todo generally the sync triggers aren't organized that well. This one fires every redirect if enabled
+    // not really an issue, but suboptimal
     let sync = this.props.sync
     if(sync.enabled){
       sync.start()

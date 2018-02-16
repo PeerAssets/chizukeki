@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { Dimensions, View, ViewStyle, Clipboard } from 'react-native'
 import { Button, CardItem, Body, Text, Card, connectStyle, H2, Icon } from 'native-base/src/index'
 
 import Wrapper from '../generics/Wrapper'
@@ -9,6 +8,7 @@ import Wallet from '../wallet/Wallet'
 
 import Summary from './Summary'
 import DeckList from './DeckList'
+
 
 
 let styles = {
@@ -21,6 +21,12 @@ let styles = {
     alignItems: 'center',
     overflow: 'hidden',
   },
+}
+
+
+function Routes({ decks, balances }: Assets.Props,){
+  return  [
+  ]
 }
 
 @connectStyle('PeerKeeper.Assets', styles)

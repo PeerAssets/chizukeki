@@ -12,7 +12,6 @@ let tabStyles = {
   link: {
     color: variables.btnInfoColor,
     textDecorationLine: 'none',
-    textDecoration: 'none',
     height: '100%',
     justifyContent: 'center',
     flexDirection: 'column',

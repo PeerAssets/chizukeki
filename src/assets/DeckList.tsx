@@ -11,9 +11,9 @@ namespace Deck {
   export type Data = Papi.Deck 
 }
 
-function Deck({ item: deck }: { item: Deck.Data }) {
+function Deck({ item: deck, ...props }: { item: Deck.Data } & any) {
   return (
-    <Card>
+    <Card {...props}>
       <CardItem styleNames='header'>
         <Body style={{justifyContent: 'space-between', flexWrap: 'wrap', flexDirection: 'row'}}>
           <Text>{deck.name}</Text>
@@ -67,5 +67,7 @@ let styles = {
     flex: 9,
   }
 }
+
+export { Deck }
 
 export default DeckList
