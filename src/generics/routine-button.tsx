@@ -5,7 +5,7 @@ import { Routine } from './routine';
 import { lang } from 'moment';
 import { Dimensions } from 'react-native';
 
-type Stage = 'STARTED' | 'DONE' | 'FAILED' | 'DEFAULT'
+type Stage = 'STARTED' | 'DONE' | 'FAILED' | 'DEFAULT' | 'STOPPED'
 
 type DismissProps = Array<{
   stage?: Stage,
@@ -24,6 +24,7 @@ type Props = {
   STARTED?: string
   DONE?: string
   FAILED?: string
+  STOPPED?: string
   DEFAULT: string
 
   [key: string]: any
@@ -37,7 +38,8 @@ const defaultIcons = {
   STARTED: <Spinner size={30} color='white' />,
   DONE: ButtonIcon('check'),
   FAILED: ButtonIcon('close'),
-  DEFAULT: undefined
+  DEFAULT: undefined,
+  STOPPED: undefined
 }
 
 function normalizeIcons(icons: Props['icons'] = {}){
@@ -112,7 +114,7 @@ class RoutineButton extends React.Component<Props, { alerting: false | Stage }> 
   render() {
     let {
       stage, icons = {}, onPress, children,
-      STARTED, DONE, FAILED, DEFAULT, LOADING: _,
+      STARTED, DONE, FAILED, DEFAULT, STOPPED,
       styleNames = '',
       ...props
     } = this.props
@@ -125,6 +127,7 @@ class RoutineButton extends React.Component<Props, { alerting: false | Stage }> 
 
     let stageBased = this.stageSwitch({
       DEFAULT: { styleNames: `info ${styleNames}`, onPress },
+      STOPPED: { styleNames: `warning ${styleNames}`, onPress },
       STARTED: { styleNames: `info ${styleNames}`, onPress },
       DONE: this.dismissable('DONE', `success ${styleNames}`),
       FAILED: this.dismissable('FAILED', `danger ${styleNames}`)
@@ -133,7 +136,7 @@ class RoutineButton extends React.Component<Props, { alerting: false | Stage }> 
     return (
       <Button {...stageBased } {...props}>
         {icon}
-        <Text>{this.stageSwitch({ STARTED, DONE, FAILED, DEFAULT })}</Text>
+        <Text>{this.stageSwitch({ STARTED, DONE, FAILED, DEFAULT, STOPPED })}</Text>
       </Button>
     )
   }

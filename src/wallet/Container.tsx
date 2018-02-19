@@ -13,11 +13,7 @@ let { sendTransaction, sync } = Redux.routines
 
 type Props = {
   wallet: Wallet.Data,
-  isSyncing: boolean,
-  stages: {
-    sync: typeof sync.currentStage,
-    sendTransaction: typeof sendTransaction.currentStage,
-  }
+  routineStages: Redux.State['routineStages'],
   actions: {
     sync: typeof sync.trigger
     stopSync: typeof sync.stop
@@ -26,7 +22,7 @@ type Props = {
 }
 
 
-function Container({ stages, isSyncing, actions, wallet }: Props){
+function Container({ routineStages, actions, wallet }: Props){
   // todo this still isn't very scaleable
   if(!Wallet.isLoaded(wallet)){
     return <Redirect to='/login'/>
@@ -34,13 +30,12 @@ function Container({ stages, isSyncing, actions, wallet }: Props){
   return (
     <Wallet {...wallet}
       sendTransaction={{
-        stage: stages.sendTransaction,
+        stage: routineStages.sendTransaction,
         send: actions.sendTransaction,
         wallet
       }}
       sync={{
-        stage: stages.sync,
-        enabled: isSyncing,
+        stage: routineStages.sync,
         start: () => actions.sync({ address: wallet.address }),
         stop: actions.stopSync
       }} />
@@ -61,10 +56,9 @@ let selectStages = routineStages({
 })
 
 export default connect(
-  ({ wallet: { actionHistory, wallet } }: { wallet: Redux.State }) => {
+  ({ wallet: { routineStages, wallet } }: { wallet: Redux.State }) => {
     return {
-      stages: selectStages(actionHistory),
-      isSyncing: isSyncing(actionHistory),
+      routineStages,
       wallet
     }
   },

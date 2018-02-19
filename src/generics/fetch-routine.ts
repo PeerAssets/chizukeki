@@ -1,21 +1,22 @@
 import { SagaIterator, delay } from 'redux-saga'
 import { take, cancel, fork, all, takeLatest, put, call, cancelled } from 'redux-saga/effects'
 import * as FSA from 'typescript-fsa'
-import expandedRoutine, { Routine, bindAsyncAction, Meta } from './routine'
+import expandedRoutine, { Switch, Routine, bindAsyncAction, Meta } from './routine'
+import { Omit } from './utils'
 
 type Action<payload> = { type: string, payload }
 
-type Params<Start, Success, Error> = {
+type Params<Start, Success, Failure> = {
   type: string,
   fetchJSON: (payload: Start) => Promise<Success>,
   commonMeta?: Meta
 }
 
-function fetchJSONRoutine<Start, Success, Error>({
+function fetchJSONRoutine<Start, Success, Failure>({
   fetchJSON, type, commonMeta
-}: Params<Start, Success, Error>) {
+}: Params<Start, Success, Failure>) {
 
-  let routine = expandedRoutine<Start, Success, Error>(type, commonMeta)
+  let routine = expandedRoutine<Start, Success, Failure>(type, commonMeta)
 
   const fetchSaga = bindAsyncAction(routine)(fetchJSON)
 
@@ -43,20 +44,20 @@ function fetchJSONRoutine<Start, Success, Error>({
   return { trigger, fetchSaga, routine }
 }
 
-type LoopPayload<Start, Success, Error> =
+type LoopPayload<Start, Success, Failure> =
   | FSA.Success<Start, Success>
-  | FSA.Failure<Start, Error>
+  | FSA.Failure<Start, Failure>
 
 namespace pollSaga {
-  export type Params<Start, Success, Error> = {
-    routine: Routine<Start, Success, Error>,
+  export type Params<Start, Success, Failure> = {
+    routine: Routine<Start, Success, Failure>,
     interval: number,
   }
 }
 
-function pollSaga<Start, Success, Error>({ interval, routine }: pollSaga.Params<Start, Success, Error>){
+function pollSaga<Start, Success, Failure>({ interval, routine }: pollSaga.Params<Start, Success, Failure>){
   let stop = FSA.actionCreatorFactory()(routine.trigger.type + '_STOPPED')
-  type LoopAction = Action<LoopPayload<Start, Success, Error>>
+  type LoopAction = Action<LoopPayload<Start, Success, Failure>>
   function* restart(action: LoopAction){
     yield call(delay, interval)
     yield put(routine.started(action.payload.params))
@@ -86,15 +87,50 @@ function pollSaga<Start, Success, Error>({ interval, routine }: pollSaga.Params<
   }
 }
 namespace fetchJSONRoutine {
-  export function withPolling<Start, Success, Error>(
-    { pollingInterval: interval, ...params }: { pollingInterval: number } & Params<Start, Success, Error>
+  export function withPolling<Start, Success, Failure>(
+    { pollingInterval: interval, ...params }: { pollingInterval: number } & Params<Start, Success, Failure>
   ){
     let { routine, ...rest } = fetchJSONRoutine(params)
     let { stop, poll } = pollSaga({ interval, routine })
     routine.allTypes.push(stop.type)
-    let stoppableRoutine: typeof routine & { stop: typeof stop } = Object.assign(routine, { stop })
+    let _switch = routine.switch
+    function extendedSwitch<Return>(
+      action: FSA.AnyAction,
+      { stopped, ...cases }: Switch.Cases<Start, Success, Failure, Return> & {
+        stopped: Return | Switch.IgnorePayload<Return>
+      }
+    ) : Return | void {
+      return _switch(action, cases) || 
+        (FSA.isType(action, stop)) ?
+          (Switch.isUncallable<Return>(stopped) ?
+            stopped :
+            stopped()
+          ) :
+          undefined
+    }
+    let stoppableRoutine = {
+      ...routine,
+      stop,
+      switch: extendedSwitch,
+      stage(action: FSA.AnyAction | string | undefined) {
+        if (action === undefined) { return }
+        action = typeof (action) === 'string' ? { type: action } : action
+        return extendedSwitch<'STARTED' | 'DONE' | 'FAILED' | 'STOPPED' | void>(
+          action,
+          {
+            started: 'STARTED',
+            done: 'DONE',
+            failed: 'FAILED',
+            stopped: 'STOPPED'
+          }
+        )
+      }
+    }
+    type StoppableRoutine = Omit<typeof stoppableRoutine, 'currentStage'>
+      & { currentStage?: Routine.Stage | 'STOPPED' };
+
     return {
-      routine: stoppableRoutine,
+      routine: stoppableRoutine as StoppableRoutine,
       poll,
       ...rest,
     }

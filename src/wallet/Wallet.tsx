@@ -103,7 +103,6 @@ class Wallet extends React.Component<
     sendTransaction: SendTransaction.Props
     sync: {
       stage: string | undefined,
-      enabled: boolean,
       start: () => any,
       stop: () => any,
     }
@@ -113,12 +112,13 @@ class Wallet extends React.Component<
     // todo generally the sync triggers aren't organized that well. This one fires every redirect if enabled
     // not really an issue, but suboptimal
     let sync = this.props.sync
-    if(sync.enabled){
+    if(!sync.stage){
       sync.start()
     }
   }
   render() {
     let { address, transactions = [], balance = 0, style, keys, sync, sendTransaction } = this.props
+    let syncToggle= sync.stage !== 'STOPPED' ? sync.stop : sync.start
     return (
       <Wrapper>
         <View style={style.main}>
@@ -130,12 +130,12 @@ class Wallet extends React.Component<
               <Body style={style.body}>
                 <UnlockThenCopy keys={keys}/>
                 <RoutineButton style={style.column}
-                  dismiss={[{ stage: 'DONE', auto: true, onPressDismiss: sync.enabled ? sync.stop : sync.start }]}
+                  dismiss={[{ stage: 'DONE', auto: true, onPressDismiss: syncToggle }]}
                   icons={{ DEFAULT: 'refresh', DONE: 'refresh' }}
-                  styleNames={!sync.enabled ? 'warning': ''}
-                  onPress={sync.enabled ? sync.stop : sync.start}
+                  onPress={syncToggle}
                   stage={sync.stage}
-                  DEFAULT={ sync.enabled ? 'Syncing' : 'Sync Disabled' }
+                  DEFAULT={'Syncing'}
+                  STOPPED={'Syncing disabled'}
                   LOADING='Syncing'
                   FAILED='Sync Failed' />
               </Body>

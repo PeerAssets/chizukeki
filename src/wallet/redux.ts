@@ -1,19 +1,26 @@
 import PrivateKey from './LoadPrivateKey'
 import Wallet from './Wallet'
 
-import ActionHistory from '../generics/action-history'
-import Saga, { syncWallet, sendTransaction } from './saga'
+import { trackRoutineStages } from '../generics/utils'
+import saga, { syncWallet, sendTransaction } from './saga'
 import { AnyAction } from 'typescript-fsa';
+import { init } from 'ramda';
 
+const routines = {
+  sync: syncWallet.routine,
+  sendTransaction: sendTransaction.routine
+}
 
-export type State = { wallet: null | Wallet.Loading | Wallet.Data } & ActionHistory.Bind
+type Stages = { routineStages: { [key in keyof typeof routines]: string | undefined } }
+
+export type State = { wallet: null | Wallet.Loading | Wallet.Data } & Stages
 
 let initialState = () => ({
   wallet: null,
-  ...ActionHistory.of([
-    ...syncWallet.routine.allTypes,
-    ...sendTransaction.routine.allTypes,
-  ])
+  routineStages: {
+    sync: undefined,
+    sendTransaction: undefined
+  }
 })
 
 function applyTransaction(
@@ -58,7 +65,7 @@ function logout(state: State){
   return initialState()
 }
 
-function walletReducer(state: State, action: AnyAction): State {
+function walletReducer(state: State = initialState(), action: AnyAction): State {
   return syncWallet.routine.switch<State>(action, {
     started: payload => {
       if(!payload.keys){
@@ -76,7 +83,8 @@ function walletReducer(state: State, action: AnyAction): State {
       ...state,
       wallet: state.wallet ? applySync({ old: state.wallet, synced: payload }) : state.wallet
     }),
-    failed: () => state
+    failed: () => state,
+    stopped: () => state,
   }) ||
   sendTransaction.routine.switch<State>(action, {
     started: payload => state,
@@ -90,9 +98,5 @@ function walletReducer(state: State, action: AnyAction): State {
   ((action.type === 'HARD_LOGOUT') ? logout(state) : state)
 }
 
-export const reducer = ActionHistory.bind(walletReducer, initialState())
-export const saga = Saga
-export const routines = {
-  sync: syncWallet.routine,
-  sendTransaction: sendTransaction.routine
-}
+export const reducer = trackRoutineStages(routines, 'routineStages')(walletReducer)
+export { saga, routines }
