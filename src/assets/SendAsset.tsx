@@ -25,6 +25,8 @@ import Wrapper from '../generics/Wrapper'
 import { WrapActionable } from '../wallet/UnlockModal'
 import Wallet from '../wallet/Wallet'
 
+import Summary from './Summary'
+
 type Recipient = { address: string, amount: number }
 
 namespace SendAsset {
@@ -34,11 +36,12 @@ namespace SendAsset {
     }
     //deckSpawn: any, // deck spawn transaction
   }
+  export type Payload = Data & { wallet: Wallet.Unlocked }
   export type Props = {
     stage?: string | undefined,
-    send: (data: Data & { wallet: Wallet.Unlocked }) => void,
+    send: (data: Payload) => any,
     wallet: Wallet.Data,
-    asset: any, // will be Asset type
+    asset: Summary.Balance
   }
 }
 
@@ -98,15 +101,22 @@ class SendAsset extends React.Component<SendAsset.Props, SendAsset.Data> {
     }
   }
   render() {
-    let { wallet: { keys, balance } } = this.props
+    let {
+      asset: { deck: { name }, type },
+      wallet: { keys, balance }
+    } = this.props
+
     let amountsMap = this.state.amountsMap
     let totalAmount = Object.values(this.state.amountsMap).reduce((s, v) => s + v, 0)
+    let transactionType = type === 'RECIEVED' ? 'Send' : 'Issue'
+    let canSendAmount = (transactionType === 'Issue' || (totalAmount > balance))
+
     let SendButton = (props: { onPress: () => any }) =>
       <RoutineButton styleNames='block'
-        disabled={(!isFilled(this.state)) || (totalAmount > balance)}
+        disabled={(!isFilled(this.state)) || (!canSendAmount)}
         icons={{ DEFAULT: 'send' }}
         stage={this.props.stage}
-        DEFAULT={totalAmount > balance ? 'Insufficient Funds!' : 'Send Transaction'}
+        DEFAULT={!canSendAmount ? 'Insufficient Funds!' : `${transactionType} Asset`}
         STARTED='Sending'
         DONE='Sent!'
         FAILED='Invalid Transaction'
@@ -117,7 +127,7 @@ class SendAsset extends React.Component<SendAsset.Props, SendAsset.Data> {
       <Card>
         <CardItem styleNames='header'>
           <Body style={{ flexDirection: 'row', width: '100%', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-            <H2 style={{ flexBasis: 200, paddingBottom: 15 }}>Send a Transaction</H2>
+            <H2 style={{ flexBasis: 200, paddingBottom: 15 }}>{transactionType} {name}</H2>
           </Body>
         </CardItem>
         {Object.entries(amountsMap).map(([ address, amount ]) => <Recipient {...{ address, amount }} />)}

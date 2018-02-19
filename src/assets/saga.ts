@@ -4,6 +4,7 @@ import { peercoin } from '../explorer'
 import papi, { Deck } from './papi'
 
 import Summary from './Summary'
+import SendAsset from './SendAsset'
 
 function getSpawnIfOwned(address: string){
   return async (deck: Deck.Summary) => {
@@ -41,7 +42,7 @@ const getDeckDetails = fetchJSONRoutine<
 })
 
 const sendAssets = fetchJSONRoutine<
-  any,
+  SendAsset.Payload,
   any,
   Error
 >({
@@ -87,4 +88,4 @@ export default function * (){
 }
 
 
-export { syncDecks, getDeckDetails, syncBalances, sendAssets,  }
+export { syncDecks, getDeckDetails, syncBalances, sendAssets }

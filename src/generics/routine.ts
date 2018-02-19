@@ -1,7 +1,8 @@
 import { bindActionCreators, Dispatch } from 'redux'
 import { SagaIterator } from 'redux-saga'
 import { put, call, cancelled } from 'redux-saga/effects'
-import actionCreatorFactory, { isType, AnyAction, ActionCreator, AsyncActionCreators } from 'typescript-fsa'
+import actionCreatorFactory, { isType, AnyAction, ActionCreator, AsyncActionCreators, EmptyActionCreator } from 'typescript-fsa'
+import { Omit } from './utils'
 
 // TODO: not sure why this caused trouble
 // import { bindAsyncAction } from 'typescript-fsa-redux-saga'
@@ -57,14 +58,15 @@ function handleOptionalPayload<Payload, Return>(f: Block<Payload, Return>, paylo
 }
 
 function routineSwitch<Start, Success, Error>(
-  routine: AsyncActionCreators<Start, Success, Error>
+  routine: Routine.Base<Start, Success, Error> | Routine.PollingBase<Start, Success, Error>
 ){
-  return <Return>(action: AnyAction, cases: { 
+  type Cases<Return> = { 
     started: Block<Start, Return> | Return
     done: Block<Success, Return> | Return
     failed: Block<Error, Return> | Return
-  }): Return | void => {
-    if(isType(action, routine.started)){
+  }
+  let base = <Return>(action: AnyAction, cases: Cases<Return>): Return | void => {
+   if(isType(action, routine.started)){
       return isUncallable<Return>(cases.started) ?
         cases.started :
         handleOptionalPayload(cases.started, action.payload)
@@ -80,35 +82,40 @@ function routineSwitch<Start, Success, Error>(
         handleOptionalPayload(cases.failed, action.payload.error)
     }
   }
-}
-
-namespace Routine {
-  export type Stage = 'STARTED' | 'DONE' | 'FAILED' | undefined
+  return ('stop' in routine) ?
+    <Return>(action: AnyAction, { stopped, ...cases }: Cases<Return> & {
+      stopped: Return | IgnorePayload<Return>
+    }): Return | void => {
+      return base(action, cases) || (() => {
+        if (isType(action, routine.stop)) {
+          return isUncallable<Return>(stopped) ?
+            stopped :
+            stopped()
+       }
+      })()
+    } : 
+    base
 }
 
 type Routine<Start, Success, Error> =
-  AsyncActionCreators<Start, Success, Error>
+  Routine.Base<Start, Success, Error>
   & {
-    currentStage?: Routine.Stage,
-    allTypes: Array<string>,
-    trigger: ActionCreator<Start>,
+    currentStage?: Routine.Stage
+    stage(action: AnyAction | string | undefined): Routine.Stage | void
     switch<Return>(action: AnyAction, cases: { 
       started: Block<Start, Return> | Return
       done: Block<Success, Return> | Return
       failed: Block<Error, Return> | Return
     }): Return | void,
-    stage(action: AnyAction | string | undefined): Routine.Stage | void
   }
 
-function expandedRoutine<Start, Success, Error>(type: string, commonMeta?: Meta): Routine<Start, Success, Error>{
-  let routine = actionCreator.async<Start, Success, Error>(type, commonMeta)
+
+function Routine<Start, Success, Error>(type: string, commonMeta?: Meta): Routine<Start, Success, Error> {
+  let routine = Routine.Base<Start, Success, Error>(type, commonMeta)
   return Object.assign(routine, {
-    trigger: actionCreator<Start>(type),
-    switch: routineSwitch<Start, Success, Error>(routine),
-    allTypes: [type, ...['STARTED', 'DONE', 'FAILED'].map(stage => `${type}_${stage}`)],
-    stage(action: AnyAction | string | undefined){
-      if(action === undefined){ return }
-      action = typeof(action) === 'string' ? { type: action } : action
+    stage(action: AnyAction | string | undefined) {
+      if (action === undefined) { return }
+      action = typeof (action) === 'string' ? { type: action } : action
       return (
         this as Routine<Start, Success, Error>
       ).switch<'STARTED' | 'DONE' | 'FAILED' | void>(
@@ -120,13 +127,48 @@ function expandedRoutine<Start, Success, Error>(type: string, commonMeta?: Meta)
         }
       )
     },
-    withStage(action: AnyAction | string | undefined){
+    withStage(action: AnyAction | string | undefined) {
       let self = this as Routine<Start, Success, Error>
       return Object.assign({}, self, { currentStage: self.stage(action) })
-    }
+    },
+    switch: routineSwitch<Start, Success, Error>(routine),
   })
 }
 
-export default expandedRoutine
+namespace Routine {
+  export type Stage = 'STARTED' | 'DONE' | 'FAILED' | undefined
+  export type Base<Start, Success, Error> =
+    AsyncActionCreators<Start, Success, Error> & {
+      trigger: ActionCreator<Start>
+      allTypes: Array<string>
+    }
+
+  export type PollingBase<Start, Success, Error> =
+    Base<Start, Success, Error> & {
+      currentStage?: Routine.Stage
+      stage(action: AnyAction | string | undefined): Routine.Stage | void
+      stop: EmptyActionCreator
+    }
+
+  export type Polling<Start, Success, Error> =
+    PollingBase<Start, Success, Error> & {
+      switch<Return>(action: AnyAction, cases: { 
+        started: Block<Start, Return> | Return
+        done: Block<Success, Return> | Return
+        failed: Block<Error, Return> | Return
+        stopped: IgnorePayload<Return> | Return
+      }): Return | void
+    }
+
+  export function Base<Start, Success, Error>(type: string, commonMeta?: Meta): Base<Start, Success, Error> {
+    let routine = actionCreator.async<Start, Success, Error>(type, commonMeta)
+    return Object.assign(routine, {
+      trigger: actionCreator<Start>(type),
+      allTypes: [type, ...['STARTED', 'DONE', 'FAILED'].map(stage => `${type}_${stage}`)],
+    })
+  }
+}
+
+export default Routine
 
 export { bindAsyncAction, Meta, Routine }

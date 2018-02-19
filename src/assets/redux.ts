@@ -1,7 +1,7 @@
 import { AnyAction } from 'typescript-fsa';
 import ActionHistory from '../generics/action-history'
 
-import Saga, { syncDecks, getDeckDetails, syncBalances } from './saga'
+import Saga, { syncDecks, getDeckDetails, syncBalances, sendAssets } from './saga'
 import { Deck } from './papi'
 import Assets from './Assets'
 
@@ -55,5 +55,6 @@ export const saga = Saga
 export const routines = {
   syncDecks: syncDecks.routine,
   getDeckDetails: getDeckDetails.routine,
-  syncBalances: syncBalances.routine
+  syncBalances: syncBalances.routine,
+  sendAssets: sendAssets.routine
 }

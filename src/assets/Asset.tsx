@@ -2,12 +2,13 @@ import * as React from 'react'
 import { View } from 'react-native'
 import { Button, CardItem, Body, Text, Card, connectStyle, H2, H3, Icon, Badge } from 'native-base/src/index'
 
-import Send from './SendAsset'
 import Wrapper from '../generics/Wrapper'
 import RoutineButton from '../generics/routine-button'
 import Modal from '../generics/modal.web'
 
 import Summary, { Balance } from './Summary'
+import SendAsset from './SendAsset'
+
 import { Deck as DeckCard } from './DeckList'
 import { Deck } from './papi'
 
@@ -42,13 +43,16 @@ function isBalance(asset: Summary.Balance | { deck: Deck }): asset is Summary.Ba
 @connectStyle('PeerKeeper.Asset', styles)
 class Asset extends React.Component<Asset.Props, {}> {
   render() {
-    let { asset } = this.props
+    let { asset, wallet, actions: { send } } = this.props
     return (
       <Wrapper>
         <View style={this.props.style.main}>
-          <Card styleNames='asset' style={{ width: '100%' }}>
-            {isBalance(asset) && <Balance styleNames='focused header' {...asset} />}
-          </Card>
+          { isBalance(asset) && [
+            <Card styleNames='asset' style={{ width: '100%' }}>
+              <Balance styleNames='focused header' {...asset} />
+            </Card>,
+            <SendAsset {...{ asset, wallet, send }} />
+          ]}
           <DeckCard style={{ width: '100%' }} item={asset.deck} />
         </View>
       </Wrapper>
@@ -59,6 +63,10 @@ class Asset extends React.Component<Asset.Props, {}> {
 namespace Asset {
   export type Props = {
     asset: Summary.Balance | { deck: Deck }
+    actions: {
+      send: SendAsset.Props['send']
+    }
+    wallet: SendAsset.Props['wallet']
     style?: any
   }
 }

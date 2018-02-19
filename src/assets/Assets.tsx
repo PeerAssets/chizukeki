@@ -10,7 +10,6 @@ import Summary from './Summary'
 import DeckList from './DeckList'
 
 
-
 let styles = {
   main: {
     flex: 3,
@@ -21,12 +20,6 @@ let styles = {
     alignItems: 'center',
     overflow: 'hidden',
   },
-}
-
-
-function Routes({ decks, balances }: Assets.Props,){
-  return  [
-  ]
 }
 
 @connectStyle('PeerKeeper.Assets', styles)
