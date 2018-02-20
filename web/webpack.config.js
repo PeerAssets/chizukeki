@@ -42,7 +42,7 @@ module.exports = {
     new webpack.NamedModulesPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new HtmlWebpackPlugin({
-      title: 'react native',
+      title: 'PeerAssets Wallet',
       chunksSortMode: 'dependency',
       template: path.resolve(__dirname, './index.ejs')
     }),

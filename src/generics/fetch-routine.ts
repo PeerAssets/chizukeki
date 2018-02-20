@@ -100,14 +100,16 @@ namespace fetchJSONRoutine {
         stopped: Return | Switch.IgnorePayload<Return>
       }
     ) : Return | void {
-      return _switch(action, cases) || 
+      return _switch(action, cases) || (
         (FSA.isType(action, stop)) ?
           (Switch.isUncallable<Return>(stopped) ?
             stopped :
             stopped()
           ) :
           undefined
+      )
     }
+    debugger;
     let stoppableRoutine = {
       ...routine,
       stop,

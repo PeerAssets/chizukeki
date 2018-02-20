@@ -31,7 +31,7 @@ function trackRoutineStages<Key extends string>(routineMap: object, stateKey = '
           break
         }
       }
-      return Object.assign({}, state, stages)
+      return Object.assign({}, state, { [stateKey]: stages })
     }
 }
 

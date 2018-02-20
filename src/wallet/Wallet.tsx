@@ -136,7 +136,7 @@ class Wallet extends React.Component<
                   stage={sync.stage}
                   DEFAULT={'Syncing'}
                   STOPPED={'Syncing disabled'}
-                  LOADING='Syncing'
+                  STARTED='Syncing'
                   FAILED='Sync Failed' />
               </Body>
             </CardItem>
