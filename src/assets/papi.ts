@@ -32,7 +32,7 @@ namespace Deck {
 type Deck = Deck.Summary | Deck.Full
 
 class Papi {
-  explorerUrl =  /**/ 'http://localhost:5555' /*/ 'http://172.104.159.149:5555' /**/
+  explorerUrl =  /*/ 'http://localhost:5555' /*/ 'http://172.104.159.149:5555' /**/
   version = 1
   get apiUrl(){
     return `${this.explorerUrl}/api/v${this.version}`
