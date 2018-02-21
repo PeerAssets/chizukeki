@@ -109,7 +109,6 @@ namespace fetchJSONRoutine {
           undefined
       )
     }
-    debugger;
     let stoppableRoutine = {
       ...routine,
       stop,
