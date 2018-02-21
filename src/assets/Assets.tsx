@@ -22,16 +22,23 @@ let styles = {
   },
 }
 
+function sync(props: Assets.Props){
+  let { actions, decks, balances, wallet } = props
+  if ((!decks) && wallet) {
+    actions.syncDecks({ address: wallet.address })
+  }
+  if (decks && (!balances)) {
+    actions.syncBalances({ address: wallet.address, decks })
+  }
+}
+
 @connectStyle('PeerKeeper.Assets', styles)
 class Assets extends React.Component<Assets.Props, {}> {
+  componentDidMount(){
+    sync(this.props)
+  }
   componentWillReceiveProps(nextProps: Assets.Props){
-    let { actions, decks, balances, wallet } = this.props
-    if((!decks) && wallet){
-      actions.syncDecks({ address: wallet.address })
-    }
-    if(decks && (!balances)){
-      actions.syncBalances({ address: wallet.address, decks })
-    }
+    sync(nextProps)
   }
   render() {
     let { decks, balances } = this.props
