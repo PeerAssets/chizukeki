@@ -1,8 +1,10 @@
 import { fork, all, put, call, take } from 'redux-saga/effects'
 import fetchJSONRoutine from '../generics/fetch-routine'
-import { peercoin } from '../explorer'
+import { peercoin, Wallet } from '../explorer'
+import bitcore from '../lib/bitcore'
 import papi, { Deck } from './papi'
 
+import { Satoshis } from '../lib/utils'
 import Summary from './Summary'
 import SendAsset from './SendAsset'
 
@@ -43,11 +45,28 @@ const getDeckDetails = fetchJSONRoutine<
 
 const sendAssets = fetchJSONRoutine<
   SendAsset.Payload,
-  any,
+  Wallet.PendingTransaction,
   Error
 >({
   type: 'SEND_ASSETS',
-  fetchJSON: async () => ({})
+  fetchJSON: async ({ wallet: { address, unspentOutputs, privateKey }, amountsMap, deckSpawn }) => {
+    let transaction = bitcore.assets.createCardTransferTransaction(
+      unspentOutputs.map(Satoshis.toBitcoreUtxo),
+      address,
+      amountsMap,
+      new bitcore.Transaction(deckSpawn)
+    )
+    let { minTagFee: amount, txnFee: fee } = bitcore.assets.configuration
+    let signature = new bitcore.PrivateKey(privateKey)
+    let hex = transaction.sign(signature).serialize({ disableDustOutputs: true })
+    debugger;
+    let sent = await peercoin._sendRawTransaction(hex)
+    return {
+      amount,
+      fee,
+      ...sent
+    }
+  }
 })
 
 const syncBalances = fetchJSONRoutine<

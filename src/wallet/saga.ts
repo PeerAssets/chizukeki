@@ -17,7 +17,7 @@ const syncWallet = fetchJSONRoutine.withPolling<
 
 const sendTransaction = fetchJSONRoutine<
   { wallet: LocalWallet.Unlocked, toAddress: string, amount: number },
-  any,
+  ExplorerWallet.PendingTransaction,
   Error
 >({
   type: 'SEND_TRANSACTION',

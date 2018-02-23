@@ -19,7 +19,7 @@ namespace Deck {
     name: string
     issuer: string
     issueMode: string
-    precision: number
+    decimals: number
     subscribed: boolean
     spawnTransaction?: any
   }

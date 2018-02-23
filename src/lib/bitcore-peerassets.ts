@@ -3,8 +3,8 @@ import { Buffer } from 'buffer'
 
 var pb = require('./peerassets_pb');
 
-var minTagFee = 10000; // 0.01PPC
-var txnFee = 10000;   // 0.01PPC
+var minTagFee = 0.01
+var txnFee = 0.01
 
 // P2TH info
 // PPC mainnet:
@@ -26,17 +26,23 @@ function getDeckSpawnTagHash(PPCtestnet = false, PAtest = false) {
 }
 
 function extendBitcore(bitcore, configuration = { minTagFee, txnFee, deckSpawnTagHash: getDeckSpawnTagHash() }) {
-  minTagFee = Satoshis.fromAmount(minTagFee)
-  txnFee = Satoshis.fromAmount(txnFee)
   bitcore.assets = {
     ISSUE_MODE: pb.DeckSpawn.MODE,
-    configuration,
+    configuration: Object.assign({
+      withFeesInSatoshis() {
+        return {
+          ...this,
+          minTagFee: Satoshis.fromAmount(this.minTagFee),
+          txnFee: Satoshis.fromAmount(this.txnFee)
+        }
+      },
+    }, configuration),
 
     //
     // Deck spawn functions
     //
     createDeckSpawnTransaction(utxo, shortName, numberOfDecimals, issueModes) {
-      let { minTagFee, txnFee, deckSpawnTagHash } = this.configuration
+      let { minTagFee, txnFee, deckSpawnTagHash } = this.configuration.withFeesInSatoshis()
       let deckSpawnTxn = new bitcore.Transaction()
         .from(arrayify(utxo).map(Satoshis.toBitcoreUtxo))                               // vin[0]: Owner signature
         .to(deckSpawnTagHash, minTagFee)                                                // vout[0]: Deck spawn P2TH
@@ -65,8 +71,8 @@ function extendBitcore(bitcore, configuration = { minTagFee, txnFee, deckSpawnTa
     //
     // Card transfer functions
     //
-    createCardTransferTransaction(utxo, amountsMap: Record<string, number>, deckSpawnTxn) {
-      let { minTagFee, txnFee } = this.configuration
+    createCardTransferTransaction(utxo, changeAddress: string, amountsMap: Record<string, number>, deckSpawnTxn) {
+      let { minTagFee, txnFee } = this.configuration.withFeesInSatoshis()
       var receivers: Array<string> = [];
       var amounts: Array<number> = [];
       for (let a in amountsMap) {
@@ -85,7 +91,7 @@ function extendBitcore(bitcore, configuration = { minTagFee, txnFee, deckSpawnTa
       }
 
       // free format from here, typically a change Output
-      cardTransferTxn.to(utxo.address, utxo.satoshis - minTagFee - minTagFee - txnFee);  // vout[n+3] Change
+      cardTransferTxn.change(changeAddress)
 
       return cardTransferTxn;
     },

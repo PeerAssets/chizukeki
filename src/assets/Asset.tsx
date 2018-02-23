@@ -48,10 +48,10 @@ class Asset extends React.Component<Asset.Props, {}> {
       <Wrapper>
         <View style={this.props.style.main}>
           { isBalance(asset) && [
-            <Card styleNames='asset' style={{ width: '100%' }}>
+            <Card key='asset' styleNames='asset' style={{ width: '100%' }}>
               <Balance styleNames='focused header' {...asset} />
             </Card>,
-            <SendAsset {...{ asset, wallet, send }} />
+            <SendAsset key='send' {...{ asset, wallet, send }} />
           ]}
           <DeckCard style={{ width: '100%' }} item={asset.deck} />
         </View>

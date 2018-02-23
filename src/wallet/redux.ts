@@ -6,6 +6,8 @@ import saga, { syncWallet, sendTransaction } from './saga'
 import { AnyAction } from 'typescript-fsa';
 import { init } from 'ramda';
 
+import { sendAssets } from '../assets/saga'
+
 const routines = {
   sync: syncWallet.routine,
   sendTransaction: sendTransaction.routine
@@ -66,6 +68,15 @@ function logout(state: State){
 }
 
 function walletReducer(state: State = initialState(), action: AnyAction): State {
+  let transactionSwitch = {
+    started: payload => state,
+    done: (payload) => ({
+      ...state,
+      // an unloaded wallet here shouldn't be possible
+      wallet: Wallet.isLoaded(state.wallet) ? applyTransaction(state.wallet, payload) : state.wallet,
+    }),
+    failed: () => state
+  }
   return syncWallet.routine.switch<State>(action, {
     started: payload => {
       if(!payload.keys){
@@ -86,15 +97,8 @@ function walletReducer(state: State = initialState(), action: AnyAction): State 
     failed: () => state,
     stopped: () => state,
   }) ||
-  sendTransaction.routine.switch<State>(action, {
-    started: payload => state,
-    done: (payload) => ({
-      ...state,
-      // an unloaded wallet here shouldn't be possible
-      wallet: Wallet.isLoaded(state.wallet) ? applyTransaction(state.wallet, payload) : state.wallet,
-    }),
-    failed: () => state
-  }) ||
+  sendTransaction.routine.switch<State>(action, transactionSwitch) ||
+  sendAssets.routine.switch<State>(action, transactionSwitch) ||
   ((action.type === 'HARD_LOGOUT') ? logout(state) : state)
 }
 

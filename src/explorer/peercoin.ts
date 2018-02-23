@@ -216,16 +216,9 @@ class PeercoinExplorer {
 
   getRawTransaction = (txid: string) => this.apiRequest<RawTransaction>('getrawtransaction', { txid, decrypt: 1 })
 
-  sendRawTransaction = async (
-    { unspentOutputs, toAddress, amount, changeAddress, privateKey, fee = 0.01, }: RawTransaction.ToSend
-  ): Promise<Wallet.PendingTransaction> => {
-    let signature = new bitcore.PrivateKey(privateKey)
-    let transaction = new bitcore.Transaction()
-      .from(unspentOutputs.map(Satoshis.toBitcoreUtxo))
-      .to(toAddress, Satoshis.fromAmount(amount))
-      .change(changeAddress)
-      .fee(Satoshis.fromAmount(fee))
-    let hex = transaction.sign(signature).serialize()
+  _sendRawTransaction = async (hex):
+    Promise<Pick<Wallet.PendingTransaction, 'id' | 'timestamp' | 'raw'>> =>
+  {
     let response = await this.rawApiRequest('sendrawtransaction', { hex })
     if (response === 'There was an error. Check your console.'){
       throw Error('Invalid Transaction')
@@ -237,9 +230,25 @@ class PeercoinExplorer {
     return {
       id: raw.hash,
       timestamp: new Date(),
+      raw: { vout: outputs, vin: inputs, ...raw }
+    }
+  }
+
+  sendRawTransaction = async (
+    { unspentOutputs, toAddress, amount, changeAddress, privateKey, fee = 0.01, }: RawTransaction.ToSend
+  ): Promise<Wallet.PendingTransaction> => {
+    let signature = new bitcore.PrivateKey(privateKey)
+    let transaction = new bitcore.Transaction()
+      .from(unspentOutputs.map(Satoshis.toBitcoreUtxo))
+      .to(toAddress, Satoshis.fromAmount(amount))
+      .change(changeAddress)
+      .fee(Satoshis.fromAmount(fee))
+    // TODO need to update available unspent transactions after send locally?
+    let sent = await this._sendRawTransaction(transaction.sign(signature).serialize())
+    return {
       amount,
       fee,
-      raw: { vout: outputs, vin: inputs, ...raw }
+      ...sent
     }
   }
 

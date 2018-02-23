@@ -12,7 +12,17 @@ let textStyles = {
   }
 }
 
-let summaryStyles = variables => {
+let assetStyles = variables => {
+  let column = {
+    '.column': {
+      flex: 1,
+      paddingTop: 5,
+      marginRight: 15,
+    },
+    '.collapsing': {
+      minWidth: 250,
+    },
+  }
   let typeBackgrounds = (background) => ({
     'NativeBase.Text': {
       '.name': {
@@ -29,6 +39,7 @@ let summaryStyles = variables => {
   return {
     'NativeBase.Card': {
       'NativeBase.CardItem': {
+        // summary & detail
         '.balance': {
           paddingTop: 0,
           paddingBottom: 10,
@@ -68,6 +79,28 @@ let summaryStyles = variables => {
         '.unissued': typeBackgrounds(variables.btnWarningBg),
         '.issued': typeBackgrounds(variables.btnSuccessBg),
         '.received': typeBackgrounds(variables.btnInfoBg),
+        'NativeBase.Body': {
+          '.row': {
+            flexDirection: 'row',
+            justifyContent: 'space-around',
+            width: '100%',
+            flexWrap: 'wrap',
+            'NativeBase.Item': {
+              ...column,
+              '.underlined': {
+                borderBottomWidth: variables.borderWidth * 2,
+                borderBottomColor: variables.inputBorderColor,
+              },
+            },
+            'NativeBase.Text': column,
+            'NativeBase.H2': column,
+            'NativeBase.H3': column,
+          },
+          '.underlined': {
+            borderBottomWidth: variables.borderWidth * 2,
+            borderBottomColor: variables.inputBorderColor,
+          },
+        }
       }
     }
   }
@@ -126,13 +159,28 @@ export default (variables = nbVariables) => {
   }
   return deepmerge(getTheme(variables), {
     "NativeBase.Text": Object.assign(textStyles, basicTextStyles),
+    "NativeBase.Item": {
+      '.stacked': {
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        'NativeBase.Label': {
+          fontSize: '14px'
+        },
+        'NativeBase.Input': {
+          lineHeight: 14,
+          textOverflow: 'ellipsis',
+          width: '100%',
+          height: 40
+        }
+      }
+    },
     "NativeBase.Icon": basicTextStyles,
     "NativeBase.IconNB": basicTextStyles,
     "NativeBase.Button": buttonStyles,
     "NativeBase.Badge": badgeStyles,
     "NativeBase.Spinner": Object.assign(spinnerStyles, basicTextStyles),
 
-    'PeerKeeper.Assets': summaryStyles(variables),
-    'PeerKeeper.Asset': summaryStyles(variables)
+    'PeerKeeper.Assets': assetStyles(variables),
+    'PeerKeeper.Asset': assetStyles(variables)
   })
 }

@@ -1,4 +1,5 @@
-import * as React from 'react';
+import * as React from 'react'
+import { View } from 'react-native'
 import RoutineButton from '../generics/routine-button'
 import {
   Container,
@@ -9,6 +10,7 @@ import {
   CardItem,
   Text,
   H2,
+  H3,
   Body,
   Input,
   Button,
@@ -34,9 +36,9 @@ namespace SendAsset {
     amountsMap: {
       [address: string]: number
     }
-    //deckSpawn: any, // deck spawn transaction
   }
-  export type Payload = Data & { wallet: Wallet.Unlocked }
+  // todo proper deckSpawn typing
+  export type Payload = Data & { wallet: Wallet.Unlocked, deckSpawn: any }
   export type Props = {
     stage?: string | undefined,
     send: (data: Payload) => any,
@@ -45,44 +47,92 @@ namespace SendAsset {
   }
 }
 
+let smallTextStyle = {
+  lineHeight: 14,
+  fontSize: 12,
+  textOverflow: 'ellipsis',
+}
+
 function isFilled(s: SendAsset.Data): s is SendAsset.Data {
   return Boolean(Object.keys(s.amountsMap).length)
 }
 
-function Recipient({ address, amount }: Recipient) {
+function Recipient(
+  { address, amount, decimals, remove }:
+  Recipient & { decimals: number, remove: () => void }
+) {
   return (
-    <CardItem>
-      <Text>${address}: ${amount}</Text>
+    <CardItem styleNames='recipient'>
+      <Body styleNames='row underlined'>
+        <Text style={smallTextStyle} styleNames='recipient column'>{address}</Text>
+        <Text style={smallTextStyle} styleNames='amount column'>{amount.toFixed(decimals)}</Text>
+        <Button style={{ height: 30 }} styleNames='warning transparent' onPress={remove}>
+          <Icon name='minus' />
+        </Button>
+      </Body>
     </CardItem>
   )
 }
 
-class AddRecipient extends React.Component<{ add: (r: Recipient) => any }, Recipient> {
+class AddRecipient extends React.Component<{ decimals: number, add: (r: Recipient) => any }, Recipient> {
   state = {
     address: '',
     amount: 0,
   }
+  setAmount = (num: string) => {
+    this.setState({
+      amount: Number(num)
+    })
+  }
+  normalizedState = () => {
+    let { amount, address } = this.state
+    let decimals = this.props.decimals
+    return {
+      address,
+      amount: Math.round(Number(amount) * Math.pow(10, decimals)) / Math.pow(10, decimals)
+    }
+  }
+  ok = () => {
+    let { address, amount } = this.normalizedState()
+    return address && amount
+  }
+  add = () => {
+    let { address, amount } = this.normalizedState()
+    if (address && amount) {
+      this.props.add({ address, amount })
+      this.setState({
+        address: '',
+        amount: 0,
+      })
+    }
+  }
   render() {
     let { address, amount } = this.state
+    let ok = this.ok()
     return (
       <CardItem>
-        <Body style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%', flexWrap: 'wrap' }}>
-          <Item styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300 }}>
+        <Body styleNames='row'>
+          <Item styleNames='stacked column collapsing'>
             <Label>To address</Label>
             <Input
-              style={{ lineHeight: 14, textOverflow: 'ellipsis' }}
+              style={smallTextStyle}
               value={address}
+              placeholder='...'
               onChangeText={address => this.setState({ address })} />
           </Item>
-          <Item styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300 }}>
-            <Label>Asset</Label>
+          <Item styleNames='stacked column collapsing'>
+            <Label>Amount</Label>
             <Input
               keyboardType='numeric'
               placeholder='0.00'
-              style={{ lineHeight: 14, textOverflow: 'ellipsis' }}
-              value={this.state.amount || undefined}
-              onChangeText={amount => this.setState({ amount: Number(amount) || 0 })} />
+              style={smallTextStyle}
+              value={`${this.state.amount || ''}`}
+              onChangeText={this.setAmount} />
           </Item>
+          <Button style={{ height: 63, paddingTop: 20 }}
+            styleNames={`${ok ? 'success' : 'dark'} transparent`} onPress={this.add}>
+            <Icon name='plus' style={{ opacity: ok ? 1 : 0.5 }}/>
+          </Button>
         </Body>
       </CardItem>
     )
@@ -97,12 +147,12 @@ class SendAsset extends React.Component<SendAsset.Props, SendAsset.Data> {
   send = (privateKey: string) => {
     if(isFilled(this.state)){
       let wallet = Object.assign({ privateKey }, this.props.wallet)
-      this.props.send({ wallet, ...this.state })
+      this.props.send({ wallet, ...this.state, deckSpawn: this.props.asset.deck.spawnTransaction })
     }
   }
   render() {
     let {
-      asset: { deck: { name }, type },
+      asset: { deck: { name, decimals }, type },
       wallet: { keys, balance }
     } = this.props
 
@@ -123,15 +173,33 @@ class SendAsset extends React.Component<SendAsset.Props, SendAsset.Data> {
         {...props} />
 
 
+    let remove = (address: string) => () => {
+      let { [address]: _, ...amountsMap } = this.state.amountsMap
+      this.setState({ amountsMap })
+    }
+
+    let recipientCount = Object.keys(amountsMap).length 
+    let headers = { address: 'Add recipents to send a transaction',  }
+
     return (
-      <Card>
+      <Card style={{width: '100%'}}>
         <CardItem styleNames='header'>
-          <Body style={{ flexDirection: 'row', width: '100%', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+          <Body styleNames='row'>
             <H2 style={{ flexBasis: 200, paddingBottom: 15 }}>{transactionType} {name}</H2>
           </Body>
         </CardItem>
-        {Object.entries(amountsMap).map(([ address, amount ]) => <Recipient {...{ address, amount }} />)}
-        <AddRecipient add={({ address, amount }: Recipient) =>
+        <CardItem>
+          <Body styleNames='row'>
+            <Text styleNames='recipient column'>Recipient Addresses</Text>
+            <Text styleNames='amount column'>Amounts</Text>
+            <View style={{ justifyContent: 'space-between', paddingRight: 17, paddingTop: 8 }}>
+              <Icon name='send' style={{ fontSize: 18 }} />
+            </View>
+          </Body>
+        </CardItem>
+        {Object.entries(amountsMap).map(([ address, amount ]) =>
+          <Recipient key={address} {...{ decimals, address, amount, remove: remove(address) }} />)}
+        <AddRecipient decimals={decimals} add={({ address, amount }: Recipient) =>
             this.setState({ amountsMap: { ...amountsMap, [address]: amount } })} />
         <CardItem styleNames='footer'>
           <Body>
