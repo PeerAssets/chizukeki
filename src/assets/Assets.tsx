@@ -8,6 +8,7 @@ import Wallet from '../wallet/Wallet'
 
 import Summary from './Summary'
 import DeckList from './DeckList'
+import SpawnDeck from './SpawnDeck'
 
 
 let styles = {
@@ -41,10 +42,12 @@ class Assets extends React.Component<Assets.Props, {}> {
     sync(nextProps)
   }
   render() {
-    let { decks, balances } = this.props
+    let { decks, balances, wallet, actions } = this.props
     return (
       <Wrapper>
-        <Summary balances={balances || []} />
+        <Summary balances={balances || []}>
+          <SpawnDeck wallet={wallet} spawn={actions.spawnDeck} />
+        </Summary>
         <DeckList decks={decks || []} />
       </Wrapper>
     )
@@ -62,6 +65,7 @@ namespace Assets {
       // TODO strange type errors when properly typed
       syncDecks: any
       syncBalances: any
+      spawnDeck: any
     }
     style?: any
   }

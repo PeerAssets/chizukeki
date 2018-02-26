@@ -45,7 +45,7 @@ function DeckList({ decks }: DeckList.Data) {
   return (
     <View style={styles.container}>
       <Text>
-        <H2>Decks</H2>
+        <H2>All Assets</H2>
         <Text styleNames='note'> {decks.length} total </Text>
       </Text>
       <FlatList

@@ -54,7 +54,7 @@ namespace Configuration {
     NETWORK: "MAINNET" | "TESTNET"
     DEPLOYMENT_MODE: "PRODUCTION" | "TESTING"
     ASSETS: {
-      getDeckSpawnTagHash: string
+      deckSpawnTagHash: string
       minTagFee: number
       txnFee: number
     }
@@ -68,7 +68,7 @@ namespace Configuration {
     let NETWORK = network.fromEnv()
     let DEPLOYMENT_MODE = deploymentMode.fromEnv()
     let ASSETS = {
-      getDeckSpawnTagHash: getDeckSpawnTagHash(NETWORK, DEPLOYMENT_MODE),
+      deckSpawnTagHash: getDeckSpawnTagHash(NETWORK, DEPLOYMENT_MODE),
       minTagFee: 0.01,
       txnFee: 0.01
     }

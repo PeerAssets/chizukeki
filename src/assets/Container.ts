@@ -10,10 +10,11 @@ import Wallet from '../wallet/Wallet'
 import * as Redux from './redux'
 import Assets from './Assets' 
 
-let { syncDecks, getDeckDetails, syncBalances } = Redux.routines
+let { syncDecks, getDeckDetails, syncBalances, spawnDeck } = Redux.routines
 
 let selectStages = routineStages({
   syncDecks,
+  spawnDeck,
   //getDeckDetails
 })
 
@@ -25,6 +26,7 @@ export default connect(
   (dispatch: Dispatch<any>) => ({
     actions: bindActionCreators({
       syncDecks: syncDecks.trigger,
+      spawnDeck: spawnDeck.trigger,
       syncBalances: syncBalances.trigger,
     },
     dispatch

@@ -6,7 +6,7 @@ import saga, { syncWallet, sendTransaction } from './saga'
 import { AnyAction } from 'typescript-fsa';
 import { init } from 'ramda';
 
-import { sendAssets } from '../assets/saga'
+import { sendAssets, spawnDeck } from '../assets/saga'
 
 const routines = {
   sync: syncWallet.routine,
@@ -99,6 +99,7 @@ function walletReducer(state: State = initialState(), action: AnyAction): State 
   }) ||
   sendTransaction.routine.switch<State>(action, transactionSwitch) ||
   sendAssets.routine.switch<State>(action, transactionSwitch) ||
+  spawnDeck.routine.switch<State>(action, transactionSwitch) ||
   ((action.type === 'HARD_LOGOUT') ? logout(state) : state)
 }
 

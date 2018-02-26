@@ -47,7 +47,7 @@ enum IssueMode {
 namespace IssueMode {
   export type Encoding = IssueModeEncoding
   export const Encoding = IssueModeEncoding
-  const encodingToNameMap = {
+  export const encodingToNameMap = {
     [Encoding.NONE]         : IssueMode.NONE,
     [Encoding.CUSTOM]       : IssueMode.CUSTOM,
     [Encoding.ONCE]         : IssueMode.ONCE,
@@ -58,7 +58,7 @@ namespace IssueMode {
     [Encoding.SINGLET]      : IssueMode.SINGLET,
 
   }
-  const nameToEncoding = {
+  export const nameToEncodingMap = {
     [IssueMode.NONE]         : Encoding.NONE,
     [IssueMode.CUSTOM]       : Encoding.CUSTOM,
     [IssueMode.ONCE]         : Encoding.ONCE,
@@ -69,11 +69,11 @@ namespace IssueMode {
     [IssueMode.SINGLET]      : Encoding.SINGLET,
 
   }
-  export function encode(mode: IssueMode){
-    return nameToEncoding[mode]
+  export function encode(modeName: IssueMode){
+    return nameToEncodingMap[modeName]
   }
-  export function decode(mode: Encoding){
-    return encodingToNameMap[mode]
+  export function decode(modeEncoding: Encoding){
+    return encodingToNameMap[modeEncoding]
   }
 
 }

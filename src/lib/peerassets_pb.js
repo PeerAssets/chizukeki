@@ -1,6 +1,8 @@
 /**
  * @fileoverview
  * @enhanceable
+ * @suppress {messageConventions} JS Compiler reports an error if a variable or
+ *     field starts with 'MSG_' and isn't a translatable message.
  * @public
  */
 // GENERATED CODE -- DO NOT EDIT!
@@ -55,14 +57,16 @@ proto.DeckSpawn.prototype.toObject = function(opt_includeInstance) {
  *     http://goto/soy-param-migration
  * @param {!proto.DeckSpawn} msg The msg instance to transform.
  * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
  */
 proto.DeckSpawn.toObject = function(includeInstance, msg) {
   var f, obj = {
-    version: msg.getVersion(),
-    shortName: msg.getShortName(),
-    numberOfDecimals: msg.getNumberOfDecimals(),
-    issueMode: msg.getIssueMode(),
-    assetSpecificData: msg.getAssetSpecificData_asB64()
+    version: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    name: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    numberOfDecimals: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    issueMode: jspb.Message.getFieldWithDefault(msg, 4, 0),
+    assetSpecificData: msg.getAssetSpecificData_asB64(),
+    fee: jspb.Message.getFieldWithDefault(msg, 6, 0)
   };
 
   if (includeInstance) {
@@ -105,7 +109,7 @@ proto.DeckSpawn.deserializeBinaryFromReader = function(msg, reader) {
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
-      msg.setShortName(value);
+      msg.setName(value);
       break;
     case 3:
       var value = /** @type {number} */ (reader.readUint32());
@@ -119,6 +123,10 @@ proto.DeckSpawn.deserializeBinaryFromReader = function(msg, reader) {
       var value = /** @type {!Uint8Array} */ (reader.readBytes());
       msg.setAssetSpecificData(value);
       break;
+    case 6:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setFee(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -129,66 +137,64 @@ proto.DeckSpawn.deserializeBinaryFromReader = function(msg, reader) {
 
 
 /**
- * Class method variant: serializes the given message to binary data
- * (in protobuf wire format), writing to the given BinaryWriter.
- * @param {!proto.DeckSpawn} message
- * @param {!jspb.BinaryWriter} writer
- */
-proto.DeckSpawn.serializeBinaryToWriter = function(message, writer) {
-  message.serializeBinaryToWriter(writer);
-};
-
-
-/**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
 proto.DeckSpawn.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  this.serializeBinaryToWriter(writer);
+  proto.DeckSpawn.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
 
 /**
- * Serializes the message to binary data (in protobuf wire format),
- * writing to the given BinaryWriter.
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.DeckSpawn} message
  * @param {!jspb.BinaryWriter} writer
+ * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.DeckSpawn.prototype.serializeBinaryToWriter = function (writer) {
+proto.DeckSpawn.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = this.getVersion();
+  f = message.getVersion();
   if (f !== 0) {
     writer.writeUint32(
       1,
       f
     );
   }
-  f = this.getShortName();
+  f = message.getName();
   if (f.length > 0) {
     writer.writeString(
       2,
       f
     );
   }
-  f = this.getNumberOfDecimals();
+  f = message.getNumberOfDecimals();
   if (f !== 0) {
     writer.writeUint32(
       3,
       f
     );
   }
-  f = this.getIssueMode();
+  f = message.getIssueMode();
   if (f !== 0) {
     writer.writeUint32(
       4,
       f
     );
   }
-  f = this.getAssetSpecificData_asU8();
+  f = message.getAssetSpecificData_asU8();
   if (f.length > 0) {
     writer.writeBytes(
       5,
+      f
+    );
+  }
+  f = message.getFee();
+  if (f !== 0) {
+    writer.writeUint32(
+      6,
       f
     );
   }
@@ -196,40 +202,45 @@ proto.DeckSpawn.prototype.serializeBinaryToWriter = function (writer) {
 
 
 /**
- * Creates a deep clone of this proto. No data is shared with the original.
- * @return {!proto.DeckSpawn} The clone.
+ * @enum {number}
  */
-proto.DeckSpawn.prototype.cloneMessage = function() {
-  return /** @type {!proto.DeckSpawn} */ (jspb.Message.cloneMessage(this));
+proto.DeckSpawn.MODE = {
+  NONE: 0,
+  CUSTOM: 1,
+  ONCE: 2,
+  MULTI: 4,
+  MONO: 8,
+  UNFLUSHABLE: 16,
+  SUBSCRIPTION: 52,
+  SINGLET: 10
 };
-
 
 /**
  * optional uint32 version = 1;
  * @return {number}
  */
 proto.DeckSpawn.prototype.getVersion = function() {
-  return /** @type {number} */ (jspb.Message.getFieldProto3(this, 1, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
-/** @param {number} value  */
+/** @param {number} value */
 proto.DeckSpawn.prototype.setVersion = function(value) {
   jspb.Message.setField(this, 1, value);
 };
 
 
 /**
- * optional string short_name = 2;
+ * optional string name = 2;
  * @return {string}
  */
-proto.DeckSpawn.prototype.getShortName = function() {
-  return /** @type {string} */ (jspb.Message.getFieldProto3(this, 2, ""));
+proto.DeckSpawn.prototype.getName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
-/** @param {string} value  */
-proto.DeckSpawn.prototype.setShortName = function(value) {
+/** @param {string} value */
+proto.DeckSpawn.prototype.setName = function(value) {
   jspb.Message.setField(this, 2, value);
 };
 
@@ -239,11 +250,11 @@ proto.DeckSpawn.prototype.setShortName = function(value) {
  * @return {number}
  */
 proto.DeckSpawn.prototype.getNumberOfDecimals = function() {
-  return /** @type {number} */ (jspb.Message.getFieldProto3(this, 3, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
 
 
-/** @param {number} value  */
+/** @param {number} value */
 proto.DeckSpawn.prototype.setNumberOfDecimals = function(value) {
   jspb.Message.setField(this, 3, value);
 };
@@ -254,11 +265,11 @@ proto.DeckSpawn.prototype.setNumberOfDecimals = function(value) {
  * @return {number}
  */
 proto.DeckSpawn.prototype.getIssueMode = function() {
-  return /** @type {number} */ (jspb.Message.getFieldProto3(this, 4, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
 };
 
 
-/** @param {number} value  */
+/** @param {number} value */
 proto.DeckSpawn.prototype.setIssueMode = function(value) {
   jspb.Message.setField(this, 4, value);
 };
@@ -269,7 +280,7 @@ proto.DeckSpawn.prototype.setIssueMode = function(value) {
  * @return {!(string|Uint8Array)}
  */
 proto.DeckSpawn.prototype.getAssetSpecificData = function() {
-  return /** @type {!(string|Uint8Array)} */ (jspb.Message.getFieldProto3(this, 5, ""));
+  return /** @type {!(string|Uint8Array)} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
 };
 
 
@@ -297,21 +308,26 @@ proto.DeckSpawn.prototype.getAssetSpecificData_asU8 = function() {
 };
 
 
-/** @param {!(string|Uint8Array)} value  */
+/** @param {!(string|Uint8Array)} value */
 proto.DeckSpawn.prototype.setAssetSpecificData = function(value) {
   jspb.Message.setField(this, 5, value);
 };
 
 
 /**
- * @enum {number}
+ * optional uint32 fee = 6;
+ * @return {number}
  */
-proto.DeckSpawn.MODE = {
-  NONE: 0,
-  CUSTOM: 1,
-  ONCE: 2,
-  MULTI: 4
+proto.DeckSpawn.prototype.getFee = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 6, 0));
 };
+
+
+/** @param {number} value */
+proto.DeckSpawn.prototype.setFee = function(value) {
+  jspb.Message.setField(this, 6, value);
+};
+
 
 
 /**
@@ -363,12 +379,13 @@ proto.CardTransfer.prototype.toObject = function(opt_includeInstance) {
  *     http://goto/soy-param-migration
  * @param {!proto.CardTransfer} msg The msg instance to transform.
  * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
  */
 proto.CardTransfer.toObject = function(includeInstance, msg) {
   var f, obj = {
-    version: msg.getVersion(),
-    amountsList: jspb.Message.getField(msg, 2),
-    numberOfDecimals: msg.getNumberOfDecimals(),
+    version: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    amountList: jspb.Message.getRepeatedField(msg, 2),
+    numberOfDecimals: jspb.Message.getFieldWithDefault(msg, 3, 0),
     assetSpecificData: msg.getAssetSpecificData_asB64()
   };
 
@@ -412,7 +429,7 @@ proto.CardTransfer.deserializeBinaryFromReader = function(msg, reader) {
       break;
     case 2:
       var value = /** @type {!Array.<number>} */ (reader.readPackedUint64());
-      msg.setAmountsList(value);
+      msg.setAmountList(value);
       break;
     case 3:
       var value = /** @type {number} */ (reader.readUint32());
@@ -432,56 +449,47 @@ proto.CardTransfer.deserializeBinaryFromReader = function(msg, reader) {
 
 
 /**
- * Class method variant: serializes the given message to binary data
- * (in protobuf wire format), writing to the given BinaryWriter.
- * @param {!proto.CardTransfer} message
- * @param {!jspb.BinaryWriter} writer
- */
-proto.CardTransfer.serializeBinaryToWriter = function(message, writer) {
-  message.serializeBinaryToWriter(writer);
-};
-
-
-/**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
 proto.CardTransfer.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  this.serializeBinaryToWriter(writer);
+  proto.CardTransfer.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
 
 /**
- * Serializes the message to binary data (in protobuf wire format),
- * writing to the given BinaryWriter.
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.CardTransfer} message
  * @param {!jspb.BinaryWriter} writer
+ * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.CardTransfer.prototype.serializeBinaryToWriter = function (writer) {
+proto.CardTransfer.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = this.getVersion();
+  f = message.getVersion();
   if (f !== 0) {
     writer.writeUint32(
       1,
       f
     );
   }
-  f = this.getAmountsList();
+  f = message.getAmountList();
   if (f.length > 0) {
     writer.writePackedUint64(
       2,
       f
     );
   }
-  f = this.getNumberOfDecimals();
+  f = message.getNumberOfDecimals();
   if (f !== 0) {
     writer.writeUint32(
       3,
       f
     );
   }
-  f = this.getAssetSpecificData_asU8();
+  f = message.getAssetSpecificData_asU8();
   if (f.length > 0) {
     writer.writeBytes(
       4,
@@ -492,48 +500,46 @@ proto.CardTransfer.prototype.serializeBinaryToWriter = function (writer) {
 
 
 /**
- * Creates a deep clone of this proto. No data is shared with the original.
- * @return {!proto.CardTransfer} The clone.
- */
-proto.CardTransfer.prototype.cloneMessage = function() {
-  return /** @type {!proto.CardTransfer} */ (jspb.Message.cloneMessage(this));
-};
-
-
-/**
  * optional uint32 version = 1;
  * @return {number}
  */
 proto.CardTransfer.prototype.getVersion = function() {
-  return /** @type {number} */ (jspb.Message.getFieldProto3(this, 1, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
-/** @param {number} value  */
+/** @param {number} value */
 proto.CardTransfer.prototype.setVersion = function(value) {
   jspb.Message.setField(this, 1, value);
 };
 
 
 /**
- * repeated uint64 amounts = 2;
- * If you change this array by adding, removing or replacing elements, or if you
- * replace the array itself, then you must call the setter to update it.
+ * repeated uint64 amount = 2;
  * @return {!Array.<number>}
  */
-proto.CardTransfer.prototype.getAmountsList = function() {
-  return /** @type {!Array.<number>} */ (jspb.Message.getField(this, 2));
+proto.CardTransfer.prototype.getAmountList = function() {
+  return /** @type {!Array.<number>} */ (jspb.Message.getRepeatedField(this, 2));
 };
 
 
-/** @param {Array.<number>} value  */
-proto.CardTransfer.prototype.setAmountsList = function(value) {
+/** @param {!Array.<number>} value */
+proto.CardTransfer.prototype.setAmountList = function(value) {
   jspb.Message.setField(this, 2, value || []);
 };
 
 
-proto.CardTransfer.prototype.clearAmountsList = function() {
-  jspb.Message.setField(this, 2, []);
+/**
+ * @param {!number} value
+ * @param {number=} opt_index
+ */
+proto.CardTransfer.prototype.addAmount = function(value, opt_index) {
+  jspb.Message.addToRepeatedField(this, 2, value, opt_index);
+};
+
+
+proto.CardTransfer.prototype.clearAmountList = function() {
+  this.setAmountList([]);
 };
 
 
@@ -542,11 +548,11 @@ proto.CardTransfer.prototype.clearAmountsList = function() {
  * @return {number}
  */
 proto.CardTransfer.prototype.getNumberOfDecimals = function() {
-  return /** @type {number} */ (jspb.Message.getFieldProto3(this, 3, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
 
 
-/** @param {number} value  */
+/** @param {number} value */
 proto.CardTransfer.prototype.setNumberOfDecimals = function(value) {
   jspb.Message.setField(this, 3, value);
 };
@@ -557,7 +563,7 @@ proto.CardTransfer.prototype.setNumberOfDecimals = function(value) {
  * @return {!(string|Uint8Array)}
  */
 proto.CardTransfer.prototype.getAssetSpecificData = function() {
-  return /** @type {!(string|Uint8Array)} */ (jspb.Message.getFieldProto3(this, 4, ""));
+  return /** @type {!(string|Uint8Array)} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
 };
 
 
@@ -585,7 +591,7 @@ proto.CardTransfer.prototype.getAssetSpecificData_asU8 = function() {
 };
 
 
-/** @param {!(string|Uint8Array)} value  */
+/** @param {!(string|Uint8Array)} value */
 proto.CardTransfer.prototype.setAssetSpecificData = function(value) {
   jspb.Message.setField(this, 4, value);
 };

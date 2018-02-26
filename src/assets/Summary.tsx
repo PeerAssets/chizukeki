@@ -85,14 +85,22 @@ class Summary extends React.Component<Summary.Props, {}> {
     let { UNISSUED, ISSUED, RECIEVED } = divideByOwnership(this.props.balances)
     return (
       <View style={styles.main as any}>
-        <Card styleNames='summary' style={{ width: '100%' }}>
+        { (UNISSUED.length || ISSUED.length) ?
+        <Card styleNames='spawned asset summary' style={{ width: '100%' }}>
           <CardItem styleNames='header'>
-            <H2>Assets</H2>
+            <H2>Spawned Assets</H2>
           </CardItem>
           {UNISSUED.map((o, key) => <Balance key={key} {...o} />)}
           {ISSUED.map((o, key) => <Balance key={key} {...o} />)}
+        </Card> : null }
+        { RECIEVED.length ? 
+        <Card styleNames='asset balances summary' style={{ width: '100%' }}>
+          <CardItem styleNames='header'>
+            <H2>Balances</H2>
+          </CardItem>
           {RECIEVED.map((o, key) => <Balance key={key} {...o} />)}
-        </Card>
+        </Card> : null }
+        { this.props.children }
       </View>
     )
   }

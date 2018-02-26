@@ -7,6 +7,7 @@ import papi, { Deck } from './papi'
 import { Satoshis } from '../lib/utils'
 import Summary from './Summary'
 import SendAsset from './SendAsset'
+import SpawnDeck from './SpawnDeck'
 
 function getSpawnIfOwned(address: string){
   return async (deck: Deck.Summary) => {
@@ -58,8 +59,33 @@ const sendAssets = fetchJSONRoutine<
     )
     let { minTagFee: amount, txnFee: fee } = bitcore.assets.configuration
     let signature = new bitcore.PrivateKey(privateKey)
-    let hex = transaction.sign(signature).serialize({ disableDustOutputs: true })
-    debugger;
+    let hex = transaction.sign(signature).serialize()
+    let sent = await peercoin._sendRawTransaction(hex)
+    return {
+      amount,
+      fee,
+      ...sent
+    }
+  }
+})
+
+const spawnDeck = fetchJSONRoutine<
+  SpawnDeck.Payload,
+  Wallet.PendingTransaction,
+  Error
+>({
+  type: 'SPAWN_DECK',
+  fetchJSON: async ({ wallet: { address, unspentOutputs, privateKey }, name, precision, issueMode }) => {
+    let transaction = bitcore.assets.createDeckSpawnTransaction(
+      unspentOutputs.map(Satoshis.toBitcoreUtxo),
+      address,
+      name,
+      precision,
+      issueMode
+    )
+    let { minTagFee: amount, txnFee: fee } = bitcore.assets.configuration
+    let signature = new bitcore.PrivateKey(privateKey)
+    let hex = transaction.sign(signature).serialize()
     let sent = await peercoin._sendRawTransaction(hex)
     return {
       amount,
@@ -102,9 +128,10 @@ export default function * (){
     syncDecks.trigger(),
     getDeckDetails.trigger(),
     syncBalances.trigger(),
-    sendAssets.trigger()
+    sendAssets.trigger(),
+    spawnDeck.trigger()
   ])
 }
 
 
-export { syncDecks, getDeckDetails, syncBalances, sendAssets }
+export { syncDecks, getDeckDetails, syncBalances, sendAssets, spawnDeck }
