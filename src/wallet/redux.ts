@@ -47,8 +47,8 @@ function preservePendingTransactions(
   let syncedIds = synced.map(t => t.id)
   // transactions are in decending order
   return [
-    ...synced,
     ...old.filter(t => !syncedIds.includes(t.id)),
+    ...synced,
   ]
 }
 
