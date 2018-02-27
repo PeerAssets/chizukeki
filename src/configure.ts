@@ -48,7 +48,7 @@ namespace Configuration {
   }
 
   export const network = validator<Network>('network', [ 'MAINNET', 'TESTNET' ], 'TESTNET')
-  export const deploymentMode = validator<DeploymentMode>('network', [ 'PRODUCTION', 'TESTING' ], 'TESTING')
+  export const deploymentMode = validator<DeploymentMode>('network', [ 'PRODUCTION', 'TESTING' ], 'PRODUCTION')
 
   type FullConfiguration = {
     NETWORK: "MAINNET" | "TESTNET"
@@ -73,7 +73,6 @@ namespace Configuration {
       txnFee: 0.01
     }
     cachedFromEnv = { NETWORK, DEPLOYMENT_MODE, ASSETS }
-    window['configuration'] = cachedFromEnv
     return cachedFromEnv
   }
 }

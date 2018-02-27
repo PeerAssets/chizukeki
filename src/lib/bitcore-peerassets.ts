@@ -45,12 +45,12 @@ function extendBitcore(bitcore, configuration = defaultConfig) {
     //
     // Deck spawn functions
     //
-    createDeckSpawnTransaction(utxo, changeAddress: string, shortName: string, numberOfDecimals: number, issueModes: number) {
+    createDeckSpawnTransaction(utxo, changeAddress: string, name: string, numberOfDecimals: number, issueModes: number) {
       let { minTagFee, txnFee, deckSpawnTagHash } = this.configuration.withFeesInSatoshis()
       let deckSpawnTxn = new bitcore.Transaction()
         .from(arrayify(utxo))                               // vin[0]: Owner signature
         .to(deckSpawnTagHash, minTagFee)                                                // vout[0]: Deck spawn P2TH
-        .addData(this.createDeckSpawnMessage(shortName, numberOfDecimals, issueModes))  // vout[1]: Asset data
+        .addData(this.createDeckSpawnMessage(name, numberOfDecimals, issueModes))  // vout[1]: Asset data
         // free format from here, typically a change Output
         .change(changeAddress)
       return deckSpawnTxn
@@ -126,10 +126,10 @@ function extendBitcore(bitcore, configuration = defaultConfig) {
     //
     // Internal functions
     //
-    createDeckSpawnMessage(shortName, numberOfDecimals, issueModes) {
+    createDeckSpawnMessage(name, numberOfDecimals, issueModes) {
       var ds = new pb.DeckSpawn();
       ds.setVersion(1);
-      ds.setName(shortName);
+      ds.setName(name);
       ds.setNumberOfDecimals(numberOfDecimals);
 
       if (typeof issueModes == 'number') {
@@ -154,7 +154,7 @@ function extendBitcore(bitcore, configuration = defaultConfig) {
 
       return {
         version: ds.getVersion(),
-        shortName: ds.getShortName(),
+        name: ds.getName(),
         numberOfDecimals: ds.getNumberOfDecimals(),
         issueMode: issueMode,
         getIssueModes: function () {
@@ -191,12 +191,13 @@ function extendBitcore(bitcore, configuration = defaultConfig) {
       var ds = pb.CardTransfer.deserializeBinary(new Uint8Array(message));
 
       return {
-        amounts: ds.getAmountsList(),
+        amounts: ds.getAmountList(),
         numberOfDecimals: ds.getNumberOfDecimals()
       }
     }
 
   }
+  window['bitcore'] = bitcore
   return bitcore
 }
 
