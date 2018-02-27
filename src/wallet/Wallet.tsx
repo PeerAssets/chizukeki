@@ -6,7 +6,7 @@ import SendTransaction from './SendTransaction'
 import { Button, CardItem, Body, Text, Card, connectStyle, H2, Icon } from 'native-base/src/index'
 
 import Wrapper from '../generics/Wrapper'
-import RoutineButton from '../generics/routine-button'
+import SyncButton from '../generics/sync-button'
 import Modal from '../generics/modal.web'
 
 import { Wallet as WalletData } from '../explorer'
@@ -101,24 +101,11 @@ class Wallet extends React.Component<
   Wallet.Data & {
     style?: any,
     sendTransaction: SendTransaction.Props
-    sync: {
-      stage: string | undefined,
-      start: () => any,
-      stop: () => any,
-    }
+    sync: SyncButton.Logic
   }
 > {
-  componentDidMount() {
-    // todo generally the sync triggers aren't organized that well. This one fires every redirect if enabled
-    // not really an issue, but suboptimal
-    let sync = this.props.sync
-    if(!sync.stage){
-      sync.start()
-    }
-  }
   render() {
     let { address, transactions = [], balance = 0, style, keys, sync, sendTransaction } = this.props
-    let syncToggle= sync.stage !== 'STOPPED' ? sync.stop : sync.start
     return (
       <Wrapper>
         <View style={style.main}>
@@ -129,15 +116,7 @@ class Wallet extends React.Component<
             <CardItem>
               <Body style={style.body}>
                 <UnlockThenCopy keys={keys}/>
-                <RoutineButton style={style.column}
-                  dismiss={[{ stage: 'DONE', auto: true, onPressDismiss: syncToggle }]}
-                  icons={{ DEFAULT: 'refresh', DONE: 'refresh' }}
-                  onPress={syncToggle}
-                  stage={sync.stage}
-                  DEFAULT={'Syncing'}
-                  STOPPED={'Syncing disabled'}
-                  STARTED='Syncing'
-                  FAILED='Sync Failed' />
+                <SyncButton style={style.column} {...sync} />
               </Body>
             </CardItem>
           </Card>

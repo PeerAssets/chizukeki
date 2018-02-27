@@ -16,19 +16,23 @@ type DismissProps = Array<{
   after?: number
 }>
 
-type Props = {
-  stage: string | undefined
-  onPress: () => any
-  icons?: Partial<Record<Stage, string | React.ReactElement <any> | undefined>>
-  dismiss?: DismissProps
-  STARTED?: string
-  DONE?: string
-  FAILED?: string
-  STOPPED?: string
-  DEFAULT: string
+namespace RoutineButton {
+  export type Props = {
+    stage: string | undefined
+    onPress: () => any
+    icons?: Partial<Record<Stage, string | React.ReactElement<any> | undefined>>
+    dismiss?: DismissProps
+    STARTED?: string
+    DONE?: string
+    FAILED?: string
+    STOPPED?: string
+    DEFAULT: string
 
-  [key: string]: any
+    style?: any
+    styleNames?: string
+  }
 }
+type Props = RoutineButton.Props
 
 function ButtonIcon(name: string){
   return <Icon styleNames='inline' {...{ name, size: 30, color: 'black' }}/>

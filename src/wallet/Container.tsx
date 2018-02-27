@@ -3,8 +3,6 @@ import { bindActionCreators, Dispatch } from 'redux'
 import { connect } from 'react-redux'
 
 import { Redirect } from '../routing/router'
-import ActionHistory from '../generics/action-history'
-import { routineStages } from '../generics/utils'
 
 import * as Redux from './redux'
 import Wallet from './Wallet' 
@@ -15,7 +13,7 @@ type Props = {
   wallet: Wallet.Data,
   routineStages: Redux.State['routineStages'],
   actions: {
-    sync: typeof sync.trigger
+    triggerSync: typeof sync.trigger
     stopSync: typeof sync.stop
     sendTransaction: typeof sendTransaction.trigger
   }
@@ -36,24 +34,11 @@ function Container({ routineStages, actions, wallet }: Props){
       }}
       sync={{
         stage: routineStages.sync,
-        start: () => actions.sync({ address: wallet.address }),
+        trigger: () => actions.triggerSync({ address: wallet.address }),
         stop: actions.stopSync
       }} />
   )
 }
-
-let isSyncing = function isSyncing(routine){
-  let selectSyncControls = action => [ routine.stop.type, routine.trigger.type ].includes(action)
-  return actionHistory => {
-    let latest = ActionHistory.filter(selectSyncControls, actionHistory).latest
-    return latest === routine.trigger.type
-  }
-}(sync)
-
-let selectStages = routineStages({
-  sync,
-  sendTransaction
-})
 
 export default connect(
   ({ wallet: { routineStages, wallet } }: { wallet: Redux.State }) => {
@@ -63,7 +48,7 @@ export default connect(
     }
   },
   (dispatch: Dispatch<any>) => ({ actions: bindActionCreators({
-    sync: sync.trigger,
+    triggerSync: sync.trigger,
     stopSync: sync.stop,
     sendTransaction: Redux.routines.sendTransaction.trigger
   }, dispatch) })
