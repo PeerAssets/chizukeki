@@ -18,7 +18,7 @@ function handleSync(
 }
 
 function logout({ decks }: State){
-  return { decks, balances: null, ...actionHistory() }
+  return { decks: null, balances: null, ...actionHistory() }
 }
 
 

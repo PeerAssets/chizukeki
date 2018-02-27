@@ -71,7 +71,6 @@ function extendBitcore(bitcore, configuration = defaultConfig) {
       return retVal;
     },
 
-
     //
     // Card transfer functions
     //
@@ -181,7 +180,7 @@ function extendBitcore(bitcore, configuration = defaultConfig) {
       if (!decoded) return undefined;
 
       var ct = new pb.CardTransfer();
-      ct.setAmountsList(amounts);
+      ct.setAmountList(amounts);
       ct.setNumberOfDecimals(decoded.numberOfDecimals);
 
       return new Buffer(ct.serializeBinary());

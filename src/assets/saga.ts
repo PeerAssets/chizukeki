@@ -55,7 +55,7 @@ const sendAssets = fetchJSONRoutine<
       unspentOutputs.map(Satoshis.toBitcoreUtxo),
       address,
       amountsMap,
-      new bitcore.Transaction(deckSpawn)
+      new bitcore.Transaction(deckSpawn.hex)
     )
     let { minTagFee: amount, txnFee: fee } = bitcore.assets.configuration
     let signature = new bitcore.PrivateKey(privateKey)
