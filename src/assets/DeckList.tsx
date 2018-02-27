@@ -5,24 +5,23 @@ import { Button, Card, Left, Right, CardItem, Body, Text, H2, Icon } from 'nativ
 import FlatList from 'react-native-web-lists/src/FlatList'
 import moment from 'moment'
 
+import SyncButton from '../generics/sync-button'
+
 import * as Papi from './papi'
+import IssueModes from './issueModes'
 
 namespace Deck {
   export type Data = Papi.Deck 
 }
 
-function Deck({ item: deck, ...props }: { item: Deck.Data } & any) {
+function Deck({ item: deck, sync,...props }: { item: Deck.Data, sync?: SyncButton.Logic } & any) {
   return (
     <Card {...props}>
       <CardItem styleNames='header'>
         <Body style={{justifyContent: 'space-between', flexWrap: 'wrap', flexDirection: 'row'}}>
           <Text>{deck.name}</Text>
-          <Button styleNames={`iconLeft transparent ${deck.subscribed ? 'success' : 'dark'}`}
-              style={{ marginRight: -30, marginTop: -20 }}>
-            <Icon styleNames={deck.subscribed ? 'active' : ''} name='eye' size={30} color='black' />
-            <Text style={{ paddingLeft: 5, paddingRight: 0 }}>{deck.subscribed ? 'subscribed' : 'subscribe'} </Text>
-          </Button>
         </Body>
+        {sync && [<SyncButton {...sync}/>]}
       </CardItem>
       <CardItem styleNames='footer' style={{alignItems: 'flex-start', flexDirection: 'column', width: '100%'}}>
         <Text styleNames='note bounded' ellipsizeMode='middle' numberOfLines={1} >
@@ -31,7 +30,7 @@ function Deck({ item: deck, ...props }: { item: Deck.Data } & any) {
         <Text styleNames='note bounded' ellipsizeMode='middle' numberOfLines={1} >
           issuer: {deck.issuer}
         </Text>
-        <Text styleNames='note'>mode: {deck.issueMode}</Text>
+        <Text styleNames='note'>mode: {IssueModes.decode(deck.issueMode)}</Text>
       </CardItem>
     </Card>
   )
@@ -39,14 +38,18 @@ function Deck({ item: deck, ...props }: { item: Deck.Data } & any) {
 
 namespace DeckList {
   export type Data = { decks: Array<Deck.Data> }
+  export type Props = Data & {
+    sync: SyncButton.Logic
+  }
 }
 
-function DeckList({ decks }: DeckList.Data) {
+function DeckList({ decks, sync }: DeckList.Props) {
   return (
     <View style={styles.container}>
       <Text>
         <H2>All Assets</H2>
         <Text styleNames='note'> {decks.length} total </Text>
+        <SyncButton {...sync} styleNames='small'/>
       </Text>
       <FlatList
         enableEmptySections // silence error, shouldn't be necessary when react-native-web implements FlatList

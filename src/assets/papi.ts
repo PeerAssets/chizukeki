@@ -1,4 +1,5 @@
 import configure from '../configure'
+import peercoin from '../explorer'
 
 async function getJSON<T = any>(url: string, emptyErrorMessage?: void | string) {
   let response = await fetch(url)
@@ -21,11 +22,14 @@ namespace Deck {
     issueMode: string
     decimals: number
     subscribed: boolean
-    spawnTransaction?: any
   }
   export type Full = Summary & {
     supply: number
+    spawnTransaction: any
     balances: { [address: string]: number }
+  }
+  export function isFull(deck: Deck): deck is Deck.Full {
+    return deck.hasOwnProperty('spawnTransaction')
   }
 }
 
@@ -53,15 +57,26 @@ class Papi {
     let decks = await this.apiRequest('decks')
     return decks.map(({ issue_mode, ...rest }) => ({ issueMode: issue_mode, ...rest }))
   }
-  deckDetails = async (deck: Deck.Summary): Promise<Deck.Full> => {
-    let balances = await this.apiRequest<{ [address: string]: number }>('decks', deck.id)
+  deckDetails = async (deck: Deck.Summary, address?: string): Promise<Deck.Full> => {
+    let [ balances, spawnTransaction ] = await Promise.all([
+      this.apiRequest<{ [address: string]: number }>('decks', deck.id),
+      peercoin.getRelativeRawTransaction(deck.id, address)
+    ]) 
     let supply = Object.values(balances).reduce((sum, balance) => sum + balance, 0)
-    return Object.assign({}, deck, { balances, supply })
+    return Object.assign({}, deck, { balances, supply, spawnTransaction })
   }
   balances = async (address: string) => {
     let filters = [{ name: "account", "op": "like", "val": `${address}%`}]
     let { objects: balances } = await this.restlessRequest('balances', { filters, results_per_page: 100 })
     return balances
+  }
+  balance = async (address: string, assetId: string) => {
+    let filters = [
+      { name: "account", "op": "like", "val": `${address}%`},
+      { name: "short_id", "op": "eq", "val": `${assetId.substring(0,10)}%`}
+    ]
+    let { objects: balances } = await this.restlessRequest('balances', { filters, results_per_page: 1 })
+    return balances[0]
   }
 } 
 

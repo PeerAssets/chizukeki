@@ -28,6 +28,7 @@ namespace RoutineButton {
     STOPPED?: string
     DEFAULT: string
 
+    disabled?: boolean
     style?: any
     styleNames?: string
   }
@@ -71,7 +72,7 @@ class RoutineButton extends React.Component<Props, { alerting: false | Stage }> 
   stageSwitch = (cases: Record<Stage, any>) => {
     let stage: Stage = (
       (!this.props.stage) ||
-      ((!this.state.alerting) && this.props.stage !== 'STARTED')
+      ((!this.state.alerting) && !['STARTED', 'STOPPED'].includes(this.props.stage))
     ) ?
       'DEFAULT' :
       this.props.stage as Stage

@@ -3,6 +3,7 @@ import { Button, CardItem, Body, Text, Card, connectStyle, H2, Icon } from 'nati
 
 import Wrapper from '../generics/Wrapper'
 import RoutineButton from '../generics/routine-button'
+import { Omit } from '../generics/utils'
 import Modal from '../generics/modal.web'
 import Wallet from '../wallet/Wallet'
 
@@ -23,32 +24,16 @@ let styles = {
   },
 }
 
-function sync(props: Assets.Props){
-  let { actions, decks, balances, wallet } = props
-  if ((!decks) && wallet) {
-    actions.syncDecks({ address: wallet.address })
-  }
-  if (decks && (!balances)) {
-    actions.syncBalances({ address: wallet.address, decks })
-  }
-}
-
 @connectStyle('PeerKeeper.Assets', styles)
 class Assets extends React.Component<Assets.Props, {}> {
-  componentDidMount(){
-    sync(this.props)
-  }
-  componentWillReceiveProps(nextProps: Assets.Props){
-    sync(nextProps)
-  }
   render() {
-    let { decks, balances, wallet, actions } = this.props
+    let { decks, balances, wallet, actions, stages } = this.props
     return (
       <Wrapper>
-        <Summary balances={balances || []}>
+        <Summary sync={{ stage: stages.syncBalances, ...actions.syncBalances }} balances={balances || []}>
           <SpawnDeck wallet={wallet} spawn={actions.spawnDeck} />
         </Summary>
-        <DeckList decks={decks || []} />
+        <DeckList sync={{ stage: stages.syncDecks, ...actions.syncDecks }} decks={decks || []} />
       </Wrapper>
     )
   }
@@ -61,10 +46,11 @@ namespace Assets {
   }
   export type Props = Data & {
     wallet: Wallet.Data
+    stages: any
     actions: {
       // TODO strange type errors when properly typed
-      syncDecks: any
-      syncBalances: any
+      syncDecks: any //Omit<DeckList.Props['sync'], 'stage'>
+      syncBalances: any //Omit<Summary.Props['sync'], 'stage'>
       spawnDeck: any
     }
     style?: any

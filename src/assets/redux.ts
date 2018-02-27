@@ -1,13 +1,35 @@
 import { AnyAction } from 'typescript-fsa';
-import ActionHistory from '../generics/action-history'
+import { trackRoutineStages } from '../generics/utils'
 
-import Saga, { syncDecks, getDeckDetails, syncBalances, sendAssets, spawnDeck } from './saga'
+import saga, { syncDecks, getDeckDetails, syncBalances, sendAssets, spawnDeck, syncAsset } from './saga'
 import { Deck } from './papi'
 import Assets from './Assets'
 
-export type State = Assets.Data & ActionHistory.Bind
+const routines = {
+  syncDecks: syncDecks.routine,
+  getDeckDetails: getDeckDetails.routine,
+  syncBalances: syncBalances.routine,
+  sendAssets: sendAssets.routine,
+  syncAsset: syncAsset.routine,
+  spawnDeck: spawnDeck.routine
+}
 
-let actionHistory = () => ActionHistory.of(syncDecks.routine.allTypes)
+type Stages = { routineStages: { [key in keyof typeof routines]: string | undefined } }
+
+export type State = Assets.Data & Stages
+
+let initialState = () => ({
+  decks: null,
+  balances: null,
+  routineStages: {
+    syncDecks: undefined,
+    getDeckDetails: undefined,
+    syncBalances: undefined,
+    sendAssets: undefined,
+    syncAsset: undefined,
+    spawnDeck: undefined
+  }
+})
 
 function handleSync(
   old: Array<Deck>,
@@ -18,17 +40,18 @@ function handleSync(
 }
 
 function logout({ decks }: State){
-  return { decks: null, balances: null, ...actionHistory() }
+  return initialState()
 }
 
 
-function assetReducer(state: State = { decks: null, balances: null, ...actionHistory() }, action: AnyAction): State {
+function assetsReducer(state: State = initialState(), action: AnyAction): State {
   return syncDecks.routine.switch<State>(action, {
     started: payload => state,
     done: (payload) => ({
       ...state,
       decks: state.decks ? handleSync(state.decks, payload) : payload
     }),
+    stopped: () => state,
     failed: () => state
   }) ||
   getDeckDetails.routine.switch<State>(action, {
@@ -45,17 +68,21 @@ function assetReducer(state: State = { decks: null, balances: null, ...actionHis
       ...state,
       balances
     }),
+    stopped: () => state,
+    failed: () => state
+  }) ||
+  syncAsset.routine.switch<State>(action, {
+    started: payload => state,
+    done: (balance) => ({
+      ...state,
+      balances: (state.balances ? state.balances.map(b =>
+        b.deck.id === balance.deck.id ? balance : b) : [ balance ])
+    }),
+    stopped: () => state,
     failed: () => state
   }) ||
   ((action.type === 'HARD_LOGOUT') ? logout(state) : state)
 }
 
-export const reducer = ActionHistory.bind<string, State>(assetReducer)
-export const saga = Saga
-export const routines = {
-  syncDecks: syncDecks.routine,
-  getDeckDetails: getDeckDetails.routine,
-  syncBalances: syncBalances.routine,
-  sendAssets: sendAssets.routine,
-  spawnDeck: spawnDeck.routine
-}
+export const reducer = trackRoutineStages(routines, 'routineStages')(assetsReducer)
+export { saga, routines }

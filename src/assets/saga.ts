@@ -9,39 +9,24 @@ import Summary from './Summary'
 import SendAsset from './SendAsset'
 import SpawnDeck from './SpawnDeck'
 
-function getSpawnIfOwned(address: string){
-  return async (deck: Deck.Summary) => {
-    if (deck.issuer === address) {
-      let spawnTransaction = await peercoin.getRelativeRawTransaction(deck.id, address)
-      deck.spawnTransaction = spawnTransaction
-    }
-    return deck
-  }
-}
-
-const syncDecks = fetchJSONRoutine<
-  { address: string },
+const syncDecks = fetchJSONRoutine.withPolling<
+  {},
   Array<Deck.Summary>,
   Error
 >({
   type: 'SYNC_DECK_LIST',
-  fetchJSON: async ({ address }) => {
-    let decks = await papi.decks()
-    if(address) {
-      decks = await Promise.all(decks.map(getSpawnIfOwned(address)))
-    }
-    return decks
-  },
-  //pollingInterval: 30 * 60 * 1000, // poll every 30 minutes
+  fetchJSON: async () => papi.decks(),
+  pollingInterval: 5 * 60 * 1000, // poll every 5 minutes
 })
 
 const getDeckDetails = fetchJSONRoutine<
-  Deck.Summary,
+  { deck: Deck.Summary, address: string },
   Deck.Full,
   Error
 >({
   type: 'GET_DECK_DETAILS',
-  fetchJSON: (summary: Deck.Summary) => papi.deckDetails(summary)
+  fetchJSON: ({ deck, address }: { deck: Deck.Summary, address?: string }) => 
+    papi.deckDetails(deck, deck.issuer === address ? address : undefined)
 })
 
 const sendAssets = fetchJSONRoutine<
@@ -95,7 +80,7 @@ const spawnDeck = fetchJSONRoutine<
   }
 })
 
-const syncBalances = fetchJSONRoutine<
+const syncBalances = fetchJSONRoutine.withPolling<
   { address: string, decks: Array<Deck> },
   { balances: Array<Summary.Balance> },
   Error
@@ -112,14 +97,35 @@ const syncBalances = fetchJSONRoutine<
       return map
     }, {})
     let balances = unissued.concat(rawBalances.map(
-      ({ value, short_id, ...balance }) => (
-        balance.type = value > 0 ? 'RECIEVED' : 'ISSUED',
-        balance.deck = deckIdMap[short_id],
-        unissued = unissued.filter(i => i.deck.id !== balance.deck.id),
-        balance as Summary.Balance
-      )))
+      ({ short_id, ...balance }) => {
+        balance.type = balance.value > 0 ? 'RECIEVED' : 'ISSUED'
+        balance.deck = deckIdMap[short_id]
+        unissued = unissued.filter(i => i.deck.id !== balance.deck.id)
+        return balance as Summary.Balance
+      }))
     return { balances }
   },
+  pollingInterval: 1 * 60 * 1000, // poll every 1 minutes
+})
+
+const syncAsset = fetchJSONRoutine.withPolling<
+  { asset: Summary.Balance, address: string },
+  Summary.Balance,
+  Error
+>({
+  type: 'SYNC_ASSET',
+  fetchJSON: async ({ asset, address }) => {
+    let [ deck, balance = asset ] = await Promise.all([
+      papi.deckDetails(asset.deck, asset.deck.issuer === address ? address : undefined),
+      papi.balance(address, asset.deck.id)
+    ])
+    balance.deck = deck
+    balance.type = (balance.value === undefined) ?
+      'UNISSUED' :
+      (balance.value > 0 ? 'RECIEVED' : 'ISSUED')
+    return balance as Summary.Balance
+  },
+  pollingInterval: 1 * 60 * 1000, // poll every 1 minutes
 })
 
 // TODO cleanup copypasta
@@ -129,9 +135,10 @@ export default function * (){
     getDeckDetails.trigger(),
     syncBalances.trigger(),
     sendAssets.trigger(),
+    syncAsset.trigger(),
     spawnDeck.trigger()
   ])
 }
 
 
-export { syncDecks, getDeckDetails, syncBalances, sendAssets, spawnDeck }
+export { syncDecks, getDeckDetails, syncBalances, sendAssets, syncAsset, spawnDeck }

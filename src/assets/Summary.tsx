@@ -5,7 +5,7 @@ import { Button, CardItem, Body, Text, Card, connectStyle, H2, H3, Icon, Badge }
 
 import { Link } from '../routing/router'
 import Wrapper from '../generics/Wrapper'
-import RoutineButton from '../generics/routine-button'
+import SyncButton from '../generics/sync-button'
 import Modal from '../generics/modal.web'
 import Wallet from '../wallet/wallet'
 
@@ -21,9 +21,11 @@ namespace Summary {
     deck: Deck
     styleNames?: string
   }
+  export type ActionableBalance = Balance & { deck: Deck.Full }
   export type Props = {
     balances: Array<Balance>
     style?: any,
+    sync: SyncButton.Logic
   }
 }
 

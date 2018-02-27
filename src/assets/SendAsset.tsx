@@ -28,6 +28,7 @@ import { WrapActionable } from '../wallet/UnlockModal'
 import Wallet from '../wallet/Wallet'
 
 import Summary from './Summary'
+import { Deck } from './papi'
 
 type Recipient = { address: string, amount: number }
 
@@ -145,9 +146,10 @@ class SendAsset extends React.Component<SendAsset.Props, SendAsset.Data> {
     amountsMap: {},
   }
   send = (privateKey: string) => {
-    if(isFilled(this.state)){
+    let { wallet, asset, send } = this.props
+    if(isFilled(this.state) && Deck.isFull(asset.deck)){
       let wallet = Object.assign({ privateKey }, this.props.wallet)
-      this.props.send({ wallet, ...this.state, deckSpawn: this.props.asset.deck.spawnTransaction })
+      send({ wallet, ...this.state, deckSpawn: asset.deck.spawnTransaction })
     }
   }
   render() {
@@ -163,7 +165,7 @@ class SendAsset extends React.Component<SendAsset.Props, SendAsset.Data> {
 
     let SendButton = (props: { onPress: () => any }) =>
       <RoutineButton styleNames='block'
-        disabled={(!isFilled(this.state)) || (!canSendAmount)}
+        disabled={(!isFilled(this.state)) || (!canSendAmount) || !Deck.isFull(this.props.asset.deck)}
         icons={{ DEFAULT: 'send' }}
         stage={this.props.stage}
         DEFAULT={!canSendAmount ? 'Insufficient Funds!' : `${transactionType} Asset`}

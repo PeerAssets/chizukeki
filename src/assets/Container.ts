@@ -1,10 +1,9 @@
+import { pick } from 'ramda'
 import * as React from 'react'
 import { bindActionCreators, Dispatch } from 'redux'
 import { connect } from 'react-redux'
 
 import { Redirect } from '../routing/router'
-import ActionHistory from '../generics/action-history'
-import { routineStages } from '../generics/utils'
 import Wallet from '../wallet/Wallet'
 
 import * as Redux from './redux'
@@ -12,23 +11,17 @@ import Assets from './Assets'
 
 let { syncDecks, getDeckDetails, syncBalances, spawnDeck } = Redux.routines
 
-let selectStages = routineStages({
-  syncDecks,
-  spawnDeck,
-  //getDeckDetails
-})
-
 type RootState = { assets: Redux.State,  wallet: { wallet: Wallet.Data } }
 export default connect(
-  ({ assets: { decks, balances }, wallet: { wallet } }: RootState) => {
-    return { decks, balances, wallet }
+  ({ assets: { routineStages, decks, balances }, wallet: { wallet } }: RootState) => {
+    return { decks, balances, wallet, stages: routineStages }
   },
   (dispatch: Dispatch<any>) => ({
-    actions: bindActionCreators({
-      syncDecks: syncDecks.trigger,
-      spawnDeck: spawnDeck.trigger,
-      syncBalances: syncBalances.trigger,
-    },
-    dispatch
-  )})
+    actions: {
+      syncDecks: bindActionCreators(pick(['trigger', 'stop'], syncDecks), dispatch),
+      syncBalances: bindActionCreators(pick(['trigger', 'stop'], syncBalances), dispatch),
+      // todo ugly
+      spawnDeck: bindActionCreators(pick(['trigger'], syncBalances), dispatch).trigger
+    }
+  })
 )(Assets)

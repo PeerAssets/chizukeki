@@ -3,7 +3,7 @@ import { View } from 'react-native'
 import { Button, CardItem, Body, Text, Card, connectStyle, H2, H3, Icon, Badge } from 'native-base/src/index'
 
 import Wrapper from '../generics/Wrapper'
-import RoutineButton from '../generics/routine-button'
+import SyncButton from '../generics/sync-button'
 import Modal from '../generics/modal.web'
 
 import Summary, { Balance } from './Summary'
@@ -42,8 +42,11 @@ function isBalance(asset: Summary.Balance | { deck: Deck }): asset is Summary.Ba
 
 @connectStyle('PeerKeeper.Asset', styles)
 class Asset extends React.Component<Asset.Props, {}> {
+  componentDidMount(){
+
+  }
   render() {
-    let { asset, wallet, actions: { send } } = this.props
+    let { asset, sync, wallet, actions: { send } } = this.props
     return (
       <Wrapper>
         <View style={this.props.style.main}>
@@ -53,7 +56,7 @@ class Asset extends React.Component<Asset.Props, {}> {
             </Card>,
             <SendAsset key='send' {...{ asset, wallet, send }} />
           ]}
-          <DeckCard style={{ width: '100%' }} item={asset.deck} />
+          <DeckCard sync={sync} style={{ width: '100%' }} item={asset.deck} />
         </View>
       </Wrapper>
     )
@@ -63,6 +66,7 @@ class Asset extends React.Component<Asset.Props, {}> {
 namespace Asset {
   export type Props = {
     asset: Summary.Balance | { deck: Deck }
+    sync: SyncButton.Logic
     actions: {
       send: SendAsset.Props['send']
     }

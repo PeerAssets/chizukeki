@@ -42,5 +42,7 @@ export default function configureStore() {
   saga.run(Wallet.saga)
   saga.run(Assets.saga)
 
+  store.dispatch(Assets.routines.syncDecks.trigger({}))
+
   return { store, persistor }
 }

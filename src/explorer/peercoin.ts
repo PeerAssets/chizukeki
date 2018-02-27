@@ -255,14 +255,17 @@ class PeercoinExplorer {
   transactionInfo = (id: string) => this.extendedRequest('txinfo', id)
   getAddress = (address: string) => this.extendedRequest<GetAddress.Response>('getaddress', address)
 
-  getRelativeRawTransaction = async (id: string, address: string) => {
+  getRelativeRawTransaction = async (id: string, address?: string) => {
     let [raw, info] = await Promise.all([
       this.getRawTransaction(id),
       this.transactionInfo(id),
     ])
-    let type: 'CREDIT' | 'DEBIT' = info.inputs.filter(i => i.addresses === address).length ?
-      'DEBIT' :
-      'CREDIT'
+    let type: 'CREDIT' | 'DEBIT' | 'UNINVOLVED' = (!address) ?
+      'UNINVOLVED' : (
+      info.inputs.filter(i => i.addresses === address).length ?
+        'DEBIT' :
+        'CREDIT'
+      )
     let inputTotal = info.inputs.reduce((total, i) => total + Satoshis.btc.toAmount(i.amount), 0)
     let fee = inputTotal - Satoshis.btc.toAmount(info.total)
     return Object.assign(raw, { type, fee, inputTotal })
