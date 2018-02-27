@@ -59,7 +59,7 @@ class Papi {
   }
   deckDetails = async (deck: Deck.Summary, address?: string): Promise<Deck.Full> => {
     let [ balances, spawnTransaction ] = await Promise.all([
-      this.apiRequest<{ [address: string]: number }>('decks', deck.id),
+      this.apiRequest<{ [address: string]: number }>('decks', deck.id, 'balances'),
       peercoin.getRelativeRawTransaction(deck.id, address)
     ]) 
     let supply = Object.values(balances).reduce((sum, balance) => sum + balance, 0)

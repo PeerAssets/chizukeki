@@ -1,4 +1,4 @@
-import { fork, all, put, call, take } from 'redux-saga/effects'
+import { fork, all, put, call, takeLatest } from 'redux-saga/effects'
 import fetchJSONRoutine from '../generics/fetch-routine'
 import { peercoin, Wallet } from '../explorer'
 import bitcore from '../lib/bitcore'

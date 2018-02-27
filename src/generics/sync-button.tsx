@@ -11,7 +11,7 @@ namespace SyncButton {
   export type Props =
     Logic
     & Omit<RoutineButton.Props, 'DEFAULT' | 'onPress'>
-    & { DEFAULT?: string, } 
+    & { DEFAULT?: string, whenMounted?: boolean }
 }
 
 const stageTexts = {
@@ -23,9 +23,15 @@ const stageTexts = {
 
 class SyncButton extends React.Component<SyncButton.Props> {
   componentDidMount() {
-    let { stage, trigger } = this.props
-    if(!stage){
+    let { stage, trigger, whenMounted } = this.props
+    if((!stage) || (stage === 'STOPPED' && whenMounted)){
       trigger()
+    }
+  }
+  componentWillUnmount() {
+    let { stage, stop, whenMounted } = this.props
+    if(stage !== 'STOPPED' && whenMounted){
+      stop()
     }
   }
   render (){

@@ -28,9 +28,14 @@ let styles = {
 class Assets extends React.Component<Assets.Props, {}> {
   render() {
     let { decks, balances, wallet, actions, stages } = this.props
+    let syncBalances = {
+      stage: stages.syncBalances,
+      trigger: () => actions.syncBalances.trigger({ address: wallet.address, decks }),
+      stop: actions.syncBalances
+    }
     return (
       <Wrapper>
-        <Summary sync={{ stage: stages.syncBalances, ...actions.syncBalances }} balances={balances || []}>
+        <Summary sync={syncBalances} balances={balances || []}>
           <SpawnDeck wallet={wallet} spawn={actions.spawnDeck} />
         </Summary>
         <DeckList sync={{ stage: stages.syncDecks, ...actions.syncDecks }} decks={decks || []} />

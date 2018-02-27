@@ -96,6 +96,8 @@ function extendBitcore(bitcore, configuration = defaultConfig) {
       // free format from here, typically a change Output
       cardTransferTxn.change(changeAddress)
 
+      debugger
+
       return cardTransferTxn;
     },
 

@@ -21,7 +21,7 @@ function Deck({ item: deck, sync,...props }: { item: Deck.Data, sync?: SyncButto
         <Body style={{justifyContent: 'space-between', flexWrap: 'wrap', flexDirection: 'row'}}>
           <Text>{deck.name}</Text>
         </Body>
-        {sync && [<SyncButton {...sync}/>]}
+        {sync ? <SyncButton {...sync}/> : null}
       </CardItem>
       <CardItem styleNames='footer' style={{alignItems: 'flex-start', flexDirection: 'column', width: '100%'}}>
         <Text styleNames='note bounded' ellipsizeMode='middle' numberOfLines={1} >

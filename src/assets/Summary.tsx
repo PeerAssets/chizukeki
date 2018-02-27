@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { View } from 'react-native'
-import { Button, CardItem, Body, Text, Card, connectStyle, H2, H3, Icon, Badge } from 'native-base/src/index'
+import { Button, Right, CardItem, Body, Text, Card, connectStyle, H2, H3, Icon, Badge } from 'native-base/src/index'
 
 
 import { Link } from '../routing/router'
@@ -84,25 +84,34 @@ function Balance({ type, value, deck: { id, name }, styleNames = '' }: Summary.B
 
 class Summary extends React.Component<Summary.Props, {}> {
   render() {
-    let { UNISSUED, ISSUED, RECIEVED } = divideByOwnership(this.props.balances)
+    let { balances, sync } = this.props
+    let { UNISSUED, ISSUED, RECIEVED } = divideByOwnership(balances)
     return (
       <View style={styles.main as any}>
-        { (UNISSUED.length || ISSUED.length) ?
-        <Card styleNames='spawned asset summary' style={{ width: '100%' }}>
+        <Card styleNames='asset summary' style={{ width: '100%' }}>
           <CardItem styleNames='header'>
-            <H2>Spawned Assets</H2>
+            <Body style={{justifyContent: 'space-between', flexWrap: 'wrap', flexDirection: 'row'}}>
+              <H2>Your Assets</H2>
+              <Right>
+                <SyncButton {...sync} whenMounted />
+              </Right>
+            </Body>
           </CardItem>
-          {UNISSUED.map((o, key) => <Balance key={key} {...o} />)}
-          {ISSUED.map((o, key) => <Balance key={key} {...o} />)}
-        </Card> : null }
-        { RECIEVED.length ? 
-        <Card styleNames='asset balances summary' style={{ width: '100%' }}>
-          <CardItem styleNames='header'>
-            <H2>Balances</H2>
-          </CardItem>
-          {RECIEVED.map((o, key) => <Balance key={key} {...o} />)}
-        </Card> : null }
-        { this.props.children }
+          {(UNISSUED.length || ISSUED.length) ? [
+            <CardItem styleNames='header'>
+              <Text>Decks</Text>
+            </CardItem>,
+            ...UNISSUED.map((o, key) => <Balance key={key} {...o} />),
+            ...ISSUED.map((o, key) => <Balance key={key} {...o} />)
+          ] : null}
+          {RECIEVED.length ? [
+            <CardItem styleNames='header'>
+              <Text>Balances</Text>
+            </CardItem>,
+            ...RECIEVED.map((o, key) => <Balance key={key} {...o} />)
+          ] : null}
+        </Card>
+        {this.props.children}
       </View>
     )
   }

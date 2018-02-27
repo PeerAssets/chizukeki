@@ -40,7 +40,7 @@ function handleSync(
 }
 
 function logout({ decks }: State){
-  return initialState()
+  return { ...initialState(), decks }
 }
 
 
