@@ -108,16 +108,16 @@ function extendBitcore(bitcore, configuration = defaultConfig) {
       if (!outputs[0].script.isPublicKeyHashOut()) return undefined;
       if (!outputs[1].script.isDataOut()) return undefined;
 
-      var msg = this.decodeCardTransferMessage(outputs[1].script.getData());
+      var { amounts, ...msg } = this.decodeCardTransferMessage(outputs[1].script.getData());
       let retVal = {
-        numberOfDecimals: msg.numberOfDecimals,
+        ...msg,
         from: inputs[0].script.toAddress().toString(),
         to: <Record<string, number>>{}
       }
-      for (let i = 0; i < msg.amounts.length; i++) {
+      for (let i = 0; i < amounts.length; i++) {
         // Test for validity
         if (!outputs[2 + i].script.isPublicKeyHashOut() && !outputs[2 + i].script.isScriptHashOut()) return undefined;
-        retVal.to[outputs[2 + i].script.toAddress().toString()] = msg.amounts[i];
+        retVal.to[outputs[2 + i].script.toAddress().toString()] = amounts[i];
       }
       return retVal;
     },
@@ -192,6 +192,7 @@ function extendBitcore(bitcore, configuration = defaultConfig) {
 
       return {
         amounts: ds.getAmountList(),
+        version: ds.getVersion(),
         numberOfDecimals: ds.getNumberOfDecimals()
       }
     }
