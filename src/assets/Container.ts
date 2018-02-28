@@ -21,7 +21,7 @@ export default connect(
       syncDecks: bindActionCreators(pick(['trigger', 'stop'], syncDecks), dispatch),
       syncBalances: bindActionCreators(pick(['trigger', 'stop'], syncBalances), dispatch),
       // todo ugly
-      spawnDeck: bindActionCreators(pick(['trigger'], syncBalances), dispatch).trigger
+      spawnDeck: bindActionCreators(pick(['trigger'], spawnDeck), dispatch).trigger
     }
   })
 )(Assets)

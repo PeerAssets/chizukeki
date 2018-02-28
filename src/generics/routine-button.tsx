@@ -76,8 +76,7 @@ class RoutineButton extends React.Component<Props, { alerting: false | Stage }> 
     ) ?
       'DEFAULT' :
       this.props.stage as Stage
-    return cases[stage] || cases.DEFAULT
-  }
+    return cases[stage] || cases.DEFAULT }
 
   dismissProps(queryStage: Stage) {
     let dismiss = () => this.setState({ alerting: false })

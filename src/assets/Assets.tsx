@@ -31,12 +31,12 @@ class Assets extends React.Component<Assets.Props, {}> {
     let syncBalances = {
       stage: stages.syncBalances,
       trigger: () => actions.syncBalances.trigger({ address: wallet.address, decks }),
-      stop: actions.syncBalances
+      stop: actions.syncBalances.stop
     }
     return (
       <Wrapper>
         <Summary sync={syncBalances} balances={balances || []}>
-          <SpawnDeck wallet={wallet} spawn={actions.spawnDeck} />
+          <SpawnDeck wallet={wallet} spawn={actions.spawnDeck} stage={stages.spawnDeck} />
         </Summary>
         <DeckList sync={{ stage: stages.syncDecks, ...actions.syncDecks }} decks={decks || []} />
       </Wrapper>

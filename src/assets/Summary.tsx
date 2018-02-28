@@ -98,14 +98,14 @@ class Summary extends React.Component<Summary.Props, {}> {
             </Body>
           </CardItem>
           {(UNISSUED.length || ISSUED.length) ? [
-            <CardItem styleNames='header'>
+            <CardItem key='decks' styleNames='header'>
               <Text>Decks</Text>
             </CardItem>,
             ...UNISSUED.map((o, key) => <Balance key={key} {...o} />),
             ...ISSUED.map((o, key) => <Balance key={key} {...o} />)
           ] : null}
           {RECIEVED.length ? [
-            <CardItem styleNames='header'>
+            <CardItem key='balances' styleNames='header'>
               <Text>Balances</Text>
             </CardItem>,
             ...RECIEVED.map((o, key) => <Balance key={key} {...o} />)

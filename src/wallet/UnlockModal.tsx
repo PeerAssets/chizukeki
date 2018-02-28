@@ -29,7 +29,7 @@ class UnlockModal extends React.Component<{
     return (
       <Modal open={open} onClose={this.close} >
         <Body style={{ flexDirection: 'column', justifyContent: 'center', width: '100%', flexWrap: 'wrap' }}>
-          <Item fixedLabel style={{ minWidth: 300 }}>
+          <Item styleNames='fixedLabel' style={{ minWidth: 300 }}>
             <Label>Password</Label>
             <Input
               clearTextOnFocus
@@ -43,10 +43,10 @@ class UnlockModal extends React.Component<{
             {this.state.error !== undefined ? <Text danger>Unlock failed, please try again</Text> : null }
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', maxWidth: 175 }}>
-            <Button info onPress={() => unlock(this.state.password).then(this.close).catch(this.incorrect)}>
+            <Button styleNames='info' onPress={() => unlock(this.state.password).then(this.close).catch(this.incorrect)}>
               <Text>Unlock</Text>
             </Button>
-            <Button danger onPress={this.close}>
+            <Button styleNames='danger' onPress={this.close}>
               <Text>Cancel</Text>
             </Button>
           </View>
@@ -66,9 +66,9 @@ class WrapActionable extends React.Component<WrapActionable.Props, {
     return action(privateKey)
   }
   render() {
-    let { Component, action, actionProp } = this.props
+    let { Component, action, actionProp, componentProps = {} } = this.props
     return [
-      <Component key='component' {...{ [actionProp]: () => this.setState({ open: true })} } />,
+      <Component key='component' {...{ ...componentProps, [actionProp]: () => this.setState({ open: true })} } />,
       <UnlockModal key='modal'
         unlock={this.unlock}
         open={this.state.open}
@@ -83,13 +83,15 @@ namespace WrapActionable {
     lockedKey: string,
     actionProp: string,
     Component: React.ComponentClass<any> | React.StatelessComponent<any> | (<P>(p: P) => React.ReactElement<P>)
+    componentProps?: any
   }
   export function IfLocked({ keys, Component, ...props }:
-    Pick<Props, 'action' | 'actionProp' | 'Component'> & { keys: Wallet.Keys } ){
+    Pick<Props, 'action' | 'actionProp' | 'Component' | 'componentProps'> & { keys: Wallet.Keys } ){
     return !Wallet.Keys.areLocked(keys) ? 
-        <Component {...{
-          [props.actionProp]: () => (!Wallet.Keys.areLocked(keys)) && props.action(keys.private)
-          }}/> :
+      <Component {...{
+        ...(props.componentProps || {}),
+        [props.actionProp]: () => (!Wallet.Keys.areLocked(keys)) && props.action(keys.private)
+      }} /> :
       <WrapActionable
         lockedKey={keys.locked}
         Component={Component}

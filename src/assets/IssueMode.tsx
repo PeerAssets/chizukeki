@@ -23,7 +23,7 @@ class IssueMode extends React.Component<IssueMode.Props, {}> {
     return (
       <Picker
         prompt='Select one'
-        selectedValue={selected !== null ? IssueModes.decode(selected): null}
+        selectedValue={selected !== null ? IssueModes.decode(selected): ''}
         onValueChange={mode => select(IssueModes.encode(mode))}
         mode='dropdown' >
         { Object.keys(IssueModes.nameToEncodingMap).map((mode: IssueModes) =>

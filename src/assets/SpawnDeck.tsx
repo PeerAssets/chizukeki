@@ -66,6 +66,17 @@ function isFilled(state: State): state is SpawnDeck.Data {
   return Fillable.isFilled<SpawnDeck.Data>(state)
 }
 
+function SpawnButton(props: { stage: string | undefined, disabled: boolean, onPress: () => any }) {
+  return <RoutineButton
+    styleNames='block'
+    icons={{ DEFAULT: 'send' }}
+    DEFAULT='Spawn Deck'
+    STARTED='Spawning'
+    DONE='Spawned!'
+    FAILED='Invalid Deck'
+    {...props} />
+}
+
 class SpawnDeck extends React.Component<SpawnDeck.Props, State> {
   state = {
     name: '',
@@ -80,16 +91,7 @@ class SpawnDeck extends React.Component<SpawnDeck.Props, State> {
   }
   render() {
     let { wallet: { keys, balance } } = this.props
-    let SpawnButton = (props: { onPress: () => any }) =>
-      <RoutineButton styleNames='block'
-        disabled={(!isFilled(this.state))}
-        icons={{ DEFAULT: 'send' }}
-        stage={this.props.stage}
-        DEFAULT='Spawn Deck'
-        STARTED='Spawning'
-        DONE='Spawned!'
-        FAILED='Invalid Deck'
-        {...props} />
+    let { precision } = this.state
 
     return (
       <Card style={this.props.style}>
@@ -114,7 +116,7 @@ class SpawnDeck extends React.Component<SpawnDeck.Props, State> {
                 keyboardType='numeric'
                 placeholder='0'
                 style={{ lineHeight: 14, textOverflow: 'ellipsis' }}
-                value={this.state.precision}
+                value={precision !== null && Number.isFinite(precision) ? `${precision}` : ''}
                 onChangeText={precision => {
                   precision = Number(precision)
                   this.setState({ precision: Number.isFinite(precision) ? precision : null })
@@ -135,6 +137,10 @@ class SpawnDeck extends React.Component<SpawnDeck.Props, State> {
               actionProp='onPress'
               action={this.spawn}
               Component={SpawnButton}
+              componentProps={{
+                disabled: (!isFilled(this.state)),
+                stage: this.props.stage
+              }}
             />
           </Body>
         </CardItem>

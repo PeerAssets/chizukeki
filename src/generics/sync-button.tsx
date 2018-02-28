@@ -35,7 +35,7 @@ class SyncButton extends React.Component<SyncButton.Props> {
     }
   }
   render (){
-    let { trigger, stop, dismiss = [], icons = {}, ...props } = this.props
+    let { trigger, stop, dismiss = [], icons = {}, whenMounted, ...props } = this.props
     let syncToggle = props.stage !== 'STOPPED' ? stop : trigger
     return (
       <RoutineButton {...props}

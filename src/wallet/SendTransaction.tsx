@@ -45,6 +45,15 @@ function isFilled(s: SendTransaction.Data | State): s is SendTransaction.Data {
   return Boolean(s.toAddress && s.amount)
 }
 
+function SendButton(props: { onPress: () => any, disabled: boolean, DEFAULT: string, stage: string | undefined }) {
+  return <RoutineButton styleNames='block'
+    icons={{ DEFAULT: 'send' }}
+    STARTED='Sending'
+    DONE='Sent!'
+    FAILED='Invalid Transaction'
+    {...props} />
+}
+
 class SendTransaction extends React.Component<SendTransaction.Props, State> {
   state = {
     toAddress: '',
@@ -58,16 +67,6 @@ class SendTransaction extends React.Component<SendTransaction.Props, State> {
   }
   render() {
     let { wallet: { keys, balance } } = this.props
-    let SendButton = (props: { onPress: () => any }) =>
-      <RoutineButton styleNames='block'
-        disabled={(!isFilled(this.state)) || (this.state.amount > balance)}
-        icons={{ DEFAULT: 'send' }}
-        stage={this.props.stage}
-        DEFAULT={(this.state.amount || -1) > balance ? 'Insufficient Funds!' : 'Send Transaction'}
-        STARTED='Sending'
-        DONE='Sent!'
-        FAILED='Invalid Transaction'
-        {...props} />
 
     return (
       <Card style={this.props.style}>
@@ -103,6 +102,11 @@ class SendTransaction extends React.Component<SendTransaction.Props, State> {
               actionProp='onPress'
               action={this.send}
               Component={SendButton}
+              componentProps={{
+                disabled: (!isFilled(this.state)) || (this.state.amount > balance),
+                stage: this.props.stage,
+                DEFAULT: (this.state.amount || -1) > balance ? 'Insufficient Funds!' : 'Send Transaction'
+              }}
             />
           </Body>
         </CardItem>
