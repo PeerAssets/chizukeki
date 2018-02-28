@@ -243,7 +243,6 @@ class PeercoinExplorer {
       .to(toAddress, Satoshis.fromAmount(amount))
       .change(changeAddress)
       .fee(Satoshis.fromAmount(fee))
-    debugger
     // TODO need to update available unspent transactions after send locally?
     let sent = await this._sendRawTransaction(transaction.sign(signature).serialize())
     return {

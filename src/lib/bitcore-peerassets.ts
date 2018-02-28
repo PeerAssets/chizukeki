@@ -53,7 +53,6 @@ function extendBitcore(bitcore, configuration = defaultConfig) {
         .addData(this.createDeckSpawnMessage(name, numberOfDecimals, issueModes))  // vout[1]: Asset data
         // free format from here, typically a change Output
         .change(changeAddress)
-      debugger
       return deckSpawnTxn
     },
     decodeDeckSpawnTransaction(transaction) {
@@ -183,6 +182,7 @@ function extendBitcore(bitcore, configuration = defaultConfig) {
       var ct = new pb.CardTransfer();
       ct.setAmountList(amounts);
       ct.setNumberOfDecimals(decoded.numberOfDecimals);
+      ct.setVersion(1);
 
       return new Buffer(ct.serializeBinary());
     },

@@ -36,7 +36,9 @@ bitcore.Networks.add({
   });
 
 bitcore.Networks.defaultNetwork = bitcore.Networks.get(
-  configure.fromEnv().NETWORK === 'TESTNET' ? 'peercoin-testnet' : 'peercoin'
+  configure.fromEnv().NETWORK === 'TESTNET' ?
+    'peercoin-testnet' :
+    'peercoin'
 )
 
 //
