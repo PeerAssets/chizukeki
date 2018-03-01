@@ -96,14 +96,14 @@ const syncBalances = fetchJSONRoutine.withPolling<
       map[deck.id.substr(0, 10)] = deck
       return map
     }, {})
-    let balances = unissued.concat(rawBalances.map(
+    let balances = rawBalances.map(
       ({ short_id, ...balance }) => {
         balance.type = balance.value > 0 ? 'RECIEVED' : 'ISSUED'
         balance.deck = deckIdMap[short_id]
         unissued = unissued.filter(i => i.deck.id !== balance.deck.id)
         return balance as Summary.Balance
-      }))
-    return { balances }
+      })
+    return { balances: unissued.concat(balances) }
   },
   pollingInterval: 1 * 60 * 1000, // poll every 1 minutes
 })
