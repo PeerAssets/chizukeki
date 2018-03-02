@@ -72,6 +72,16 @@ function Balance({ balance, ...props }) {
     </View>
   )
 }
+function Address({ address, ...props }) {
+  return (
+    <View {...props}>
+      <Button styleNames='iconLeft dark transparent' style={styles.column} onPress={() => Clipboard.setString(address)}>
+        <Icon name='clipboard' />
+        <Text note>{address}</Text>
+      </Button>
+    </View>
+  )
+}
 
 let styles = {
   main: {
@@ -118,6 +128,9 @@ class Wallet extends React.Component<
                 <UnlockThenCopy keys={keys}/>
                 <SyncButton style={style.column} {...sync} />
               </Body>
+            </CardItem>
+            <CardItem styleNames='footer'>
+              <Address address={address} style={style.body} />
             </CardItem>
           </Card>
           <SendTransaction {...sendTransaction} />
