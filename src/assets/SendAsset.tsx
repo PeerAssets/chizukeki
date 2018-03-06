@@ -19,7 +19,7 @@ import {
   Icon,
   Label,
   variables
-} from 'native-base/src/index'
+} from 'native-base'
 
 import bitcore from '../lib/bitcore'
 import Wrapper from '../generics/Wrapper'

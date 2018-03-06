@@ -3,7 +3,7 @@ import { View, Clipboard } from 'react-native'
 import PrivateKey from './LoadPrivateKey'
 import TransactionList from './Transaction'
 import SendTransaction from './SendTransaction'
-import { Button, CardItem, Body, Text, Card, connectStyle, H2, Icon } from 'native-base/src/index'
+import { Button, CardItem, Body, Text, Card, connectStyle, H2, Icon } from 'native-base'
 
 import Wrapper from '../generics/Wrapper'
 import SyncButton from '../generics/sync-button'
@@ -77,7 +77,7 @@ function Address({ address, ...props }) {
     <View {...props}>
       <Button styleNames='iconLeft dark transparent' style={styles.column} onPress={() => Clipboard.setString(address)}>
         <Icon name='clipboard' />
-        <Text note>{address}</Text>
+        <Text styleNames='note'>{address}</Text>
       </Button>
     </View>
   )
@@ -99,8 +99,8 @@ let styles = {
     width: '100%'
   },
   column: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: 'center' as 'center',
+    alignItems: 'center' as 'center',
     margin: 7.5,
     flex: 1,
   }

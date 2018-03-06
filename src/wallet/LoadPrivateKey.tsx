@@ -16,7 +16,7 @@ import {
   Right,
   Icon,
   variables
-} from 'native-base/src/index'
+} from 'native-base'
 
 import Wrapper from '../generics/Wrapper'
 import RoutineButton from '../generics/routine-button'
@@ -131,7 +131,7 @@ class LoadPrivateKey extends React.Component<
       <Wrapper>
         <Card >
           <CardItem styleNames='header'>
-            <Body style={[styles.row, { paddingLeft: 0, paddingRight: 0 }]}>
+            <Body style={{...styles.row, paddingLeft: 0, paddingRight: 0 }}>
               <H2 style={{ flexBasis: 200, paddingBottom: 15 }}>Import or Generate Private Key</H2>
             </Body>
           </CardItem>
@@ -141,7 +141,7 @@ class LoadPrivateKey extends React.Component<
                 <Icon styleNames='active' name='key' />
                 <Input
                   placeholder={`Paste WIF, HD Key, or Raw Private Key here`}
-                  style={{ fontSize: 12, lineHeight: 14, textOverflow: 'ellipsis', minWidth: 200 }}
+                  style={{ fontSize: 12, lineHeight: 14, minWidth: 200 }}
                   value={pKeyInput}
                   onChangeText={privateKey => this.processKeyChange(privateKey)}/>
                   { format && <SelectedFormat selected={format} style={styles.right} /> }
@@ -151,7 +151,7 @@ class LoadPrivateKey extends React.Component<
                 <Input
                   placeholder={'Add a password'}
                   secureTextEntry
-                  style={{ fontSize: 12, lineHeight: 14, textOverflow: 'ellipsis' }}
+                  style={{ fontSize: 12, lineHeight: 14 }}
                   value={password}
                   onChangeText={this.setPassword} />
               </Item>
@@ -160,7 +160,7 @@ class LoadPrivateKey extends React.Component<
           <CardItem styleNames='footer'>
             <Body style={styles.row}>
               <RoutineButton
-                style={[{ justifyContent: 'center', width: '100%', paddingBottom: 6 + (26 / 2), borderBottomRightRadius: 0, borderBottomLeftRadius: 0 }]}
+                style={styles.importButton}
                 disabled={(!load) || this.state.error}
                 onPress={load || (() => {})}
                 stage={this.props.syncStage}
@@ -169,14 +169,14 @@ class LoadPrivateKey extends React.Component<
                 DONE='Successfully synced!'
                 FAILED='There was a Problem syncing!' />
               <View style={{ zIndex: 2, width: '100%', flexDirection: 'row', justifyContent: 'center', height: 1, overflow: 'visible' }}>
-                <Badge styleNames='light' style={{ position: 'absolute', top: -(26 / 2), width: 26, height: 26, flexDirection: 'column', justifyContent: 'center', borderRadius: '50%' }}>
-                  <Text style={{ fontSize: 10, whiteSpace: 'nowrap' }}>or</Text>
+                <Badge styleNames='light' style={styles.validBadge}>
+                  <Text numberOfLines={1} style={{ fontSize: 10 }}>or</Text>
                 </Badge>
               </View>
               <Button
                 styleNames='primary'
                 disabled={!password}
-                style={[{ justifyContent: 'center', width: '100%', paddingTop: 6 + (26 / 2), borderTopRightRadius: 0, borderTopLeftRadius: 0 }]}
+                style={styles.generateButton}
                 onPress={this.generateNew}>
                 <Text>Generate new Wallet</Text>
               </Button>
@@ -214,16 +214,39 @@ namespace LoadPrivateKey {
 
 const styles = {
   row: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: 'row' as 'row',
+    justifyContent: 'space-around' as 'space-around',
     width: '100%',
-    flexWrap: 'wrap',
+    flexWrap: 'wrap' as 'wrap',
     paddingLeft: 15,
     paddingRight: 15
   },
   right: {
-    alignSelf: 'flex-end',
-    justifyContent: 'center'
+    alignSelf: 'flex-end' as 'flex-end',
+    justifyContent: 'center' as 'center'
+  },
+  importButton: {
+    justifyContent: 'center' as 'center',
+    width: '100%',
+    paddingBottom: 6 + (26 / 2),
+    borderBottomRightRadius: 0,
+    borderBottomLeftRadius: 0
+  },
+  validBadge: {
+    top: (-(26 / 2)),
+    width: 26,
+    height: 26,
+    position: 'absolute' as 'absolute',
+    flexDirection: 'column' as 'column',
+    justifyContent: 'center' as 'center',
+    borderRadius: 50
+  },
+  generateButton: {
+    justifyContent: 'center' as 'center',
+    width: '100%',
+    paddingTop: 6 + (26 / 2),
+    borderTopRightRadius: 0,
+    borderTopLeftRadius: 0
   }
 }
 

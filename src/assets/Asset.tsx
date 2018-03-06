@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { View } from 'react-native'
-import { Button, CardItem, Body, Text, Card, connectStyle, H2, H3, Icon, Badge } from 'native-base/src/index'
+import { Button, CardItem, Body, Text, Card, connectStyle, H2, H3, Icon, Badge } from 'native-base'
 
 import Wrapper from '../generics/Wrapper'
 import SyncButton from '../generics/sync-button'

@@ -62,7 +62,6 @@ module.exports = {
           path.resolve(__dirname, '../src'),
           nodeModule('react-native-uncompiled'),
           nodeModule('react-native-web-lists'),
-          nodeModule('native-base'),
           nodeModule('react-native-easy-grid'),
           nodeModule('react-native-drawer'),
           nodeModule('react-native-modal'),

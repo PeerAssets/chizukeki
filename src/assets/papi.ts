@@ -62,7 +62,9 @@ class Papi {
       this.apiRequest<{ [address: string]: number }>('decks', deck.id, 'balances'),
       peercoin.getRelativeRawTransaction(deck.id, address)
     ]) 
-    let supply = Object.values(balances).reduce((sum, balance) => sum + balance, 0)
+    // TODO casting shouldn't be necessary
+    let supply: number = Object.values(balances)
+      .reduce((sum: number, balance: number) => sum + balance, 0) as number
     return Object.assign({}, deck, { balances, supply, spawnTransaction })
   }
   balances = async (address: string) => {

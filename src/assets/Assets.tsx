@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Button, CardItem, Body, Text, Card, connectStyle, H2, Icon } from 'native-base/src/index'
+import { Button, CardItem, Body, Text, Card, connectStyle, H2, Icon } from 'native-base'
 
 import Wrapper from '../generics/Wrapper'
 import RoutineButton from '../generics/routine-button'

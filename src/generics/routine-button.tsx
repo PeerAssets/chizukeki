@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { mapObjIndexed } from 'ramda'
-import { Text, Button, Icon, Spinner, variables } from 'native-base/src/index'
+import { Text, Button, Icon, Spinner, variables } from 'native-base'
 import { Routine } from './routine';
 import { lang } from 'moment';
 import { Dimensions } from 'react-native';

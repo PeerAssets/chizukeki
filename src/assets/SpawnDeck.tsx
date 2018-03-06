@@ -19,7 +19,7 @@ import {
   Icon,
   Label,
   variables
-} from 'native-base/src/index'
+} from 'native-base'
 
 import bitcore from '../lib/bitcore'
 import Wrapper from '../generics/Wrapper'
@@ -106,7 +106,7 @@ class SpawnDeck extends React.Component<SpawnDeck.Props, State> {
             <Item styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300 }}>
               <Label>Name</Label>
               <Input
-                style={{ lineHeight: 14, textOverflow: 'ellipsis' }}
+                style={{ lineHeight: 14 }}
                 value={this.state.name}
                 onChangeText={name => this.setState({ name })} />
             </Item>
@@ -115,10 +115,10 @@ class SpawnDeck extends React.Component<SpawnDeck.Props, State> {
               <Input
                 keyboardType='numeric'
                 placeholder='0'
-                style={{ lineHeight: 14, textOverflow: 'ellipsis' }}
+                style={{ lineHeight: 14 }}
                 value={precision !== null && Number.isFinite(precision) ? `${precision}` : ''}
-                onChangeText={precision => {
-                  precision = Number(precision)
+                onChangeText={_precision => {
+                  let precision = Number(_precision)
                   this.setState({ precision: Number.isFinite(precision) ? precision : null })
                 }} />
             </Item>

@@ -18,7 +18,7 @@ import {
   Icon,
   Label,
   variables
-} from 'native-base/src/index'
+} from 'native-base'
 
 import bitcore from '../lib/bitcore'
 import Wrapper from '../generics/Wrapper'
@@ -80,7 +80,7 @@ class SendTransaction extends React.Component<SendTransaction.Props, State> {
             <Item styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300 }}>
               <Label>To address</Label>
               <Input
-                style={{ lineHeight: 14, textOverflow: 'ellipsis' }}
+                style={{ lineHeight: 14 }}
                 value={this.state.toAddress}
                 onChangeText={toAddress => this.setState({ toAddress })} />
             </Item>
@@ -89,7 +89,7 @@ class SendTransaction extends React.Component<SendTransaction.Props, State> {
               <Input
                 keyboardType='numeric'
                 placeholder='0.00'
-                style={{ lineHeight: 14, textOverflow: 'ellipsis' }}
+                style={{ lineHeight: 14 }}
                 value={this.state.amount}
                 onChangeText={amount => this.setState({ amount: Number(amount) || undefined })} />
             </Item>

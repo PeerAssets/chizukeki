@@ -1,7 +1,7 @@
 import React from "react"
 import { StyleProp } from "react-native"
 import { ActivityIndicator } from "react-native";
-import { connectStyle, variables } from 'native-base/src/index'
+import { connectStyle, variables } from 'native-base'
 
 const styles = {
   color: variables.defaultSpinnerColor,

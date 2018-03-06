@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { View } from 'react-native'
-import { Button, Card, Left, CardItem, Body, Text, H2, Icon } from 'native-base/src/index'
+import { Button, Card, Left, CardItem, Body, Text, H2, Icon } from 'native-base'
 
 import FlatList from 'react-native-web-lists/src/FlatList'
 import moment from 'moment'

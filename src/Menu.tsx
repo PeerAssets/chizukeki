@@ -6,7 +6,7 @@ import { withRouter } from 'react-router'
 
 import { Link } from './routing/router'
 
-import { Button, connectStyle, variables, Right, Icon } from 'native-base/src/index'
+import { Button, connectStyle, variables, Right, Icon } from 'native-base'
 
 let tabStyles = {
   link: {

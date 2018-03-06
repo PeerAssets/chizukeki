@@ -14,7 +14,7 @@ import AuthenticatedRoute from './wallet/AuthenticatedRoute'
 import Assets from './assets/Container'
 import Asset from './assets/AssetContainer'
 
-import { StyleProvider, variables } from 'native-base/src/index';
+import { StyleProvider, variables } from 'native-base';
 import theme from './theme'
 
 let { store, persistor } = configureStore()

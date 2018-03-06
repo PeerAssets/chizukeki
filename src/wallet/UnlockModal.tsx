@@ -1,6 +1,6 @@
 import * as React from 'react'
 import Modal from '../generics/modal.web'
-import { Text, Body, Input, Button, Item, Label } from 'native-base/src/index'
+import { Text, Body, Input, Button, Item, Label } from 'native-base'
 import { View } from 'react-native';
 
 import { unlockKey } from '../lib/encrypt-key'
@@ -40,7 +40,7 @@ class UnlockModal extends React.Component<{
               onChangeText={password => this.setState({ password })} />
           </Item>
           <View style={{ justifyContent: 'center', marginTop: 7.5, marginBottom: 7.5 }}>
-            {this.state.error !== undefined ? <Text danger>Unlock failed, please try again</Text> : null }
+            {this.state.error !== undefined ? <Text styleNames='danger'>Unlock failed, please try again</Text> : null }
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', maxWidth: 175 }}>
             <Button styleNames='info' onPress={() => unlock(this.state.password).then(this.close).catch(this.incorrect)}>

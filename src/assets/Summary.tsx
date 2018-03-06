@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { View } from 'react-native'
-import { Button, Right, CardItem, Body, Text, Card, connectStyle, H2, H3, Icon, Badge } from 'native-base/src/index'
+import { Button, Right, CardItem, Body, Text, Card, connectStyle, H2, H3, Icon, Badge } from 'native-base'
 
 
 import { Link } from '../routing/router'

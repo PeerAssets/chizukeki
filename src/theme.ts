@@ -1,7 +1,7 @@
 import color from 'color'
 import { Platform } from 'react-native'
 import deepmerge from 'deepmerge'
-import { getTheme, variables as nbVariables } from 'native-base/src/index'
+import { getTheme, variables as nbVariables } from 'native-base'
 
 let textStyles = {
   '.bounded': {

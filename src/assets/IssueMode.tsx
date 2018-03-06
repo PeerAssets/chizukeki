@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { Picker as RNPicker } from 'react-native';
 let Item = RNPicker.Item
-import { Picker, Right, Radio, Text } from 'native-base/src/index'
+import { Picker, Right, Radio, Text } from 'native-base'
 import IssueModes from './issueModes'
 
 let styles = {

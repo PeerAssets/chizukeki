@@ -16,10 +16,6 @@
       "react-native",
       "node"
     ],
-    "typeRoots": [
-      "@types",
-      "./@types"
-    ],
     "skipLibCheck": true
   }
 }
