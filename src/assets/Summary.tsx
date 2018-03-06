@@ -7,7 +7,7 @@ import { Link } from '../routing/router'
 import Wrapper from '../generics/Wrapper'
 import SyncButton from '../generics/sync-button'
 import Modal from '../generics/modal.web'
-import Wallet from '../wallet/wallet'
+import Wallet from '../wallet/Wallet'
 
 import { Deck } from './papi'
 import Send from './SendAsset'

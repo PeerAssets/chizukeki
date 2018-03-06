@@ -55,15 +55,16 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /.jsx?|\.tsx?/,
+        test: /.jsx?|\.tsx?|\.json/,
         // Add every directory that needs to be compiled by Babel during the build
         include: [
           path.join(__dirname, '../index.web.tsx'),
           path.resolve(__dirname, '../src'),
           nodeModule('react-native-uncompiled'),
+          nodeModule('native-base'),
           nodeModule('react-native-web-lists'),
           nodeModule('react-native-easy-grid'),
-          nodeModule('react-native-drawer'),
+          //nodeModule('react-native-drawer'),
           nodeModule('react-native-modal'),
         ],
 
@@ -83,13 +84,22 @@ module.exports = {
                 babelrc: false,
                 // This aliases 'react-native' to 'react-native-web' and includes only
                 // the modules needed by the app
-                plugins: ['react-native-web/babel', 'transform-regenerator'],
+                plugins: [
+                  'react-native-web/babel', 'transform-regenerator'
+                ],
                 // The 'react-native' preset is recommended (or use your own .babelrc)
                 presets : [ 'react-native' ],
               }
             }
           }
         ]
+      },
+      {
+        test: /\.json$/,
+        loader: 'json-loader',
+        include: [
+          nodeModule('native-base'),
+        ],
       },
       // This is needed for webpack to import static images in JavaScript files
       {
