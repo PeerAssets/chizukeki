@@ -141,6 +141,17 @@ class AddRecipient extends React.Component<{ decimals: number, add: (r: Recipien
   }
 }
 
+function SendButton(props: { stage: undefined | string, DEFAULT: string, disabled: boolean, onPress: () => any }){
+  return (
+    <RoutineButton styleNames='block'
+      icons={{ DEFAULT: 'send' }}
+      STARTED='Sending'
+      DONE='Sent!'
+      FAILED='Invalid Transaction'
+      {...props} />
+  )
+}
+
 class SendAsset extends React.Component<SendAsset.Props, SendAsset.Data> {
   state: SendAsset.Data = {
     amountsMap: {},
@@ -162,18 +173,6 @@ class SendAsset extends React.Component<SendAsset.Props, SendAsset.Data> {
     let totalAmount = Object.values(this.state.amountsMap).reduce((s, v) => s + v, 0)
     let transactionType = type === 'RECEIVED' ? 'Send' : 'Issue'
     let canSendAmount = (transactionType === 'Issue' || (totalAmount < balance))
-
-    let SendButton = (props: { onPress: () => any }) =>
-      <RoutineButton styleNames='block'
-        disabled={(!isFilled(this.state)) || (!canSendAmount) || !Deck.isFull(this.props.asset.deck)}
-        icons={{ DEFAULT: 'send' }}
-        stage={this.props.stage}
-        DEFAULT={!canSendAmount ? 'Insufficient Funds!' : `${transactionType} Asset`}
-        STARTED='Sending'
-        DONE='Sent!'
-        FAILED='Invalid Transaction'
-        {...props} />
-
 
     let remove = (address: string) => () => {
       let { [address]: _, ...amountsMap } = this.state.amountsMap
@@ -210,6 +209,11 @@ class SendAsset extends React.Component<SendAsset.Props, SendAsset.Data> {
               actionProp='onPress'
               action={this.send}
               Component={SendButton}
+              componentProps={{
+                disabled: (!isFilled(this.state)) || (!canSendAmount) || !Deck.isFull(this.props.asset.deck),
+                stage: this.props.stage,
+                DEFAULT: !canSendAmount ? 'Insufficient Funds!' : `${transactionType} Asset`,
+              }}
             />
           </Body>
         </CardItem>

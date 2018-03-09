@@ -35,11 +35,11 @@ export default connect(
   ({ wallet: { wallet }, assets: { routineStages, decks, balances } }: RootState, { match }: RouterProps): MappedProps => {
     let balance = (balances || []).filter(b => b.deck.id === match.params.id)[0]
     if(balance){
-      return { asset: balance, wallet, stage: routineStages.syncAsset }
+      return { asset: balance, wallet, stage: routineStages.syncAsset, sendAssetsStage: routineStages.sendAssets }
     }
     let deck = (decks || []).filter(deck => deck.id === match.params.id)[0]
     if(deck){
-      return { asset: { deck }, wallet, stage: routineStages.syncAsset  }
+      return { asset: { deck }, wallet, stage: routineStages.syncAsset, sendAssetsStage: routineStages.sendAssets }
     }
     return { redirect: true as true }
   },

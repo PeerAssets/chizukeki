@@ -46,7 +46,7 @@ class Asset extends React.Component<Asset.Props, {}> {
 
   }
   render() {
-    let { asset, sync, wallet, actions: { send } } = this.props
+    let { asset, sync, wallet, actions: { send }, sendAssetsStage } = this.props
     return (
       <Wrapper>
         <View style={this.props.style.main}>
@@ -54,7 +54,7 @@ class Asset extends React.Component<Asset.Props, {}> {
             <Card key='asset' styleNames='asset' style={{ width: '100%' }}>
               <Balance styleNames='focused header' {...asset} />
             </Card>,
-            <SendAsset key='send' {...{ asset, wallet, send }} />
+            <SendAsset key='send' {...{ asset, wallet, send, stage: sendAssetsStage }} />
           ]}
           <DeckCard sync={sync} style={{ width: '100%' }} item={asset.deck} />
         </View>
@@ -67,6 +67,7 @@ namespace Asset {
   export type Props = {
     asset: Summary.Balance | { deck: Deck }
     sync: SyncButton.Logic
+    sendAssetsStage: string | undefined
     actions: {
       send: SendAsset.Props['send']
     }
