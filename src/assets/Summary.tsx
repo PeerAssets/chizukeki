@@ -13,13 +13,14 @@ import { Deck } from './papi'
 import Send from './SendAsset'
 
 namespace Summary {
-  export type BalanceType = 'UNISSUED' | 'ISSUED' | 'RECIEVED'
+  export type BalanceType = 'UNISSUED' | 'ISSUED' | 'RECEIVED'
   export type Balance = {
     type: BalanceType
     value?: number
     account?: string
     deck: Deck
     styleNames?: string
+    _raw?: any // store list of raw balances
   }
   export type ActionableBalance = Balance & { deck: Deck.Full }
   export type Props = {
@@ -57,7 +58,7 @@ function divideByOwnership(balances: Array<Summary.Balance>){
   let divided: Record<Summary.BalanceType, Array<Summary.Balance>> = {
     UNISSUED: [],
     ISSUED: [],
-    RECIEVED: [],
+    RECEIVED: [],
   }
   for (let balance of balances){
     divided[balance.type].push(balance)
@@ -85,7 +86,7 @@ function Balance({ type, value, deck: { id, name }, styleNames = '' }: Summary.B
 class Summary extends React.Component<Summary.Props, {}> {
   render() {
     let { balances, sync } = this.props
-    let { UNISSUED, ISSUED, RECIEVED } = divideByOwnership(balances)
+    let { UNISSUED, ISSUED, RECEIVED } = divideByOwnership(balances)
     return (
       <View style={styles.main as any}>
         <Card styleNames='asset summary' style={{ width: '100%' }}>
@@ -101,14 +102,14 @@ class Summary extends React.Component<Summary.Props, {}> {
             <CardItem key='decks' styleNames='header'>
               <Text>Decks</Text>
             </CardItem>,
-            ...UNISSUED.map((o, key) => <Balance key={key} {...o} />),
-            ...ISSUED.map((o, key) => <Balance key={-key + 1} {...o} />)
+            ...UNISSUED.map(o => <Balance key={o.deck.id} {...o} />),
+            ...ISSUED.map(o => <Balance key={o.deck.id} {...o} />)
           ] : null}
-          {RECIEVED.length ? [
+          {RECEIVED.length ? [
             <CardItem key='balances' styleNames='header'>
               <Text>Balances</Text>
             </CardItem>,
-            ...RECIEVED.map((o, key) => <Balance key={key} {...o} />)
+            ...RECEIVED.map(o => <Balance key={o.deck.id} {...o} />)
           ] : null}
         </Card>
         {this.props.children}

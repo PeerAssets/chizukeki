@@ -80,6 +80,23 @@ const spawnDeck = fetchJSONRoutine<
   }
 })
 
+
+function mergeByShortId(balances: Array<any>){
+  return Object.values(
+    balances.reduce((shortIdMap, { short_id, ...balance }) => {
+      let { _raw = [], value = 0 } = shortIdMap[short_id] || {}
+      shortIdMap[short_id] = {
+        short_id,
+        value: value + balance.value,
+        _raw: [ ..._raw, balance ]
+      }
+      return shortIdMap
+    },
+    <Record<string, any>>{
+    })
+  )
+}
+
 const syncBalances = fetchJSONRoutine.withPolling<
   { address: string, decks: Array<Deck> },
   { balances: Array<Summary.Balance> },
@@ -88,6 +105,7 @@ const syncBalances = fetchJSONRoutine.withPolling<
   type: 'SYNC_ASSET_BALANCES',
   fetchJSON: async ({ address, decks }) => {
     let rawBalances: Array<any> = await papi.balances(address)
+    rawBalances = mergeByShortId(rawBalances)
     let unissued: Array<Summary.Balance> = []
     let deckIdMap = decks.reduce((map, deck) => {
       if(deck.issuer === address){
@@ -98,7 +116,7 @@ const syncBalances = fetchJSONRoutine.withPolling<
     }, {})
     let balances = rawBalances.map(
       ({ short_id, ...balance }) => {
-        balance.type = balance.value > 0 ? 'RECIEVED' : 'ISSUED'
+        balance.type = balance.value > 0 ? 'RECEIVED' : 'ISSUED'
         balance.deck = deckIdMap[short_id]
         unissued = unissued.filter(i => i.deck.id !== balance.deck.id)
         return balance as Summary.Balance
@@ -122,7 +140,7 @@ const syncAsset = fetchJSONRoutine.withPolling<
     balance.deck = deck
     balance.type = (balance.value === undefined) ?
       'UNISSUED' :
-      (balance.value > 0 ? 'RECIEVED' : 'ISSUED')
+      (balance.value > 0 ? 'RECEIVED' : 'ISSUED')
     return balance as Summary.Balance
   },
   pollingInterval: 1 * 60 * 1000, // poll every 1 minutes

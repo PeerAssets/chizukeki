@@ -160,8 +160,8 @@ class SendAsset extends React.Component<SendAsset.Props, SendAsset.Data> {
 
     let amountsMap = this.state.amountsMap
     let totalAmount = Object.values(this.state.amountsMap).reduce((s, v) => s + v, 0)
-    let transactionType = type === 'RECIEVED' ? 'Send' : 'Issue'
-    let canSendAmount = (transactionType === 'Issue' || (totalAmount > balance))
+    let transactionType = type === 'RECEIVED' ? 'Send' : 'Issue'
+    let canSendAmount = (transactionType === 'Issue' || (totalAmount < balance))
 
     let SendButton = (props: { onPress: () => any }) =>
       <RoutineButton styleNames='block'
