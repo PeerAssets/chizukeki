@@ -3,7 +3,13 @@ import { Satoshis, HTTP } from '../lib/utils'
 namespace Wallet {
   export type UTXO = {
     txid: string,
-    scriptPubKey: string,
+    scriptPubKey: string | {
+      addresses: Array<string>,
+      asm: string,
+      hex: string,
+      reqSigs: number,
+      type: string,
+    },
     vout: number,
     amount: number,
     // unused address, confirmations
@@ -17,7 +23,7 @@ namespace Wallet {
     timestamp: Date,
     raw?: {
       [key: string]: any,
-      vout: Array<any>,
+      vout: Array<UTXO>,
       vin: Array<any>,
     }
   }
@@ -40,6 +46,7 @@ type Wallet = {
   _meta: {
     created: Date,
     updated: Date,
+    syncState: 'DEFAULT' | 'OPTIMISTICALLY_PENDING'
   },
   address: string,
   received: number,
@@ -50,12 +57,13 @@ type Wallet = {
   unspentOutputs: Array<Wallet.UTXO>
 }
 
-export function walletMeta() {
+export function walletMeta(): Pick<Wallet, '_meta'> {
   let created = new Date()
   return {
     _meta: {
       created,
       updated: created,
+      syncState: 'DEFAULT'
     }
   }
 }

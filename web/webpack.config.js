@@ -10,7 +10,6 @@ function nodeModule(mod){
 module.exports = {
 
   entry: [
-    'react-hot-loader/patch',
     path.join(__dirname, '../index.web.tsx')
   ],
 
@@ -64,12 +63,11 @@ module.exports = {
           nodeModule('native-base'),
           nodeModule('react-native-web-lists'),
           nodeModule('react-native-easy-grid'),
-          //nodeModule('react-native-drawer'),
+          nodeModule('react-native-drawer'),
           nodeModule('react-native-modal'),
         ],
 
         use: [
-          'react-hot-loader/webpack',
           {
             loader: 'awesome-typescript-loader',
             options: {
@@ -85,7 +83,9 @@ module.exports = {
                 // This aliases 'react-native' to 'react-native-web' and includes only
                 // the modules needed by the app
                 plugins: [
-                  'react-native-web/babel', 'transform-regenerator'
+                  'react-hot-loader/babel',
+                  'react-native-web/babel',
+                  'transform-regenerator'
                 ],
                 // The 'react-native' preset is recommended (or use your own .babelrc)
                 presets : [ 'react-native' ],

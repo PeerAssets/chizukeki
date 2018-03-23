@@ -24,14 +24,31 @@ let initialState = () => ({
     sendTransaction: undefined
   }
 })
+function optimisticallyCacheUnspentOutputs(
+  unspentOutputs: Wallet.Data['unspentOutputs'],
+  raw: Wallet.Transaction['raw'] = { vout: [], vin: [] }
+): Wallet.Data['unspentOutputs'] {
+  // TODO vin typing still sloppy
+  let consumed = raw.vin.map(i => i.prevTxId) 
+  return [
+    ...unspentOutputs.filter(utxo => !consumed.includes(utxo.txid)),
+    raw.vout[raw.vout.length - 1]
+  ]
+}
 
 function applyTransaction(
-  { balance, transactions, ...wallet }: Wallet.Data,
+  { balance, unspentOutputs, transactions, _meta, ...wallet }: Wallet.Data,
   { amount, ...transaction }: Wallet.PendingTransaction
 ): Wallet.Data {
   balance = balance - amount
   return {
     ...wallet,
+    _meta: {
+      ..._meta,
+      updated: new Date(),
+      syncState: 'OPTIMISTICALLY_PENDING'
+    },
+    unspentOutputs: optimisticallyCacheUnspentOutputs(unspentOutputs, transaction.raw),
     balance,
     transactions: [
       { balance, amount: - amount, confirmations: 0, ...transaction },
@@ -40,26 +57,37 @@ function applyTransaction(
   }
 }
 
-function preservePendingTransactions(
+function stillPendingTransactions(
   old: Array<Wallet.Transaction>,
   synced: Array<Wallet.Transaction>
 ){
   let syncedIds = synced.map(t => t.id)
-  // transactions are in decending order
-  return [
-    ...old.filter(t => !syncedIds.includes(t.id)),
-    ...synced,
-  ]
+  return old.filter(t => !syncedIds.includes(t.id))
 }
 
-function applySync({ old, synced }: {
+function byTimestampDesc(a: Wallet.Transaction, b: Wallet.Transaction){
+  return (b.timestamp || new Date()).getTime() - (a.timestamp || new Date()).getTime()
+}
+
+function applySync({ old, synced: { _meta, transactions, unspentOutputs, ...synced } }: {
   old: Wallet.Loading | Wallet.Data,
   synced: Wallet.Synced,
 }): Wallet.Data {
+  let stillPending = stillPendingTransactions(
+    Wallet.isLoaded(old) ? old.transactions : [],
+    transactions
+  )
   return {
     ...old,
     ...synced,
-    transactions: preservePendingTransactions(Wallet.isLoaded(old) ? old.transactions : [], synced.transactions)
+    _meta: {
+      created: '_meta' in old ? old._meta.created : _meta.updated,
+      updated: _meta.updated,
+      syncState: stillPending.length ? 'OPTIMISTICALLY_PENDING' : 'DEFAULT'
+    },
+    unspentOutputs: stillPending.length && 'unspentOutputs' in old ?
+      old.unspentOutputs : unspentOutputs,
+    transactions: [ ...stillPending, ...transactions ].sort(byTimestampDesc)
   }
 }
 

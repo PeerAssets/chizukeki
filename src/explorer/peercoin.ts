@@ -124,6 +124,15 @@ namespace normalize {
     }
   }
 
+  export function vout(txid: string, { n, value, ...raw }: RawTransaction.UTXO): Wallet.UTXO {
+    return {
+      txid,
+      amount: value,
+      vout: n,
+      ...raw,
+    }
+  }
+
   // todo converting to/from satoshis to avoid precision errors is inefficient 
   export function transactions({ address, balance }: Wallet, txs: Array<RawTransaction.Relative>){
     let nTransactions: Array<Wallet.Transaction> = []
@@ -142,7 +151,10 @@ namespace normalize {
         fee,
         balance,
         timestamp: new Date(time * 1000),
-        raw
+        raw: {
+          ...raw,
+          vout: vout.map(out => normalize.vout(id, out))
+        }
       })
       balance -= Satoshis.toAmount(amount)
     }
@@ -226,11 +238,15 @@ class PeercoinExplorer {
     let { outputs, inputs, ...raw }: {
       hash: string, outputs: Array<any>, inputs: Array<any>
     } = bitcore.Transaction(hex).toObject()
-    // TODO need to update available unspent transactions after send locally?
     return {
       id: raw.hash,
       timestamp: new Date(),
-      raw: { vout: outputs, vin: inputs, ...raw }
+      raw: {
+        vout: outputs.map(({ satoshis, script, ...txn }, vout) =>
+          ({ ...txn, txid: raw.hash, vout, scriptPubKey: script, amount: Satoshis.toAmount(satoshis) })),
+        vin: inputs,
+        ...raw
+      }
     }
   }
 
