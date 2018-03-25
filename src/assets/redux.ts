@@ -1,14 +1,12 @@
 import { AnyAction } from 'typescript-fsa';
 import { trackRoutineStages } from '../generics/utils'
 
-import saga, { syncDecks, getDeckDetails, syncBalances, sendAssets, spawnDeck, syncAsset } from './saga'
+import saga, { syncAssets, sendAssets, spawnDeck, syncAsset } from './saga'
 import { Deck } from './papi'
 import Assets from './Assets'
 
 const routines = {
-  syncDecks: syncDecks.routine,
-  getDeckDetails: getDeckDetails.routine,
-  syncBalances: syncBalances.routine,
+  syncAssets: syncAssets.routine,
   sendAssets: sendAssets.routine,
   syncAsset: syncAsset.routine,
   spawnDeck: spawnDeck.routine
@@ -19,12 +17,11 @@ type Stages = { routineStages: { [key in keyof typeof routines]: string | undefi
 export type State = Assets.Data & Stages
 
 let initialState = () => ({
-  decks: null,
-  balances: null,
+  assets: null,
   routineStages: {
     syncDecks: undefined,
     getDeckDetails: undefined,
-    syncBalances: undefined,
+    syncAssets: undefined,
     sendAssets: undefined,
     syncAsset: undefined,
     spawnDeck: undefined
@@ -39,44 +36,27 @@ function handleSync(
   return synced.map(s => Object.assign({}, oldMap[s.id] || {}, s))
 }
 
-function logout({ decks }: State){
-  return { ...initialState(), decks }
+function logout({}: State){
+  return initialState()
 }
 
 
 function assetsReducer(state: State = initialState(), action: AnyAction): State {
-  return syncDecks.routine.switch<State>(action, {
+  return syncAssets.routine.switch<State>(action, {
     started: payload => state,
-    done: (payload) => ({
+    done: ({ assets }) => ({
       ...state,
-      decks: state.decks ? handleSync(state.decks, payload) : payload
-    }),
-    stopped: () => state,
-    failed: () => state
-  }) ||
-  getDeckDetails.routine.switch<State>(action, {
-    started: payload => state,
-    done: (payload) => ({
-      ...state,
-      decks: (state.decks || <Array<Deck>>[]).map(deck => deck.id === payload.id ? payload : deck)
-    }),
-    failed: () => state
-  }) ||
-  syncBalances.routine.switch<State>(action, {
-    started: payload => state,
-    done: ({ balances }) => ({
-      ...state,
-      balances
+      assets
     }),
     stopped: () => state,
     failed: () => state
   }) ||
   syncAsset.routine.switch<State>(action, {
     started: payload => state,
-    done: (balance) => ({
+    done: (asset) => ({
       ...state,
-      balances: (state.balances ? state.balances.map(b =>
-        b.deck.id === balance.deck.id ? balance : b) : [ balance ])
+      assets: (state.assets ? state.assets.map(a =>
+        a.deck.id === asset.deck.id ? asset : a) : [ asset ])
     }),
     stopped: () => state,
     failed: () => state

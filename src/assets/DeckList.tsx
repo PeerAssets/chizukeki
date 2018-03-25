@@ -39,7 +39,7 @@ function Deck({ item: deck, sync,...props }: { item: Deck.Data, sync?: SyncButto
 namespace DeckList {
   export type Data = { decks: Array<Deck.Data> }
   export type Props = Data & {
-    sync: SyncButton.Logic
+    sync?: SyncButton.Logic
   }
 }
 
@@ -47,9 +47,9 @@ function DeckList({ decks, sync }: DeckList.Props) {
   return (
     <View style={styles.container}>
       <Text>
-        <H2>All Assets</H2>
+        <H2>Decks</H2>
         <Text styleNames='note'> {decks.length} total </Text>
-        <SyncButton {...sync} styleNames='small'/>
+        { sync && <SyncButton {...sync} styleNames='small'/> }
       </Text>
       <FlatList
         enableEmptySections // silence error, shouldn't be necessary when react-native-web implements FlatList

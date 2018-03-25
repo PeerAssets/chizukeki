@@ -44,7 +44,7 @@ namespace SendAsset {
     stage?: string | undefined,
     send: (data: Payload) => any,
     wallet: Wallet.Data,
-    asset: Summary.Balance
+    asset: Summary.Asset
   }
 }
 
@@ -165,7 +165,7 @@ class SendAsset extends React.Component<SendAsset.Props, SendAsset.Data> {
   }
   render() {
     let {
-      asset: { deck: { name, decimals }, type },
+      asset: { deck: { name, decimals }, balance: { type } },
       wallet: { keys, balance }
     } = this.props
 

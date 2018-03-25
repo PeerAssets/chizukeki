@@ -35,7 +35,7 @@ let styles = {
   }
 }
 
-function isBalance(asset: Summary.Balance | { deck: Deck }): asset is Summary.Balance {
+function hasBalance(asset: Summary.Asset | { deck: Deck }): asset is Summary.Asset {
   return asset.hasOwnProperty('type')
 }
 
@@ -50,7 +50,7 @@ class Asset extends React.Component<Asset.Props, {}> {
     return (
       <Wrapper>
         <View style={this.props.style.main}>
-          { isBalance(asset) && [
+          { hasBalance(asset) && [
             <Card key='asset' styleNames='asset' style={{ width: '100%' }}>
               <Balance styleNames='focused header' {...asset} />
             </Card>,
@@ -65,7 +65,7 @@ class Asset extends React.Component<Asset.Props, {}> {
 
 namespace Asset {
   export type Props = {
-    asset: Summary.Balance | { deck: Deck }
+    asset: Summary.Asset | { deck: Deck }
     sync: SyncButton.Logic
     sendAssetsStage: string | undefined
     actions: {

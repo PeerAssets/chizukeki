@@ -57,6 +57,14 @@ class Papi {
     let decks = await this.apiRequest('decks')
     return decks.map(({ issue_mode, ...rest }) => ({ issueMode: issue_mode, ...rest }))
   }
+  deckSummary = async (deckPrefix: string): Promise<Deck.Summary> => {
+    let filters = [
+      { name: "id", "op": "like", "val": `${deckPrefix}%`}
+    ]
+    let { objects: decks } = await this.restlessRequest('decks', { filters, results_per_page: 1 })
+    let { issue_mode, ...deck } = decks[0]
+    return { issueMode: issue_mode, ...deck } as Deck.Summary
+  }
   deckDetails = async (deck: Deck.Summary, address?: string): Promise<Deck.Full> => {
     let [ balances, spawnTransaction ] = await Promise.all([
       this.apiRequest<{ [address: string]: number }>('decks', deck.id, 'balances'),
@@ -79,6 +87,20 @@ class Papi {
     ]
     let { objects: balances } = await this.restlessRequest('balances', { filters, results_per_page: 1 })
     return balances[0]
+  }
+  deckSummaries = async (address: string, deckPrefixes: Array<string>): Promise<Array<Deck.Summary>> => {
+    let filters = [
+      { "or": [
+        { name: "issuer", "op": "eq", "val": address},
+        ...deckPrefixes.map(deckPrefix => ({
+          name: "id",
+          "op": "like",
+          "val": `${deckPrefix}%`
+        }))
+      ]}
+    ]
+    let { objects: decks } = await this.restlessRequest('decks', { filters, results_per_page: 100 })
+    return decks.map(({ issue_mode, ...rest }) => ({ issueMode: issue_mode, ...rest }))
   }
 } 
 

@@ -12,7 +12,7 @@ import Wallet from '../wallet/Wallet'
 import * as Redux from './redux'
 import Asset from './Asset' 
 
-let { getDeckDetails, sendAssets, syncAsset } = Redux.routines
+let { sendAssets, syncAsset } = Redux.routines
 
 type RootState = { assets: Redux.State,  wallet: { wallet: Wallet.Data } }
 type RouterProps = { match: match<{ id : string }> }
@@ -32,14 +32,12 @@ function Container(_props: MappedProps & { actions: Record<'send' | 'triggerSync
 }
 
 export default connect(
-  ({ wallet: { wallet }, assets: { routineStages, decks, balances } }: RootState, { match }: RouterProps): MappedProps => {
-    let balance = (balances || []).filter(b => b.deck.id === match.params.id)[0]
-    if(balance){
-      return { asset: balance, wallet, stage: routineStages.syncAsset, sendAssetsStage: routineStages.sendAssets }
-    }
-    let deck = (decks || []).filter(deck => deck.id === match.params.id)[0]
-    if(deck){
-      return { asset: { deck }, wallet, stage: routineStages.syncAsset, sendAssetsStage: routineStages.sendAssets }
+  ({ wallet: { wallet }, assets: { routineStages, assets } }: RootState, { match }: RouterProps): MappedProps => {
+
+    // todo right not unowned assets aren't synced
+    let asset = (assets || []).filter(a => a.deck.id === match.params.id)[0]
+    if(asset){
+      return { asset, wallet, stage: routineStages.syncAsset, sendAssetsStage: routineStages.sendAssets }
     }
     return { redirect: true as true }
   },

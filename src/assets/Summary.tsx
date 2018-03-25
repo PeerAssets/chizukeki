@@ -18,13 +18,15 @@ namespace Summary {
     type: BalanceType
     value?: number
     account?: string
-    deck: Deck
-    styleNames?: string
     _raw?: any // store list of raw balances
+  }
+  export type Asset = {
+    balance: Balance,
+    deck: Deck
   }
   export type ActionableBalance = Balance & { deck: Deck.Full }
   export type Props = {
-    balances: Array<Balance>
+    assets: Array<Asset>
     style?: any,
     sync: SyncButton.Logic
   }
@@ -54,19 +56,19 @@ let styles = {
 }
 
 
-function divideByOwnership(balances: Array<Summary.Balance>){
-  let divided: Record<Summary.BalanceType, Array<Summary.Balance>> = {
+function divideByOwnership(assets: Array<Summary.Asset>){
+  let divided: Record<Summary.BalanceType, Array<Summary.Asset>> = {
     UNISSUED: [],
     ISSUED: [],
     RECEIVED: [],
   }
-  for (let balance of balances){
-    divided[balance.type].push(balance)
+  for (let asset of assets){
+    divided[asset.balance.type].push(asset)
   }
   return divided
 }
 
-function Balance({ type, value, deck: { id, name }, styleNames = '' }: Summary.Balance) {
+function Balance({ balance: { type, value }, deck: { id, name }, styleNames = '' }: Summary.Asset & { styleNames?: string }) {
   return (
     <Link to={`/assets/${id}`}>
       <CardItem styleNames={`balance ${type.toLowerCase()} ${styleNames}`}>
@@ -85,8 +87,8 @@ function Balance({ type, value, deck: { id, name }, styleNames = '' }: Summary.B
 
 class Summary extends React.Component<Summary.Props, {}> {
   render() {
-    let { balances, sync } = this.props
-    let { UNISSUED, ISSUED, RECEIVED } = divideByOwnership(balances)
+    let { assets, sync } = this.props
+    let { UNISSUED, ISSUED, RECEIVED } = divideByOwnership(assets)
     return (
       <View style={styles.main as any}>
         <Card styleNames='asset summary' style={{ width: '100%' }}>

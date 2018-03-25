@@ -20,7 +20,7 @@ module.exports = {
   },
 
   // Enable sourcemaps for debugging webpack's output.
-  devtool: "eval-source-map",
+  devtool: "inline-source-map",
 
   resolve: {
     symlinks: false,

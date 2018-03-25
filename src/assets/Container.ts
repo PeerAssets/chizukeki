@@ -9,17 +9,16 @@ import Wallet from '../wallet/Wallet'
 import * as Redux from './redux'
 import Assets from './Assets' 
 
-let { syncDecks, getDeckDetails, syncBalances, spawnDeck } = Redux.routines
+let { syncAssets, spawnDeck } = Redux.routines
 
 type RootState = { assets: Redux.State,  wallet: { wallet: Wallet.Data } }
 export default connect(
-  ({ assets: { routineStages, decks, balances }, wallet: { wallet } }: RootState) => {
-    return { decks, balances, wallet, stages: routineStages }
+  ({ assets: { routineStages, assets }, wallet: { wallet } }: RootState) => {
+    return { assets, wallet, stages: routineStages }
   },
   (dispatch: Dispatch<any>) => ({
     actions: {
-      syncDecks: bindActionCreators(pick(['trigger', 'stop'], syncDecks), dispatch),
-      syncBalances: bindActionCreators(pick(['trigger', 'stop'], syncBalances), dispatch),
+      syncAssets: bindActionCreators(pick(['trigger', 'stop'], syncAssets), dispatch),
       // todo ugly
       spawnDeck: bindActionCreators(pick(['trigger'], spawnDeck), dispatch).trigger
     }

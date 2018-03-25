@@ -9,26 +9,6 @@ import Summary from './Summary'
 import SendAsset from './SendAsset'
 import SpawnDeck from './SpawnDeck'
 
-const syncDecks = fetchJSONRoutine.withPolling<
-  {},
-  Array<Deck.Summary>,
-  Error
->({
-  type: 'SYNC_DECK_LIST',
-  fetchJSON: async () => papi.decks(),
-  pollingInterval: 5 * 60 * 1000, // poll every 5 minutes
-})
-
-const getDeckDetails = fetchJSONRoutine<
-  { deck: Deck.Summary, address: string },
-  Deck.Full,
-  Error
->({
-  type: 'GET_DECK_DETAILS',
-  fetchJSON: ({ deck, address }: { deck: Deck.Summary, address?: string }) => 
-    papi.deckDetails(deck, deck.issuer === address ? address : undefined)
-})
-
 const sendAssets = fetchJSONRoutine<
   SendAsset.Payload,
   Wallet.PendingTransaction,
@@ -97,61 +77,67 @@ function mergeByShortId(balances: Array<any>){
   )
 }
 
-const syncBalances = fetchJSONRoutine.withPolling<
-  { address: string, decks: Array<Deck> },
-  { balances: Array<Summary.Balance> },
-  Error
->({
-  type: 'SYNC_ASSET_BALANCES',
-  fetchJSON: async ({ address, decks }) => {
-    let rawBalances: Array<any> = await papi.balances(address)
-    rawBalances = mergeByShortId(rawBalances)
-    let unissued: Array<Summary.Balance> = []
-    let deckIdMap = decks.reduce((map, deck) => {
-      if(deck.issuer === address){
-        unissued.push({ deck, type: 'UNISSUED' })
-      }
-      map[deck.id.substr(0, 10)] = deck
-      return map
-    }, {})
-    let balances = rawBalances.map(
-      ({ short_id, ...balance }) => {
-        balance.type = balance.value > 0 ? 'RECEIVED' : 'ISSUED'
-        balance.deck = deckIdMap[short_id]
-        unissued = unissued.filter(i => i.deck.id !== balance.deck.id)
-        return balance as Summary.Balance
-      })
-    return { balances: unissued.concat(balances) }
-  },
-  pollingInterval: 1 * 60 * 1000, // poll every 1 minutes
-})
 
 const syncAsset = fetchJSONRoutine.withPolling<
-  { asset: Summary.Balance, address: string },
-  Summary.Balance,
+  { asset: Summary.Asset, address: string },
+  Summary.Asset,
   Error
 >({
   type: 'SYNC_ASSET',
   fetchJSON: async ({ asset, address }) => {
-    let [ deck, balance = asset ] = await Promise.all([
+    let [ deck, balance = asset.balance ] = await Promise.all([
       papi.deckDetails(asset.deck, asset.deck.issuer === address ? address : undefined),
       papi.balance(address, asset.deck.id)
     ])
-    balance.deck = deck
     balance.type = (balance.value === undefined) ?
       'UNISSUED' :
       (balance.value > 0 ? 'RECEIVED' : 'ISSUED')
-    return balance as Summary.Balance
+    return { deck, balance } as Summary.Asset
   },
   pollingInterval: 1 * 60 * 1000, // poll every 1 minutes
 })
 
+/*
+ * grab balances
+ * grab all decks that start with a balance short_id OR are issued by the user
+ * merge (request sorting from restless?)
+*/
+
+const syncAssets = fetchJSONRoutine.withPolling<
+  { address: string },
+  { assets: Array<Summary.Asset> },
+  Error
+>({
+  type: 'SYNC_ASSETS',
+  fetchJSON: async ({ address }) => {
+    let rawBalances: Array<any> = await papi.balances(address)
+    rawBalances = mergeByShortId(rawBalances)
+    let decks: Array<Deck.Summary> = await papi.deckSummaries(address, rawBalances.map(b => b.short_id))
+    let unissued: Array<Summary.Asset> = []
+    let deckIdMap = decks.reduce((map, deck) => {
+      if(deck.issuer === address){
+        unissued.push({ deck, balance: { type: 'UNISSUED' } })
+      }
+      map[deck.id.substr(0, 10)] = deck
+      return map
+    }, {})
+    let assets = rawBalances.map(
+      ({ short_id, ...balance }) => {
+        balance.type = balance.value > 0 ? 'RECEIVED' : 'ISSUED'
+        let deck = deckIdMap[short_id]
+        unissued = unissued.filter(i => i.deck.id !== deck.id)
+        return { deck, balance } as Summary.Asset
+      })
+    return { assets: unissued.concat(assets) }
+  },
+  pollingInterval: 1 * 60 * 1000, // poll every 1 minutes
+})
+
+
 // TODO cleanup copypasta
 export default function * (){
   yield all([
-    syncDecks.trigger(),
-    getDeckDetails.trigger(),
-    syncBalances.trigger(),
+    syncAssets.trigger(),
     sendAssets.trigger(),
     syncAsset.trigger(),
     spawnDeck.trigger()
@@ -159,4 +145,4 @@ export default function * (){
 }
 
 
-export { syncDecks, getDeckDetails, syncBalances, sendAssets, syncAsset, spawnDeck }
+export { syncAssets, sendAssets, syncAsset, spawnDeck }
