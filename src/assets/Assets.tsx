@@ -9,8 +9,20 @@ import Wallet from '../wallet/Wallet'
 
 import Summary from './Summary'
 import SpawnDeck from './SpawnDeck'
-import DeckList from './DeckList'
+import CardTransferList, { CardTransfer } from './CardTransfer'
 
+function byTimestampDesc(a: CardTransfer.Data, b: CardTransfer.Data){
+  return new Date(b.transaction.timestamp).getTime() - new Date(a.transaction.timestamp).getTime()
+}
+
+function mergeCardTransfers(assets: Summary.Props['assets']){
+  return assets.reduce(
+    (transfers, a) => transfers.concat(
+      a.cardTransfers.map(t => (t.deck_name = a.deck.name, t))
+    ),
+    [] as CardTransfer.Data[]
+  ).sort(byTimestampDesc)
+}
 
 let styles = {
   main: {
@@ -38,7 +50,7 @@ class Assets extends React.Component<Assets.Props, {}> {
         <Summary sync={syncAssets} assets={assets || []}>
           <SpawnDeck wallet={wallet} spawn={actions.spawnDeck} stage={stages.spawnDeck} />
         </Summary>
-        <DeckList decks={(assets || []).map(a => a.deck)} />
+        <CardTransferList cardTransfers={mergeCardTransfers(assets || [])} />
       </Wrapper>
     )
   }

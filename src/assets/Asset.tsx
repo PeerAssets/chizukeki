@@ -6,11 +6,12 @@ import Wrapper from '../generics/Wrapper'
 import SyncButton from '../generics/sync-button'
 import Modal from '../generics/modal.web'
 
-import Summary, { Balance } from './Summary'
+import Summary from './AssetSummary'
 import SendAsset from './SendAsset'
 
-import { Deck as DeckCard } from './DeckList'
 import { Deck } from './papi'
+
+import CardTransferList from './CardTransfer'
 
 let styles = {
   main: {
@@ -35,11 +36,6 @@ let styles = {
   }
 }
 
-function hasBalance(asset: Summary.Asset | { deck: Deck }): asset is Summary.Asset {
-  return asset.hasOwnProperty('type')
-}
-
-
 @connectStyle('PeerKeeper.Asset', styles)
 class Asset extends React.Component<Asset.Props, {}> {
   componentDidMount(){
@@ -49,15 +45,17 @@ class Asset extends React.Component<Asset.Props, {}> {
     let { asset, sync, wallet, actions: { send }, sendAssetsStage } = this.props
     return (
       <Wrapper>
-        <View style={this.props.style.main}>
-          { hasBalance(asset) && [
-            <Card key='asset' styleNames='asset' style={{ width: '100%' }}>
-              <Balance styleNames='focused header' {...asset} />
-            </Card>,
-            <SendAsset key='send' {...{ asset, wallet, send, stage: sendAssetsStage }} />
-          ]}
-          <DeckCard sync={sync} style={{ width: '100%' }} item={asset.deck} />
+        <View style={styles.main as any}>
+          <Card styleNames='asset summary' style={{ width: '100%', padding: 10 }}>
+            <Summary asset={asset} sync={sync} />
+          </Card>
+            {'balance' in asset &&
+              <SendAsset key='send' {...{ asset, wallet, send, stage: sendAssetsStage }} />
+            }
         </View>
+        { ('cardTransfers' in asset) &&
+          <CardTransferList style={{ width: '100%' }} cardTransfers={asset.cardTransfers} />
+        }
       </Wrapper>
     )
   }

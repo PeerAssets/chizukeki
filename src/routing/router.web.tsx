@@ -2,9 +2,10 @@ import * as React from 'react'
 import * as RouterPackage from 'react-router-dom'
 import { LinkProps } from 'react-router-dom'
 
-function Link({ onPress: onClick, style = { textDecoration: 'none' }, ...props }: LinkProps & { onPress?: LinkProps['onClick'] }){
+let defaultStyle = { textDecoration: 'none' }
+function Link({ onPress: onClick, style = {}, ...props }: LinkProps & { onPress?: LinkProps['onClick'] }){
 
-  return <RouterPackage.Link {...onClick ? { onClick } : {}} {...props} style={style}/>
+  return <RouterPackage.Link {...onClick ? { onClick } : {}} {...props} style={{...defaultStyle, ...style }}/>
 }
 
 const { Route, Redirect } = RouterPackage

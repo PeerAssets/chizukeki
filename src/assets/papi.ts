@@ -1,5 +1,7 @@
 import configure from '../configure'
-import peercoin from '../explorer'
+import peercoin, { Wallet } from '../explorer'
+
+import IssueMode from './issueModes'
 
 async function getJSON<T = any>(url: string, emptyErrorMessage?: void | string) {
   let response = await fetch(url)
@@ -19,7 +21,7 @@ namespace Deck {
     id: string
     name: string
     issuer: string
-    issueMode: string
+    issueMode: IssueMode.Encoding
     decimals: number
     subscribed: boolean
   }
@@ -34,6 +36,22 @@ namespace Deck {
 }
 
 type Deck = Deck.Summary | Deck.Full
+
+export type CardTransfer = {
+  type: 'CardBurn' | 'CardIssue' | 'CardTransfer'
+  amount: number,
+  txid: string,
+  id: string,
+  deck_id: string,
+  deck_name?: string,
+  receiver: string,
+  sender: string,
+
+  blockseq: number,
+  blocknum: number,
+
+  transaction: Wallet.Transaction
+}
 
 class Papi {
   explorerUrl =  /*/ 'http://localhost:5555' /*/ 'https://papi.peercoin.net' /**/
@@ -101,6 +119,25 @@ class Papi {
     ]
     let { objects: decks } = await this.restlessRequest('decks', { filters, results_per_page: 100 })
     return decks.map(({ issue_mode, ...rest }) => ({ issueMode: issue_mode, ...rest }))
+  }
+  cards = async (address: string): Promise<Array<CardTransfer>> => {
+    let filters = [{
+      "or": [
+        { name: "sender", "op": "like", "val": `${address}%`},
+        { name: "receiver", "op": "like", "val": `${address}%`},
+      ]
+    }]
+    let { objects: cards } = await this.restlessRequest('cards', { filters, results_per_page: 100 })
+    cards = await Promise.all(cards.map(async ({ amount, receiver, ctype, ...card }) => {
+      let transaction = await peercoin.getRelativeTransaction(card.txid, address)
+      return {
+        amount: receiver.startsWith(address) ? amount : -amount,
+        type: ctype,
+        transaction,
+        ...card,
+      }
+    }))
+    return cards
   }
 } 
 

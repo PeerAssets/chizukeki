@@ -5,13 +5,15 @@ import { Button, Card, Left, CardItem, Body, Text, H2, Icon } from 'native-base'
 import FlatList from 'react-native-web-lists/src/FlatList'
 import moment from 'moment'
 
-import { Wallet } from '../explorer'
+import { CardTransfer as CardTransferData } from './papi'
 
-namespace WalletTransaction {
-  export type Data = Wallet.Transaction
+namespace CardTransfer {
+  export type Data = CardTransferData
 }
 
-function WalletTransaction({ item: { amount, timestamp, confirmations } }: { item: WalletTransaction.Data }) {
+function CardTransfer({
+  item: { amount, deck_name = '', transaction: { confirmations, timestamp } }
+}: { item: CardTransfer.Data }) {
   let io = (inbound, outbound) => amount > 0 ? inbound : outbound
   let textProps = { styleNames: io('success', 'dark') }
   return (
@@ -22,7 +24,7 @@ function WalletTransaction({ item: { amount, timestamp, confirmations } }: { ite
           <Body>
             <Text {...textProps}>
               {io('+', '-')}
-              {amount.toString()} PPC
+              {amount.toString()} {deck_name}
             </Text>
             <Text styleNames='note'>{moment(timestamp).fromNow()}</Text>
           </Body>
@@ -42,21 +44,21 @@ function WalletTransaction({ item: { amount, timestamp, confirmations } }: { ite
   )
 }
 
-namespace TransactionList {
-  export type Data = Array<WalletTransaction.Data>
+namespace CardTransferList {
+  export type Data = Array<CardTransfer.Data>
 }
 
-function TransactionList({ transactions }: { transactions: TransactionList.Data }) {
+function CardTransferList({ cardTransfers, style = {} }: { style?: any, cardTransfers: CardTransferList.Data }) {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, style]}>
       <Text>
-        <H2>Transactions</H2>
-        <Text styleNames='note'> {transactions.length} total </Text>
+        <H2>Card Transfers</H2>
+        <Text styleNames='note'> {cardTransfers.length} total </Text>
       </Text>
       <FlatList
         enableEmptySections // silence error, shouldn't be necessary when react-native-web implements FlatList
-        data={transactions}
-        renderItem={WalletTransaction} />
+        data={cardTransfers}
+        renderItem={CardTransfer} />
     </View>
   )
 }
@@ -73,5 +75,6 @@ let styles = {
   }
 }
 
-export { WalletTransaction }
-export default TransactionList
+
+export { CardTransfer }
+export default CardTransferList

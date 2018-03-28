@@ -59,7 +59,7 @@ namespace RawTransaction {
     privateKey: string,
     fee?: number
   }
-  export type Relative = RawTransaction & { type: 'CREDIT' | 'DEBIT', fee: number, inputTotal: number }
+  export type Relative = RawTransaction & { type: 'CREDIT' | 'DEBIT' | 'UNINVOLVED', fee: number, inputTotal: number }
 }
 
 type RawTransaction = {
@@ -133,30 +133,36 @@ namespace normalize {
     }
   }
 
+  export function transaction(address: string, raw: RawTransaction.Relative){
+    let { txid: id, confirmations, time, vout, type, inputTotal, fee } = raw
+    let amount = type === 'CREDIT' ? 0 : -Satoshis.fromAmount(inputTotal - fee)
+    for (let out of vout) {
+      if (out.scriptPubKey.addresses && out.scriptPubKey.addresses.includes(address)) {
+        amount += Satoshis.fromAmount(out.value)
+      }
+    }
+    return {
+      id,
+      confirmations,
+      amount: Satoshis.toAmount(amount),
+      fee,
+      balance: NaN,
+      timestamp: new Date(time * 1000),
+      raw: {
+        ...raw,
+        vout: vout.map(out => normalize.vout(id, out))
+      }
+    }
+  }
+
   // todo converting to/from satoshis to avoid precision errors is inefficient 
   export function transactions({ address, balance }: Wallet, txs: Array<RawTransaction.Relative>){
     let nTransactions: Array<Wallet.Transaction> = []
     for (let raw of txs.reverse()){
-      let { txid: id, confirmations, time, vout, type, inputTotal, fee } = raw
-      let amount = type === 'CREDIT' ? 0 : -Satoshis.fromAmount(inputTotal - fee)
-      for (let out of vout){
-        if(out.scriptPubKey.addresses && out.scriptPubKey.addresses.includes(address)){
-          amount += Satoshis.fromAmount(out.value)
-        }
-      }
-      nTransactions.push({
-        id,
-        confirmations,
-        amount: Satoshis.toAmount(amount),
-        fee,
-        balance,
-        timestamp: new Date(time * 1000),
-        raw: {
-          ...raw,
-          vout: vout.map(out => normalize.vout(id, out))
-        }
-      })
-      balance -= Satoshis.toAmount(amount)
+      let tx = normalize.transaction(address, raw)
+      tx.balance = balance
+      nTransactions.push(tx)
+      balance -= Satoshis.toAmount(tx.amount)
     }
     return nTransactions
   }
@@ -285,6 +291,14 @@ class PeercoinExplorer {
     let inputTotal = info.inputs.reduce((total, i) => total + Satoshis.btc.toAmount(i.amount), 0)
     let fee = inputTotal - Satoshis.btc.toAmount(info.total)
     return Object.assign(raw, { type, fee, inputTotal })
+  }
+
+  getRelativeTransaction = async (id: string, address: string) => {
+    let transaction = await this.getRelativeRawTransaction(id, address)
+    if (isError(transaction)){
+      return transaction
+    }
+    return normalize.transaction(address, transaction)
   }
 
   wallet = async (address: string) => {

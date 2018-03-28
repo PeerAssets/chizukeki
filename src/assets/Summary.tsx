@@ -12,25 +12,19 @@ import Wallet from '../wallet/Wallet'
 import { Deck } from './papi'
 import Send from './SendAsset'
 
+import CardTransferList from './CardTransfer'
+
+import AssetSummary from './AssetSummary'
+
 namespace Summary {
-  export type BalanceType = 'UNISSUED' | 'ISSUED' | 'RECEIVED'
-  export type Balance = {
-    type: BalanceType
-    value?: number
-    account?: string
-    _raw?: any // store list of raw balances
-  }
-  export type Asset = {
-    balance: Balance,
-    deck: Deck
-  }
-  export type ActionableBalance = Balance & { deck: Deck.Full }
+  export type Asset = AssetSummary.Asset
   export type Props = {
     assets: Array<Asset>
     style?: any,
     sync: SyncButton.Logic
   }
 }
+
 
 let styles = {
   main: {
@@ -56,34 +50,26 @@ let styles = {
 }
 
 
-function divideByOwnership(assets: Array<Summary.Asset>){
-  let divided: Record<Summary.BalanceType, Array<Summary.Asset>> = {
+function divideByOwnership(assets: Array<Summary.Asset>) {
+  let divided: Record<Summary.Asset['balance']['type'], Array<Summary.Asset>> = {
     UNISSUED: [],
     ISSUED: [],
     RECEIVED: [],
   }
-  for (let asset of assets){
+  for (let asset of assets) {
     divided[asset.balance.type].push(asset)
   }
   return divided
 }
 
-function Balance({ balance: { type, value }, deck: { id, name }, styleNames = '' }: Summary.Asset & { styleNames?: string }) {
-  return (
-    <Link to={`/assets/${id}`}>
-      <CardItem styleNames={`balance ${type.toLowerCase()} ${styleNames}`}>
-        <Text styleNames='name'>{name}</Text>
-        <Text styleNames='value'>
-          {value !== undefined ? Math.abs(value).toLocaleString('en') : '-'}
-        </Text>
-        <Text styleNames='type'>
-          {type.toLowerCase()}
-        </Text>
-      </CardItem>
-    </Link>
-  )
+function pad(padding: number) {
+  return {
+    paddingTop: padding,
+    paddingLeft: padding,
+    paddingRight: padding,
+    paddingBottom: padding,
+  }
 }
-
 
 class Summary extends React.Component<Summary.Props, {}> {
   render() {
@@ -91,36 +77,37 @@ class Summary extends React.Component<Summary.Props, {}> {
     let { UNISSUED, ISSUED, RECEIVED } = divideByOwnership(assets)
     return (
       <View style={styles.main as any}>
-        <Card styleNames='asset summary' style={{ width: '100%' }}>
+        <Card styleNames='asset summary' style={{ width: '100%', padding: 10 }}>
           <CardItem styleNames='header'>
-            <Body style={{justifyContent: 'space-between', flexWrap: 'wrap', flexDirection: 'row'}}>
+            <Body style={{ justifyContent: 'space-between', flexWrap: 'wrap', flexDirection: 'row' }}>
               <H2>Your Assets</H2>
               <Right>
                 <SyncButton {...sync} whenMounted />
               </Right>
             </Body>
           </CardItem>
-          {(UNISSUED.length || ISSUED.length) ? [
-            <CardItem key='decks' styleNames='header'>
-              <Text>Decks</Text>
-            </CardItem>,
-            ...UNISSUED.map(o => <Balance key={o.deck.id} {...o} />),
-            ...ISSUED.map(o => <Balance key={o.deck.id} {...o} />)
-          ] : null}
-          {RECEIVED.length ? [
-            <CardItem key='balances' styleNames='header'>
-              <Text>Balances</Text>
-            </CardItem>,
-            ...RECEIVED.map(o => <Balance key={o.deck.id} {...o} />)
-          ] : null}
         </Card>
+        {(UNISSUED.length || ISSUED.length) ? (
+          <Card styleNames='asset summary' style={{ width: '100%', padding: 10 }}>
+            <CardItem styleNames='header' style={pad(10)}>
+              <H3>Your Decks</H3>
+            </CardItem>
+            {...UNISSUED.map(o => <AssetSummary key={o.deck.id} asset={o} />)}
+            {...ISSUED.map(o => <AssetSummary key={o.deck.id} asset={o} />)}
+          </Card>
+        ) : null}
+        {RECEIVED.length ? (
+          <Card styleNames='asset summary' style={{ width: '100%', padding: 10 }}>
+            <CardItem styleNames='header' style={pad(10)}>
+              <H3>Your Balances</H3>
+            </CardItem>
+            {...RECEIVED.map(o => <AssetSummary key={o.deck.id} asset={o} />)}
+          </Card>
+        ) : null}
         {this.props.children}
       </View>
     )
   }
 }
-
-
-export { Balance }
 
 export default Summary

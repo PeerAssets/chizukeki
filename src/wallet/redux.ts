@@ -66,7 +66,7 @@ function stillPendingTransactions(
 }
 
 function byTimestampDesc(a: Wallet.Transaction, b: Wallet.Transaction){
-  return (b.timestamp || new Date()).getTime() - (a.timestamp || new Date()).getTime()
+  return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
 }
 
 function applySync({ old, synced: { _meta, transactions, unspentOutputs, ...synced } }: {

@@ -9,6 +9,8 @@ import Summary from './Summary'
 import SendAsset from './SendAsset'
 import SpawnDeck from './SpawnDeck'
 
+import { mergeByShortId } from './utils'
+
 const sendAssets = fetchJSONRoutine<
   SendAsset.Payload,
   Wallet.PendingTransaction,
@@ -61,23 +63,6 @@ const spawnDeck = fetchJSONRoutine<
 })
 
 
-function mergeByShortId(balances: Array<any>){
-  return Object.values(
-    balances.reduce((shortIdMap, { short_id, ...balance }) => {
-      let { _raw = [], value = 0 } = shortIdMap[short_id] || {}
-      shortIdMap[short_id] = {
-        short_id,
-        value: value + balance.value,
-        _raw: [ ..._raw, balance ]
-      }
-      return shortIdMap
-    },
-    <Record<string, any>>{
-    })
-  )
-}
-
-
 const syncAsset = fetchJSONRoutine.withPolling<
   { asset: Summary.Asset, address: string },
   Summary.Asset,
@@ -85,14 +70,19 @@ const syncAsset = fetchJSONRoutine.withPolling<
 >({
   type: 'SYNC_ASSET',
   fetchJSON: async ({ asset, address }) => {
-    let [ deck, balance = asset.balance ] = await Promise.all([
+    let [ deck, balance = asset.balance, cardTransfers ] = await Promise.all([
       papi.deckDetails(asset.deck, asset.deck.issuer === address ? address : undefined),
-      papi.balance(address, asset.deck.id)
+      papi.balance(address, asset.deck.id),
+      papi.cards(address)
     ])
     balance.type = (balance.value === undefined) ?
       'UNISSUED' :
       (balance.value > 0 ? 'RECEIVED' : 'ISSUED')
-    return { deck, balance } as Summary.Asset
+    cardTransfers = cardTransfers.map(t => (
+      t.deck_name = deck.name,
+      t
+    ))
+    return { deck, balance, cardTransfers } as Summary.Asset
   },
   pollingInterval: 1 * 60 * 1000, // poll every 1 minutes
 })
@@ -102,7 +92,6 @@ const syncAsset = fetchJSONRoutine.withPolling<
  * grab all decks that start with a balance short_id OR are issued by the user
  * merge (request sorting from restless?)
 */
-
 const syncAssets = fetchJSONRoutine.withPolling<
   { address: string },
   { assets: Array<Summary.Asset> },
@@ -112,11 +101,14 @@ const syncAssets = fetchJSONRoutine.withPolling<
   fetchJSON: async ({ address }) => {
     let rawBalances: Array<any> = await papi.balances(address)
     rawBalances = mergeByShortId(rawBalances)
-    let decks: Array<Deck.Summary> = await papi.deckSummaries(address, rawBalances.map(b => b.short_id))
+    let [ decks, cards ] = await Promise.all([
+      papi.deckSummaries(address, rawBalances.map(b => b.short_id)),
+      papi.cards(address)
+    ])
     let unissued: Array<Summary.Asset> = []
     let deckIdMap = decks.reduce((map, deck) => {
       if(deck.issuer === address){
-        unissued.push({ deck, balance: { type: 'UNISSUED' } })
+        unissued.push({ deck, balance: { type: 'UNISSUED' }, cardTransfers: [] })
       }
       map[deck.id.substr(0, 10)] = deck
       return map
@@ -126,7 +118,8 @@ const syncAssets = fetchJSONRoutine.withPolling<
         balance.type = balance.value > 0 ? 'RECEIVED' : 'ISSUED'
         let deck = deckIdMap[short_id]
         unissued = unissued.filter(i => i.deck.id !== deck.id)
-        return { deck, balance } as Summary.Asset
+        let cardTransfers = cards.filter(c => c.deck_id = deck.id)
+        return { deck, balance, cardTransfers } as Summary.Asset
       })
     return { assets: unissued.concat(assets) }
   },

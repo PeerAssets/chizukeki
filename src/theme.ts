@@ -38,47 +38,49 @@ let assetStyles = variables => {
   })
   return {
     'NativeBase.Card': {
+      'NativeBase.Body': {
+        'NativeBase.CardItem': {
+          // summary & detail
+          '.balance': {
+            padding: 0,
+            paddingBottom: 10,
+            'NativeBase.Text': {
+              paddingTop: 5,
+              paddingBottom: 5,
+              '.name': {
+                flex: 2,
+                fontSize: 'bold',
+                paddingLeft: 10,
+                borderTopLeftRadius: 3,
+                borderBottomLeftRadius: 3,
+              },
+              '.value': {
+                flex: 1,
+                textAlign: 'center'
+              },
+              '.type': {
+                flex: 1,
+                color: variables.brandLight,
+                borderTopRightRadius: 3,
+                borderBottomRightRadius: 3,
+                textAlign: 'center',
+                paddingRight: 10,
+              },
+            },
+          },
+          '.focused': {
+            'NativeBase.Text': {
+              '.name': {
+                fontSize: 20
+              }
+            },
+          },
+          '.unissued': typeBackgrounds(variables.btnWarningBg),
+          '.issued': typeBackgrounds(variables.btnSuccessBg),
+          '.received': typeBackgrounds(variables.btnInfoBg),
+        }
+      },
       'NativeBase.CardItem': {
-        // summary & detail
-        '.balance': {
-          paddingTop: 0,
-          paddingBottom: 10,
-          paddingLeft: 15,
-          paddingRight: 15,
-          'NativeBase.Text': {
-            paddingTop: 5,
-            paddingBottom: 5,
-            '.name': {
-              flex: 2,
-              fontSize: 'bold',
-              paddingLeft: 10,
-              borderTopLeftRadius: 3,
-              borderBottomLeftRadius: 3,
-            },
-            '.value': {
-              flex: 1,
-              textAlign: 'center'
-            },
-            '.type': {
-              flex: 1,
-              color: variables.brandLight,
-              borderTopRightRadius: 3,
-              borderBottomRightRadius: 3,
-              textAlign: 'center',
-              paddingRight: 10,
-            },
-          },
-        },
-        '.focused': {
-          'NativeBase.Text': {
-            '.name': {
-              fontSize: 20
-            }
-          },
-        },
-        '.unissued': typeBackgrounds(variables.btnWarningBg),
-        '.issued': typeBackgrounds(variables.btnSuccessBg),
-        '.received': typeBackgrounds(variables.btnInfoBg),
         'NativeBase.Body': {
           '.row': {
             flexDirection: 'row',
