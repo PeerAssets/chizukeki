@@ -3,7 +3,7 @@ import { routerReducer, routerMiddleware } from 'react-router-redux'
 import createSagaMiddleware from 'redux-saga'
 
 
-import { persistStore, persistReducer } from 'redux-persist'
+import { persistStore, persistReducer, createMigrate } from 'redux-persist'
 import storage from 'redux-persist/es/storage' // handles web/native 
 
 
@@ -16,10 +16,20 @@ import * as Assets from '../assets/redux'
 
 export const history = (createHistory as any)({ basename: process.env.PUBLIC_PATH || '/' })
 
+const migrations: any = {
+  0: (state) => {
+    // log user out
+    return {
+    }
+  }
+}
+
 let persist = (key: string, reducer: Reducer<any>) => persistReducer({
   key,
   storage,
-  blacklist: ['actionHistory']
+  blacklist: ['actionHistory'],
+  version: 0,
+  migrate: createMigrate(migrations, { debug: false }),
 }, reducer)
 
 /* Persist to either device or localStorage
