@@ -1,8 +1,8 @@
 
 import * as React from 'react'
 import { Picker as RNPicker } from 'react-native';
-let Item = RNPicker.Item
-import { Picker, Right, Radio, Text } from 'native-base'
+// TODO this errors, maybe because of react-native-web
+//import { Picker, Right, Radio, Text } from 'native-base'
 import IssueModes from './issueModes'
 
 let styles = {
@@ -21,15 +21,15 @@ class IssueMode extends React.Component<IssueMode.Props, {}> {
   render() {
     let { selected, select } = this.props
     return (
-      <Picker
+      <RNPicker
         prompt='Select one'
         selectedValue={selected !== null ? IssueModes.decode(selected): ''}
         onValueChange={mode => select(IssueModes.encode(mode))}
         mode='dropdown' >
         { Object.keys(IssueModes.nameToEncodingMap).map((mode: IssueModes) =>
-          <Item key={mode} label={mode} value={mode} />
+          <RNPicker.Item key={mode} label={mode} value={mode} />
         ) }
-      </Picker>
+      </RNPicker>
     )
   }
 }

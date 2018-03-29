@@ -4,7 +4,7 @@ import { Button, Right, CardItem, Body, Text, Card, connectStyle, H2, H3, Icon, 
 
 
 import { Link } from '../routing/router'
-import Wrapper from '../generics/Wrapper'
+import { Wrapper, Main } from '../generics/Layout'
 import SyncButton from '../generics/sync-button'
 import Modal from '../generics/modal.web'
 import Wallet from '../wallet/Wallet'
@@ -27,15 +27,6 @@ namespace Summary {
 
 
 let styles = {
-  main: {
-    flex: 3,
-    minWidth: 325,
-    marginTop: -5,
-    flexDirection: 'column',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    overflow: 'hidden',
-  },
   body: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -76,7 +67,7 @@ class Summary extends React.Component<Summary.Props, {}> {
     let { assets, sync } = this.props
     let { UNISSUED, ISSUED, RECEIVED } = divideByOwnership(assets)
     return (
-      <View style={styles.main as any}>
+      <Main>
         <Card styleNames='asset summary' style={{ width: '100%', padding: 10 }}>
           <CardItem styleNames='header'>
             <Body style={{ justifyContent: 'space-between', flexWrap: 'wrap', flexDirection: 'row' }}>
@@ -105,7 +96,7 @@ class Summary extends React.Component<Summary.Props, {}> {
           </Card>
         ) : null}
         {this.props.children}
-      </View>
+      </Main>
     )
   }
 }

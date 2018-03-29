@@ -25,9 +25,11 @@ namespace Wallet {
       [key: string]: any,
       vout: Array<UTXO>,
       vin: Array<any>,
-    }
+    },
+    addresses: Array<string>,
+    assetAction?: 'DeckSpawn' | 'CardTransfer'
   }
-  export type PendingTransaction = Pick<Transaction, 'id' | 'amount' | 'timestamp' | 'raw' | 'fee'>
+  export type PendingTransaction = Pick<Transaction, 'id' | 'amount' | 'timestamp' | 'raw' | 'fee' | 'addresses'>
   export function empty(address: string): Wallet {
     return Object.assign(
       walletMeta(), {

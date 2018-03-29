@@ -28,6 +28,7 @@
     "lodash": "^4.17.4",
     "moment": "^2.20.1",
     "native-base": "git://github.com/micimize/NativeBase.git#bab6882be240ef906c667b4486a9433386cfa916",
+    "number-precision": "^1.2.0",
     "prop-types": "^15.6.0",
     "ramda": "^0.25.0",
     "react": "16.0.0",

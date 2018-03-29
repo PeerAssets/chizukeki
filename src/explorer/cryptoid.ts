@@ -58,6 +58,7 @@ namespace normalize {
         confirmations,
         amount,
         balance,
+        addresses: [],
         timestamp: new Date(time_utc),
       })
       balance -= amount

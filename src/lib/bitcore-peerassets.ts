@@ -122,6 +122,15 @@ function extendBitcore(bitcore, configuration = defaultConfig) {
       return retVal;
     },
 
+    assetActionType(transaction): 'DeckSpawn' | 'CardTransfer' | undefined {
+      try {
+        return this.decodeCardTransferTransaction(transaction) && 'CardTransfer'
+      } catch { }
+      try {
+        return this.decodeDeckSpawnTransaction(transaction) && 'DeckSpawn'
+      } catch { }
+    },
+
     //
     // Internal functions
     //

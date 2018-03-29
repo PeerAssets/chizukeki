@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Button, CardItem, Body, Text, Card, connectStyle, H2, Icon } from 'native-base'
 
-import Wrapper from '../generics/Wrapper'
+import { Wrapper, Main } from '../generics/Layout'
 import RoutineButton from '../generics/routine-button'
 import { Omit } from '../generics/utils'
 import Modal from '../generics/modal.web'
@@ -24,19 +24,7 @@ function mergeCardTransfers(assets: Summary.Props['assets']){
   ).sort(byTimestampDesc)
 }
 
-let styles = {
-  main: {
-    flex: 3,
-    minWidth: 325,
-    marginTop: -5,
-    flexDirection: 'column',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    overflow: 'hidden',
-  },
-}
-
-@connectStyle('PeerKeeper.Assets', styles)
+@connectStyle('PeerKeeper.Assets', {})
 class Assets extends React.Component<Assets.Props, {}> {
   render() {
     let { assets, wallet, actions, stages } = this.props
@@ -48,7 +36,7 @@ class Assets extends React.Component<Assets.Props, {}> {
     return (
       <Wrapper>
         <Summary sync={syncAssets} assets={assets || []}>
-          <SpawnDeck wallet={wallet} spawn={actions.spawnDeck} stage={stages.spawnDeck} />
+          <SpawnDeck style={{ width: '100%' }} wallet={wallet} spawn={actions.spawnDeck} stage={stages.spawnDeck} />
         </Summary>
         <CardTransferList cardTransfers={mergeCardTransfers(assets || [])} />
       </Wrapper>

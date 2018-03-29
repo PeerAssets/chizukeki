@@ -1,8 +1,12 @@
-import { fork, all, put, call, takeLatest } from 'redux-saga/effects'
+import { SagaIterator } from 'redux-saga'
+import { select, fork, all, put, call, takeLatest } from 'redux-saga/effects'
 import fetchJSONRoutine from '../generics/fetch-routine'
 import { peercoin, Wallet } from '../explorer'
 import bitcore from '../lib/bitcore'
-import papi, { Deck } from './papi'
+
+import { getTransactionMap } from '../wallet/selectors'
+
+import papi, { Deck, CardTransfer } from './papi'
 
 import { Satoshis } from '../lib/utils'
 import Summary from './Summary'
@@ -18,11 +22,12 @@ const sendAssets = fetchJSONRoutine<
 >({
   type: 'SEND_ASSETS',
   fetchJSON: async ({ wallet: { address, unspentOutputs, privateKey }, amountsMap, deckSpawn }) => {
+    let deckSpawnTxn = new bitcore.Transaction(deckSpawn.hex)
     let transaction = bitcore.assets.createCardTransferTransaction(
       unspentOutputs.map(Satoshis.toBitcoreUtxo),
       address,
       amountsMap,
-      new bitcore.Transaction(deckSpawn.hex)
+      deckSpawnTxn
     )
     let { minTagFee: amount, txnFee: fee } = bitcore.assets.configuration
     let signature = new bitcore.PrivateKey(privateKey)
@@ -31,6 +36,7 @@ const sendAssets = fetchJSONRoutine<
     return {
       amount,
       fee,
+      addresses: [bitcore.assets.assetTag(deckSpawnTxn), ...Object.keys(amountsMap)],
       ...sent
     }
   }
@@ -56,12 +62,24 @@ const spawnDeck = fetchJSONRoutine<
     let sent = await peercoin._sendRawTransaction(hex)
     return {
       amount,
+      addresses: [ bitcore.configuration.deckSpawnTagHash ],
       fee,
       ...sent
     }
   }
 })
 
+function* syncCards(address: string, deck_id?: string) {
+  let cards = yield call(papi.cards, address, deck_id)
+  let transactionMap = yield select(getTransactionMap, cards.map(c => c.txid))
+  for (let card of cards) {
+    card.transaction = transactionMap[card.txid]
+    if(!card.transaction) {
+      card.transaction = yield call(peercoin.getRelativeTransaction, card.txid, address)
+    }
+  }
+  return cards as Array<CardTransfer>
+}
 
 const syncAsset = fetchJSONRoutine.withPolling<
   { asset: Summary.Asset, address: string },
@@ -69,11 +87,11 @@ const syncAsset = fetchJSONRoutine.withPolling<
   Error
 >({
   type: 'SYNC_ASSET',
-  fetchJSON: async ({ asset, address }) => {
-    let [ deck, balance = asset.balance, cardTransfers ] = await Promise.all([
-      papi.deckDetails(asset.deck, asset.deck.issuer === address ? address : undefined),
-      papi.balance(address, asset.deck.id),
-      papi.cards(address)
+  fetchJSON: function* ({ asset, address }): SagaIterator {
+    let [ deck, balance, cardTransfers ] = yield all([
+      call(papi.deckDetails, asset.deck, asset.deck.issuer === address ? address : undefined),
+      call(papi.balance, address, asset.deck.id),
+      call(syncCards, address, asset.deck.id)
     ])
     balance.type = (balance.value === undefined) ?
       'UNISSUED' :
@@ -98,12 +116,12 @@ const syncAssets = fetchJSONRoutine.withPolling<
   Error
 >({
   type: 'SYNC_ASSETS',
-  fetchJSON: async ({ address }) => {
-    let rawBalances: Array<any> = await papi.balances(address)
+  fetchJSON: function* ({ address }): SagaIterator {
+    let rawBalances: Array<any> = yield call(papi.balances, address)
     rawBalances = mergeByShortId(rawBalances)
-    let [ decks, cards ] = await Promise.all([
-      papi.deckSummaries(address, rawBalances.map(b => b.short_id)),
-      papi.cards(address)
+    let [ decks, cards ] = yield all([
+      call(papi.deckSummaries, address, rawBalances.map(b => b.short_id)),
+      call(syncCards, address)
     ])
     let unissued: Array<Summary.Asset> = []
     let deckIdMap = decks.reduce((map, deck) => {

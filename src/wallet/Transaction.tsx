@@ -1,44 +1,37 @@
 import * as React from 'react'
 import { View } from 'react-native'
-import { Button, Card, Left, CardItem, Body, Text, H2, Icon } from 'native-base'
+import { Button, Card, Left, CardItem, Body, Text, H2, Icon, Right, Badge } from 'native-base'
 
 import FlatList from 'react-native-web-lists/src/FlatList'
 import moment from 'moment'
 
+import { Secondary } from '../generics/Layout'
+import Transaction from '../generics/transaction-like'
 import { Wallet } from '../explorer'
 
 namespace WalletTransaction {
   export type Data = Wallet.Transaction
 }
 
-function WalletTransaction({ item: { amount, timestamp, confirmations } }: { item: WalletTransaction.Data }) {
-  let io = (inbound, outbound) => amount > 0 ? inbound : outbound
-  let textProps = { styleNames: io('success', 'dark') }
+function TransactionDetails({ confirmations, id, assetAction }: WalletTransaction.Data) {
   return (
-    <Card>
-      <CardItem styleNames='header'>
-        <Left>
-          <Icon {...textProps} name={`arrow-circle-o-${io('down', 'up')}`} size={30} color={'black'} />
-          <Body>
-            <Text {...textProps}>
-              {io('+', '-')}
-              {amount.toString()} PPC
-            </Text>
-            <Text styleNames='note'>{moment(timestamp).fromNow()}</Text>
-          </Body>
-        </Left>
-      </CardItem>
-      <CardItem styleNames='footer' style={{maxWidth: '100%'}}>
-        <Text styleNames='bounded note'>
-          {confirmations} confirmations
-        </Text>
-      {/*
-        <Text bounded note  ellipsizeMode='middle' numberOfLines={1}>
-          {io('from', 'to')} {address}
-        </Text>
-      */}
-      </CardItem>
-    </Card>
+    <CardItem styleNames='footer' style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+      <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
+        id: {id}
+      </Text>
+      <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
+        confirmations: {confirmations}
+      </Text>
+  { assetAction && <Badge><Text>{assetAction}</Text></Badge> }
+    </CardItem>
+  )
+}
+
+function WalletTransaction({ item }: { item: WalletTransaction.Data }) {
+  return (
+    <Transaction asset='PPC' {...item}>
+      <TransactionDetails {...item} />
+    </Transaction>
   )
 }
 
@@ -48,7 +41,7 @@ namespace TransactionList {
 
 function TransactionList({ transactions }: { transactions: TransactionList.Data }) {
   return (
-    <View style={styles.container}>
+    <Secondary>
       <Text>
         <H2>Transactions</H2>
         <Text styleNames='note'> {transactions.length} total </Text>
@@ -57,20 +50,8 @@ function TransactionList({ transactions }: { transactions: TransactionList.Data 
         enableEmptySections // silence error, shouldn't be necessary when react-native-web implements FlatList
         data={transactions}
         renderItem={WalletTransaction} />
-    </View>
+    </Secondary>
   )
-}
-
-let styles = {
-  container: {
-    flex: 2,
-    minWidth: 200,
-    margin: 7.5,
-  },
-  main: {
-    paddingLeft: 10,
-    flex: 9,
-  }
 }
 
 export { WalletTransaction }

@@ -5,7 +5,7 @@ import TransactionList from './Transaction'
 import SendTransaction from './SendTransaction'
 import { Button, CardItem, Body, Text, Card, connectStyle, H2, Icon } from 'native-base'
 
-import Wrapper from '../generics/Wrapper'
+import { Wrapper, Main } from '../generics/Layout'
 import SyncButton from '../generics/sync-button'
 import Modal from '../generics/modal.web'
 
@@ -84,15 +84,6 @@ function Address({ address, ...props }) {
 }
 
 let styles = {
-  main: {
-    flex: 3,
-    minWidth: 325,
-    marginTop: -5,
-    flexDirection: 'column',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    overflow: 'hidden',
-  },
   body: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -118,7 +109,7 @@ class Wallet extends React.Component<
     let { address, transactions = [], balance = 0, style, keys, sync, sendTransaction } = this.props
     return (
       <Wrapper>
-        <View style={style.main}>
+        <Main>
           <Card style={{ width: '100%' }}>
             <CardItem styleNames='header'>
               <Balance balance={balance} style={style.column} />
@@ -134,7 +125,7 @@ class Wallet extends React.Component<
             </CardItem>
           </Card>
           <SendTransaction {...sendTransaction} />
-        </View>
+        </Main>
         <TransactionList transactions={transactions} />
       </Wrapper>
     )

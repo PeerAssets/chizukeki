@@ -1,5 +1,6 @@
 import configure from '../configure'
 import peercoin, { Wallet } from '../explorer'
+import { Omit } from '../generics/utils'
 
 import IssueMode from './issueModes'
 
@@ -83,15 +84,19 @@ class Papi {
     let { issue_mode, ...deck } = decks[0]
     return { issueMode: issue_mode, ...deck } as Deck.Summary
   }
-  deckDetails = async (deck: Deck.Summary, address?: string): Promise<Deck.Full> => {
+  deckDetails = async (deck: Deck.Summary, address?: string, transaction?: Wallet.Transaction): Promise<Deck.Full> => {
+    type Balances = { [address: string]: number }
     let [ balances, spawnTransaction ] = await Promise.all([
-      this.apiRequest<{ [address: string]: number }>('decks', deck.id, 'balances'),
-      peercoin.getRelativeRawTransaction(deck.id, address)
+      this.apiRequest<Balances>('decks', deck.id, 'balances'),
+      transaction ?
+        new Promise(() => transaction) :
+        peercoin.getRelativeRawTransaction(deck.id, address)
     ]) 
     // TODO casting shouldn't be necessary
     let supply: number = Object.values(balances)
       .reduce((sum: number, balance: number) => sum + balance, 0) as number
-    return Object.assign({}, deck, { balances, supply, spawnTransaction })
+    // checker required casting for no reason out of the blue
+    return Object.assign({}, deck, { balances: balances as Balances, supply, spawnTransaction })
   }
   balances = async (address: string) => {
     let filters = [{ name: "account", "op": "like", "val": `${address}%`}]
@@ -101,7 +106,7 @@ class Papi {
   balance = async (address: string, assetId: string) => {
     let filters = [
       { name: "account", "op": "like", "val": `${address}%`},
-      { name: "short_id", "op": "eq", "val": `${assetId.substring(0,10)}%`}
+      { name: "short_id", "op": "like", "val": `${assetId.substring(0,10)}%`}
     ]
     let { objects: balances } = await this.restlessRequest('balances', { filters, results_per_page: 1 })
     return balances[0]
@@ -120,23 +125,27 @@ class Papi {
     let { objects: decks } = await this.restlessRequest('decks', { filters, results_per_page: 100 })
     return decks.map(({ issue_mode, ...rest }) => ({ issueMode: issue_mode, ...rest }))
   }
-  cards = async (address: string): Promise<Array<CardTransfer>> => {
-    let filters = [{
+  cards = async (address: string, deck_id?: string): Promise<Array<Omit<CardTransfer, 'transaction'>>> => {
+    let involved = {
       "or": [
         { name: "sender", "op": "like", "val": `${address}%`},
         { name: "receiver", "op": "like", "val": `${address}%`},
       ]
-    }]
+    }
+    let filters = [ deck_id ? {
+      "and": [
+        { name: "deck_id", "op": "eq", "val": deck_id },
+        involved
+      ]
+    }: involved ]
     let { objects: cards } = await this.restlessRequest('cards', { filters, results_per_page: 100 })
-    cards = await Promise.all(cards.map(async ({ amount, receiver, ctype, ...card }) => {
-      let transaction = await peercoin.getRelativeTransaction(card.txid, address)
+    cards = cards.map(({ amount, ctype, ...card }) => {
       return {
-        amount: receiver.startsWith(address) ? amount : -amount,
+        amount: card.receiver.startsWith(address) ? amount : -amount,
         type: ctype,
-        transaction,
         ...card,
       }
-    }))
+    })
     return cards
   }
 } 

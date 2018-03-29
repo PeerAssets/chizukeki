@@ -18,7 +18,7 @@ import {
   variables
 } from 'native-base'
 
-import Wrapper from '../generics/Wrapper'
+import { Wrapper } from '../generics/Layout'
 import RoutineButton from '../generics/routine-button'
 import bitcore from '../lib/bitcore'
 

@@ -8,7 +8,7 @@ type Action<payload> = { type: string, payload }
 
 type Params<Start, Success, Failure> = {
   type: string,
-  fetchJSON: (payload: Start) => Promise<Success>,
+  fetchJSON: (payload: Start) => (Promise<Success> | SagaIterator),
   commonMeta?: Meta
 }
 

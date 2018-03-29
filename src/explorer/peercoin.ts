@@ -1,3 +1,5 @@
+import { plus, minus } from 'number-precision'
+import { dropRepeats } from 'ramda'
 import bitcore from '../lib/bitcore'
 import { HTTP, Satoshis } from '../lib/utils'
 import configure from '../configure'
@@ -59,10 +61,16 @@ namespace RawTransaction {
     privateKey: string,
     fee?: number
   }
-  export type Relative = RawTransaction & { type: 'CREDIT' | 'DEBIT' | 'UNINVOLVED', fee: number, inputTotal: number }
+  export type Relative = RawTransaction & {
+    type: 'CREDIT' | 'DEBIT' | 'UNINVOLVED',
+    fee: number,
+    inputTotal: number,
+    addresses: Array<string>
+  }
 }
 
 type RawTransaction = {
+  hex: string,
   txid: string,
   time: number,
   confirmations: number,
@@ -81,7 +89,7 @@ namespace TxInfo {
   }
   export type Output = {
     script: string,
-    address: string,
+    addresses: string,
     amount: Satoshis
   }
 
@@ -134,16 +142,18 @@ namespace normalize {
   }
 
   export function transaction(address: string, raw: RawTransaction.Relative){
-    let { txid: id, confirmations, time, vout, type, inputTotal, fee } = raw
-    let amount = type === 'CREDIT' ? 0 : -Satoshis.fromAmount(inputTotal - fee)
+    let { txid: id, confirmations, time, vout, type, inputTotal, fee, addresses } = raw
+    let amount = type === 'CREDIT' ? 0 : -Satoshis.fromAmount(minus(inputTotal, fee))
     for (let out of vout) {
       if (out.scriptPubKey.addresses && out.scriptPubKey.addresses.includes(address)) {
-        amount += Satoshis.fromAmount(out.value)
+        amount = plus(amount, Satoshis.fromAmount(out.value))
       }
     }
+    let assetAction = bitcore.assets.assetActionType(new bitcore.Transaction(raw.hex))
     return {
       id,
       confirmations,
+      addresses,
       amount: Satoshis.toAmount(amount),
       fee,
       balance: NaN,
@@ -151,7 +161,8 @@ namespace normalize {
       raw: {
         ...raw,
         vout: vout.map(out => normalize.vout(id, out))
-      }
+      },
+      ...(assetAction ? { assetAction } : {})
     }
   }
 
@@ -270,27 +281,40 @@ class PeercoinExplorer {
     return {
       amount,
       fee,
+      addresses: [ toAddress ],
       ...sent
     }
   }
 
-  transactionInfo = (id: string) => this.extendedRequest('txinfo', id)
+  transactionInfo = (id: string) => this.extendedRequest<TxInfo.Response>('txinfo', id)
   getAddress = (address: string) => this.extendedRequest<GetAddress.Response>('getaddress', address)
 
-  getRelativeRawTransaction = async (id: string, address?: string) => {
+  getRelativeRawTransaction = async (id: string, address?: string): Promise<RawTransaction.Relative | Error> => {
     let [raw, info] = await Promise.all([
       this.getRawTransaction(id),
       this.transactionInfo(id),
     ])
+    if(isError(raw)){
+      return raw
+    }
+    if(isError(info)){
+      return info
+    }
     let type: 'CREDIT' | 'DEBIT' | 'UNINVOLVED' = (!address) ?
       'UNINVOLVED' : (
       info.inputs.filter(i => i.addresses === address).length ?
         'DEBIT' :
         'CREDIT'
       )
-    let inputTotal = info.inputs.reduce((total, i) => total + Satoshis.btc.toAmount(i.amount), 0)
-    let fee = inputTotal - Satoshis.btc.toAmount(info.total)
-    return Object.assign(raw, { type, fee, inputTotal })
+    let addresses = dropRepeats( type === 'CREDIT' ?
+      info.inputs.map(o => o.addresses).filter(a => a !== address) :
+      info.outputs.map(o => o.addresses).filter(a => a !== address)
+    )
+      
+    let inputTotal = info.inputs.reduce((total, i) => plus(total, i.amount), 0)
+    let fee = Satoshis.btc.toAmount(minus(inputTotal, info.total))
+    inputTotal = Satoshis.btc.toAmount(inputTotal)
+    return Object.assign(raw, { type, fee, inputTotal, addresses })
   }
 
   getRelativeTransaction = async (id: string, address: string) => {

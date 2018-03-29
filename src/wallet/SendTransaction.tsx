@@ -21,7 +21,7 @@ import {
 } from 'native-base'
 
 import bitcore from '../lib/bitcore'
-import Wrapper from '../generics/Wrapper'
+import { Wrapper } from '../generics/Layout'
 
 import { WrapActionable } from './UnlockModal'
 import Wallet from './Wallet';

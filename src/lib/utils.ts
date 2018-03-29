@@ -1,4 +1,5 @@
 import bitcore from './bitcore'
+import { times, divide } from 'number-precision'
 
 function arrayify<T>(a: T | Array<T>): Array<T> {
   return Array.isArray(a) ? a : [a]
@@ -8,10 +9,10 @@ type BtcSatoshies = number
 namespace BtcSatoshies  {
   export const inACoin = 1e8
   export function fromAmount(amount: number): BtcSatoshies {
-    return Math.floor(amount * inACoin)
+    return times(amount, inACoin)
   }
   export function toAmount(amountInSatoshis: BtcSatoshies): number {
-    return amountInSatoshis / inACoin
+    return divide(amountInSatoshis, inACoin)
   }
 }
 
@@ -20,10 +21,10 @@ namespace Satoshis {
   export const btc = BtcSatoshies
   export const inACoin = 1e6
   export function fromAmount(amount: number): Satoshis {
-    return Math.floor(amount * inACoin)
+    return times(amount, inACoin)
   }
   export function toAmount(amountInSatoshis: Satoshis): number {
-    return amountInSatoshis / inACoin
+    return divide(amountInSatoshis, inACoin)
   }
 
   export function toBitcoreUtxo({ amount, ...utxo }: { amount: number } & { [key: string]: any }) {
