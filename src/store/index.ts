@@ -16,19 +16,18 @@ import * as Assets from '../assets/redux'
 
 export const history = (createHistory as any)({ basename: process.env.PUBLIC_PATH || '/' })
 
+const logoutMigration = state => ({})
+
 const migrations: any = {
-  0: (state) => {
-    // log user out
-    return {
-    }
-  }
+  0: logoutMigration,
+  1: logoutMigration
 }
 
 let persist = (key: string, reducer: Reducer<any>) => persistReducer({
   key,
   storage,
   blacklist: ['actionHistory'],
-  version: 0,
+  version: 1,
   migrate: createMigrate(migrations, { debug: false }),
 }, reducer)
 
