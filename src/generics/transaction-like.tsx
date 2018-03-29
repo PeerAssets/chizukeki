@@ -6,7 +6,7 @@ type Props = {
   amount: number,
   timestamp: Date,
   addresses: Array<string>,
-  asset: string,
+  asset: string | React.ReactNode,
   children?: any
 }
 
