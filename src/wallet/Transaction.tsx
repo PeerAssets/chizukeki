@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { View } from 'react-native'
-import { Button, Card, Left, CardItem, Body, Text, H2, Icon, Right, Badge, Switch } from 'native-base'
+import { Button, Card, CardItem, Text, H2, Badge, Switch } from 'native-base'
 
 import FlatList from 'react-native-web-lists/src/FlatList'
 import moment from 'moment'
@@ -27,25 +27,35 @@ function TransactionDetails({ confirmations, id, assetAction }: WalletTransactio
   )
 }
 
-function WalletTransaction({ item }: { item: WalletTransaction.Data }) {
-  let asset = item.assetAction ? <Text>PPC <Badge styleNames='info'><Text>asset</Text></Badge></Text> : 'PPC'
-  return (
-    <Transaction asset={asset} {...item}>
-      <TransactionDetails {...item} />
-    </Transaction>
-  )
+class WalletTransaction extends React.PureComponent<WalletTransaction.Data & { hide?: boolean }> {
+  render() {
+    let { hide, ...item } = this.props
+    if (hide) {
+      return null
+    }
+    let asset = item.assetAction ? <Text>PPC <Badge styleNames='info'><Text>asset</Text></Badge></Text> : 'PPC'
+    return (
+      <Transaction asset={asset} {...item}>
+        <TransactionDetails {...item} />
+      </Transaction>
+    )
+  }
 }
 
 namespace TransactionList {
   export type Data = Array<WalletTransaction.Data>
 }
 
-class TransactionList extends React.Component<{ transactions: TransactionList.Data }, { showAssets: boolean }> {
+class TransactionList extends React.Component<
+  { transactions: TransactionList.Data },
+  { showAssets: boolean }
+> {
   toggleFilter = () => this.setState({ showAssets: !this.state.showAssets })
   constructor(props){
     super(props)
     this.state = { showAssets: false }
   }
+  componentDid
   render() {
     let showAssets = this.state.showAssets
     let transactions = this.props.transactions
@@ -72,8 +82,10 @@ class TransactionList extends React.Component<{ transactions: TransactionList.Da
         </View>
         <FlatList
           enableEmptySections // silence error, shouldn't be necessary when react-native-web implements FlatList
-          data={showAssets ? transactions : transactions.filter(t => !t.assetAction)}
-          renderItem={WalletTransaction} />
+          data={transactions}
+          renderItem={({ item }) =>
+            <WalletTransaction key={item.id} hide={(!showAssets && item.assetAction)} {...item} />
+          }/>
       </Secondary>
     )
   }

@@ -47,7 +47,7 @@ class Transaction extends React.Component<Props, { showDetails: boolean }> {
         <CardItem
           style={{ paddingTop: 0, maxWidth: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
           {addresses.map((address, i) => (
-            <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
+            <Text key={address} styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
               {io('from', 'to')} {address}
             </Text>
           ))}
