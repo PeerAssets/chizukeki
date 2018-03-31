@@ -20,13 +20,12 @@ module.exports = {
   },
 
   // Enable sourcemaps for debugging webpack's output.
-  devtool: "inline-source-map",
+  devtool: "inline-cheap-module-source-map",
 
   resolve: {
     symlinks: false,
     extensions: [ "*", ".js", ".jsx", ".ts", ".tsx", ".web.ts", ".web.tsx", ".web.js", ".web.jsx" ],
     alias: {
-      'react-native$': 'react-native-web',
       'react-router-native': 'react-router',
       'react-native/Libraries/Renderer/shims/ReactNativePropRegistry': 'react-native-web/dist/modules/ReactNativePropRegistry/index.js',
       'react-native-vector-icons/Fonts': nodeModule('react-native-vector-icons/Fonts'),
@@ -84,7 +83,7 @@ module.exports = {
                 // the modules needed by the app
                 plugins: [
                   'react-hot-loader/babel',
-                  'react-native-web/babel',
+                  'react-native-web',
                   'transform-regenerator'
                 ],
                 // The 'react-native' preset is recommended (or use your own .babelrc)
@@ -118,23 +117,7 @@ module.exports = {
           nodeModule('react-native-vector-icons'),
           nodeModule('native-base/Fonts'),
         ]
-      },
-
-      /* All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
-      {
-        enforce: "pre",
-        test: /\.js$/,
-        loader: "source-map-loader"
-      },
-
-      {
-        test: /\.scss$/,
-        use: [
-          'style-loader',
-          { loader: 'css-loader', options: { importLoaders: 1 } },
-          'sass-loader',
-        ],
-      }*/
+      }
     ]
   },
 

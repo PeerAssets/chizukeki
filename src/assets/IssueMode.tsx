@@ -27,7 +27,7 @@ class IssueMode extends React.Component<IssueMode.Props, {}> {
         onValueChange={mode => select(IssueModes.encode(mode))}
         mode='dropdown' >
         { Object.keys(IssueModes.nameToEncodingMap).map((mode: IssueModes) =>
-          <RNPicker.Item key={mode} label={mode} value={mode} />
+          <RNPicker.Item key={mode} label={mode} value={mode}/>
         ) }
       </RNPicker>
     )
