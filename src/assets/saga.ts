@@ -62,7 +62,7 @@ const spawnDeck = fetchJSONRoutine<
     let sent = await peercoin._sendRawTransaction(hex)
     return {
       amount,
-      addresses: [ bitcore.configuration.deckSpawnTagHash ],
+      addresses: [ bitcore.assets.configuration.deckSpawnTagHash ],
       fee,
       ...sent
     }
