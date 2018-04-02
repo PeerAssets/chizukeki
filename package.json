@@ -4,12 +4,12 @@
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
-    "web": "webpack-dev-server -d --config web/webpack.config.js --colors",
     "native": "tsc --watch --pretty --sourceMap --target es2015 --module commonjs",
-    "build": "webpack -d --config web/webpack.config.js --colors",
-    "build-gh-pages": "PUBLIC_PATH=/chizukeki webpack -d --config web/webpack.config.js --colors",
-    "deploy-gh-pages": "bash web/deploy.sh",
-    "gh-pages": "npm run build-gh-pages && npm run deploy-gh-pages",
+
+    "web:start": "webpack-dev-server -d --config web/config/webpack.dev.js --colors",
+    "web:build": "webpack -d --config web/config/webpack.prod.js --colors",
+    "web:deploy": "bash web/deploy.sh",
+    "gh-pages": "npm run web:build && npm run web:deploy",
     "test": "jest"
   },
   "dependencies": {
@@ -57,9 +57,11 @@
     "typescript": "^2.6.2",
     "typescript-fsa": "^2.5.0",
     "typescript-fsa-redux-saga": "^1.0.3",
+    "uglifyjs-webpack-plugin": "^1.2.4",
     "url-loader": "^0.6.2",
     "webpack": "^3.9.1",
-    "webpack-dev-server": "^2.9.5"
+    "webpack-dev-server": "^2.9.5",
+    "webpack-merge": "^4.1.2"
   },
   "jest": {
     "preset": "react-native"

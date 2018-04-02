@@ -1,30 +1,29 @@
-var webpack = require("webpack");
-var path = require("path");
-var fs = require("fs");
+var webpack = require('webpack');
+var path = require('path');
+var fs = require('fs');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
-function nodeModule(mod){
-  return path.resolve(__dirname, '../node_modules/' + mod)
-}
+const appDirectory = fs.realpathSync(process.cwd());
+const resolveApp = relativePath => path.resolve(appDirectory, relativePath);
+const nodeModule = mod => resolveApp(`node_modules/${mod}`)
 
 module.exports = {
 
   entry: [
-    path.join(__dirname, '../index.web.tsx')
+    resolveApp('index.web.tsx')
   ],
 
   output: {
-    path: path.join(__dirname, 'dist'),
-    filename: "bundle.js",
-    publicPath: process.env.PUBLIC_PATH || "/"
+    path: resolveApp('web/dist'),
+    filename: 'bundle.js',
   },
 
   // Enable sourcemaps for debugging webpack's output.
-  devtool: "inline-cheap-module-source-map",
+  devtool: 'inline-cheap-module-source-map',
 
   resolve: {
     symlinks: false,
-    extensions: [ "*", ".js", ".jsx", ".ts", ".tsx", ".web.ts", ".web.tsx", ".web.js", ".web.jsx" ],
+    extensions: [ '*', '.js', '.jsx', '.ts', '.tsx', '.web.ts', '.web.tsx', '.web.js', '.web.jsx' ],
     alias: {
       'react-router-native': 'react-router',
       'react-native/Libraries/Renderer/shims/ReactNativePropRegistry': 'react-native-web/dist/modules/ReactNativePropRegistry/index.js',
@@ -38,16 +37,11 @@ module.exports = {
       'regeneratorRuntime': 'regenerator-runtime/runtime'
     }),
     new webpack.NamedModulesPlugin(),
-    new webpack.HotModuleReplacementPlugin(),
     new HtmlWebpackPlugin({
       title: 'PeerAssets Wallet',
       chunksSortMode: 'dependency',
-      template: path.resolve(__dirname, './index.ejs')
+      template: path.resolve(__dirname, '../index.ejs')
     }),
-    new webpack.EnvironmentPlugin({
-      NODE_ENV: 'development',
-      PUBLIC_PATH: '/'
-    })
   ],
 
   module: {
@@ -56,8 +50,8 @@ module.exports = {
         test: /.jsx?|\.tsx?|\.json/,
         // Add every directory that needs to be compiled by Babel during the build
         include: [
-          path.join(__dirname, '../index.web.tsx'),
-          path.resolve(__dirname, '../src'),
+          resolveApp('index.web.tsx'),
+          resolveApp('src/'),
           nodeModule('react-native-uncompiled'),
           nodeModule('native-base'),
           nodeModule('react-native-web-lists'),
@@ -112,18 +106,13 @@ module.exports = {
       },
       {
         test: /\.ttf$/,
-        loader: "url-loader", // or directly file-loader
+        loader: 'url-loader', // or directly file-loader
         include: [
           nodeModule('react-native-vector-icons'),
           nodeModule('native-base/Fonts'),
         ]
       }
     ]
-  },
-
-  devServer: {
-    hot: true,
-    historyApiFallback: true
   }
 
 };
