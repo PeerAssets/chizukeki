@@ -116,6 +116,7 @@ const syncAssets = fetchJSONRoutine.withPolling<
   Error
 >({
   type: 'SYNC_ASSETS',
+  // todo doesn't handle pending spawned decks
   fetchJSON: function* ({ address }): SagaIterator {
     let rawBalances: Array<any> = yield call(papi.balances, address)
     rawBalances = mergeByShortId(rawBalances)
@@ -131,14 +132,16 @@ const syncAssets = fetchJSONRoutine.withPolling<
       map[deck.id.substr(0, 10)] = deck
       return map
     }, {})
-    let assets = rawBalances.map(
+    let assets: Array<Summary.Asset> = rawBalances.map(
       ({ short_id, ...balance }) => {
-        balance.type = balance.value > 0 ? 'RECEIVED' : 'ISSUED'
         let deck = deckIdMap[short_id]
-        unissued = unissued.filter(i => i.deck.id !== deck.id)
-        let cardTransfers = cards.filter(c => c.deck_id = deck.id)
+        if(deck){
+          balance.type = (deck.issuer === address) ? 'ISSUED' : 'RECEIVED'
+          unissued = unissued.filter(i => i.deck.id !== deck.id)
+        }
+        let cardTransfers = deck ? cards.filter(c => c.deck_id = deck.id) : []
         return { deck, balance, cardTransfers } as Summary.Asset
-      })
+      }).filter(a => a.deck)
     return { assets: unissued.concat(assets) }
   },
   pollingInterval: 1 * 60 * 1000, // poll every 1 minutes
