@@ -4,7 +4,7 @@ const { output, plugins, ...common }= require('./webpack.common.js')
 
 module.exports = {
   ...common,
-  devtool: 'source-map',
+  devtool: false,
   output: {
     ...output,
     publicPath: '/chizukeki'

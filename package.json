@@ -6,9 +6,9 @@
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "native": "tsc --watch --pretty --sourceMap --target es2015 --module commonjs",
     "web:start": "webpack-dev-server -d --config web/config/webpack.dev.js --colors",
-    "web:build": "webpack -d --config web/config/webpack.prod.js --colors",
+    "web:build": "webpack --config web/config/webpack.prod.js --colors",
     "web:deploy": "bash web/deploy.sh",
-    "gh-pages": "npm run web:build && npm run web:deploy",
+    "gh-pages": "yarn run web:build && yarn run web:deploy",
     "test": "jest"
   },
   "dependencies": {
