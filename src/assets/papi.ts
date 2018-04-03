@@ -55,6 +55,8 @@ export type CardTransfer = {
   transaction: Wallet.Transaction
 }
 
+const bigPage = { results_per_page: 10000 }
+
 class Papi {
   explorerUrl =  /*/ 'http://localhost:5555' /*/ 'https://papi.peercoin.net' /**/
   version = 1
@@ -77,12 +79,6 @@ class Papi {
       })
     return getJSON<T>(`${this.restlessUrl}/${resource}${path}`)
   }
-  /*
-  decks = async (): Promise<Array<Deck.Summary>> => {
-    let decks = await this.apiRequest('decks', {}, { results_per_page: 100 })
-    return decks.map(({ issue_mode, ...rest }) => ({ issueMode: issue_mode, ...rest }))
-  }
-  */
   deckSummary = async (deckPrefix: string): Promise<Deck.Summary> => {
     let filters = [
       { name: "id", "op": "like", "val": `${deckPrefix}%`}
@@ -107,7 +103,7 @@ class Papi {
   }
   balances = async (address: string) => {
     let filters = [{ name: "account", "op": "like", "val": `${address}%`}]
-    let { objects: balances } = await this.restlessRequest('balances', { filters }, { results_per_page: 100 })
+    let { objects: balances } = await this.restlessRequest('balances', { filters }, bigPage)
     return balances
   }
   balance = async (address: string, assetId: string) => {
@@ -129,7 +125,7 @@ class Papi {
         }))
       ]}
     ]
-    let { objects: decks } = await this.restlessRequest('decks', { filters }, { results_per_page: 100 })
+    let { objects: decks } = await this.restlessRequest('decks', { filters }, bigPage)
     return decks.map(({ issue_mode, ...rest }) => ({ issueMode: issue_mode, ...rest }))
   }
   cards = async (address: string, deck_id?: string): Promise<Array<Omit<CardTransfer, 'transaction'>>> => {
@@ -143,7 +139,7 @@ class Papi {
     if(deck_id){
       filters.push({ name: "deck_id", "op": "eq", "val": deck_id })
     }
-    let { objects: cards } = await this.restlessRequest('cards', { filters }, { results_per_page: 100 })
+    let { objects: cards } = await this.restlessRequest('cards', { filters }, bigPage)
     cards = cards.map(({ amount, ctype, ...card }) => {
       return {
         amount: card.receiver.startsWith(address) ? amount : -amount,
