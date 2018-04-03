@@ -9,7 +9,7 @@ import Wallet from '../wallet/Wallet'
 import * as Redux from './redux'
 import Assets from './Assets' 
 
-let { syncAssets, spawnDeck } = Redux.routines
+let { syncAssets, spawnDeck, loadMoreCards } = Redux.routines
 
 type RootState = { assets: Redux.State,  wallet: { wallet: Wallet.Data } }
 export default connect(
@@ -20,7 +20,8 @@ export default connect(
     actions: {
       syncAssets: bindActionCreators(pick(['trigger', 'stop'], syncAssets), dispatch),
       // todo ugly
-      spawnDeck: bindActionCreators(pick(['trigger'], spawnDeck), dispatch).trigger
+      spawnDeck: bindActionCreators(pick(['trigger'], spawnDeck), dispatch).trigger,
+      loadMoreCards: bindActionCreators(pick(['trigger'], loadMoreCards), dispatch).trigger
     }
   })
 )(Assets)

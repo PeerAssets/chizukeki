@@ -6,6 +6,7 @@ import FlatList from 'react-native-web-lists/src/FlatList'
 import moment from 'moment'
 
 import { Secondary } from '../generics/Layout'
+import RoutineButton from '../generics/routine-button'
 
 import { CardTransfer as CardTransferData } from './papi'
 
@@ -29,7 +30,13 @@ namespace CardTransferList {
   export type Data = Array<CardTransfer.Data>
 }
 
-function CardTransferList({ cardTransfers, style = {} }: { style?: any, cardTransfers: CardTransferList.Data }) {
+function CardTransferList({ cardTransfers, loadMore, canLoadMore, style = {}, stage }: {
+  style?: any,
+  cardTransfers: CardTransferList.Data,
+  loadMore: () => any,
+  stage: string | undefined,
+  canLoadMore: boolean
+}) {
   return (
     <Secondary style={style}>
       <Text>
@@ -39,7 +46,14 @@ function CardTransferList({ cardTransfers, style = {} }: { style?: any, cardTran
       <FlatList
         enableEmptySections // silence error, shouldn't be necessary when react-native-web implements FlatList
         data={cardTransfers}
-        renderItem={CardTransfer} />
+        renderItem={CardTransfer}/>
+      <RoutineButton
+        onPress={canLoadMore ? loadMore : () => { }}
+        DEFAULT={canLoadMore ? 'Load More' : 'All Card Transfers Loaded'}
+        STARTED='Loading'
+        dismiss={[{ stage: 'DONE', auto: true, onPressDismiss: canLoadMore ? loadMore : () => { } } ]}
+        styleNames={canLoadMore ? 'bordered block' : 'bordered block disabled'}
+        stage={stage} />
     </Secondary>
   )
 }

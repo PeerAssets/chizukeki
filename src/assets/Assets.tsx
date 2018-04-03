@@ -31,12 +31,22 @@ class Assets extends React.Component<Assets.Props, {}> {
       trigger: () => actions.syncAssets.trigger({ address: wallet.address }),
       stop: actions.syncAssets.stop
     }
+    let cardTransfers = mergeCardTransfers(assets || [])
+    let loadMoreCards = {
+      canLoadMore: (assets || []).reduce(
+        (b, { _canLoadMoreCards = true }) => b || _canLoadMoreCards, false),
+      stage: stages.loadMoreCards,
+      loadMore: () => actions.loadMoreCards({
+        address: wallet.address,
+        currentlyLoaded: cardTransfers.length
+      })
+    }
     return (
       <Wrapper>
         <Summary sync={syncAssets} assets={assets || []}>
           <SpawnDeck style={{ width: '100%' }} wallet={wallet} spawn={actions.spawnDeck} stage={stages.spawnDeck} />
         </Summary>
-        <CardTransferList cardTransfers={mergeCardTransfers(assets || [])} />
+        <CardTransferList cardTransfers={cardTransfers} {...loadMoreCards} />
       </Wrapper>
     )
   }
@@ -54,6 +64,7 @@ namespace Assets {
       syncDecks: any //Omit<DeckList.Props['sync'], 'stage'>
       syncAssets: any //Omit<Summary.Props['sync'], 'stage'>
       spawnDeck: any
+      loadMoreCards: any
     }
     style?: any
   }

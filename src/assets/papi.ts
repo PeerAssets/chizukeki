@@ -128,7 +128,9 @@ class Papi {
     let { objects: decks } = await this.restlessRequest('decks', { filters }, bigPage)
     return decks.map(({ issue_mode, ...rest }) => ({ issueMode: issue_mode, ...rest }))
   }
-  cards = async (address: string, deck_id?: string): Promise<Array<Omit<CardTransfer, 'transaction'>>> => {
+  cards = async (address: string, deck_id?: string, currentlyLoaded: number = 0): Promise<Array<Omit<CardTransfer, 'transaction'>>> => {
+    let results_per_page = 10
+    let page = Math.floor(currentlyLoaded / results_per_page) + 1
     let filters: Array<object> = [ 
       { name: "valid", "op": "eq", "val": true },
        {"or": [
@@ -139,7 +141,7 @@ class Papi {
     if(deck_id){
       filters.push({ name: "deck_id", "op": "eq", "val": deck_id })
     }
-    let { objects: cards } = await this.restlessRequest('cards', { filters }, bigPage)
+    let { objects: cards } = await this.restlessRequest('cards', { filters }, { results_per_page, page })
     cards = cards.map(({ amount, ctype, ...card }) => {
       return {
         amount: card.receiver.startsWith(address) ? amount : -amount,

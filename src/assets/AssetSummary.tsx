@@ -23,6 +23,7 @@ namespace AssetSummary {
     _raw?: any // store list of raw balances
   }
   export type Asset = {
+    _canLoadMoreCards?: boolean,
     balance: Balance,
     deck: Papi.Deck,
     cardTransfers: CardTransferList.Data

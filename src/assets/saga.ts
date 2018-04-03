@@ -69,8 +69,8 @@ const spawnDeck = fetchJSONRoutine<
   }
 })
 
-function* syncCards(address: string, deck_id?: string) {
-  let cards = yield call(papi.cards, address, deck_id)
+function* syncCards(address: string, deck_id?: string, currentlyLoaded?: number) {
+  let cards = yield call(papi.cards, address, deck_id, currentlyLoaded)
   let transactionMap = yield select(getTransactionMap, cards.map(c => c.txid))
   for (let card of cards) {
     card.transaction = transactionMap[card.txid]
@@ -108,7 +108,8 @@ const syncAsset = fetchJSONRoutine.withPolling<
 /*
  * grab balances
  * grab all decks that start with a balance short_id OR are issued by the user
- * merge (request sorting from restless?)
+ * merge (TODO request sorting from restless?)
+ * TODO: pass in most recent block height and only sync from there
 */
 const syncAssets = fetchJSONRoutine.withPolling<
   { address: string },
@@ -135,10 +136,8 @@ const syncAssets = fetchJSONRoutine.withPolling<
     let assets: Array<Summary.Asset> = rawBalances.map(
       ({ short_id, ...balance }) => {
         let deck = deckIdMap[short_id]
-        if(deck){
-          balance.type = (deck.issuer === address) ? 'ISSUED' : 'RECEIVED'
-          unissued = unissued.filter(i => i.deck.id !== deck.id)
-        }
+        balance.type = (deck.issuer === address) ? 'ISSUED' : 'RECEIVED'
+        unissued = unissued.filter(i => i.deck.id !== deck.id)
         let cardTransfers = deck ? cards
             .filter(c => c.deck_id === deck.id)
             .map(c => {
@@ -153,6 +152,19 @@ const syncAssets = fetchJSONRoutine.withPolling<
   pollingInterval: 1 * 60 * 1000, // poll every 1 minutes
 })
 
+const loadMoreCards = fetchJSONRoutine<
+  { address: string, deckId?: string, currentlyLoaded: number },
+  { cardTransfers: Summary.Asset['cardTransfers'], deckId?: string },
+  Error
+>({
+  type: 'LOAD_MORE_CARDS',
+  // todo doesn't handle pending spawned decks
+  fetchJSON: function* ({ address, deckId, currentlyLoaded }): SagaIterator {
+    let cardTransfers = yield call(syncCards, address, deckId, currentlyLoaded)
+    return { cardTransfers, deckId }
+  }
+})
+
 
 // TODO cleanup copypasta
 export default function * (){
@@ -160,9 +172,10 @@ export default function * (){
     syncAssets.trigger(),
     sendAssets.trigger(),
     syncAsset.trigger(),
-    spawnDeck.trigger()
+    spawnDeck.trigger(),
+    loadMoreCards.trigger()
   ])
 }
 
 
-export { syncAssets, sendAssets, syncAsset, spawnDeck }
+export { syncAssets, sendAssets, syncAsset, spawnDeck, loadMoreCards }

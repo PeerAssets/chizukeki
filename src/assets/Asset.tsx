@@ -29,11 +29,8 @@ let styles = {
 
 @connectStyle('PeerKeeper.Asset', styles)
 class Asset extends React.Component<Asset.Props, {}> {
-  componentDidMount(){
-
-  }
   render() {
-    let { asset, sync, wallet, actions: { send }, sendAssetsStage } = this.props
+    let { asset, sync, wallet, actions, stages: { sendAssets, loadMoreCards } } = this.props
     return (
       <Wrapper>
         <Main>
@@ -41,11 +38,20 @@ class Asset extends React.Component<Asset.Props, {}> {
             <Summary asset={asset} sync={sync} />
           </Card>
             {'balance' in asset &&
-              <SendAsset key='send' {...{ asset, wallet, send, stage: sendAssetsStage }} />
+              <SendAsset key='send' {...{ asset, wallet, send: actions.send, stage: sendAssets }} />
             }
         </Main>
         { ('cardTransfers' in asset) &&
-          <CardTransferList style={{ width: '100%' }} cardTransfers={asset.cardTransfers} />
+          <CardTransferList style={{ width: '100%' }}
+            cardTransfers={asset.cardTransfers}
+            canLoadMore={'_canLoadMoreCards' in asset ? Boolean(asset._canLoadMoreCards) : true}
+            stage={loadMoreCards}
+            loadMore={() => actions.loadMoreCards({
+              address: wallet.address,
+              deckId: asset.deck.id,
+              currentlyLoaded: 'cardTransfers' in asset ? asset.cardTransfers.length : 0
+            })}
+          />
         }
       </Wrapper>
     )
@@ -56,9 +62,10 @@ namespace Asset {
   export type Props = {
     asset: Summary.Asset | { deck: Deck }
     sync: SyncButton.Logic
-    sendAssetsStage: string | undefined
+    stages: Record<'sendAssets' | 'loadMoreCards', string | undefined>,
     actions: {
       send: SendAsset.Props['send']
+      loadMoreCards: any
     }
     wallet: SendAsset.Props['wallet']
     style?: any

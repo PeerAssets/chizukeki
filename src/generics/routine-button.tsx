@@ -85,7 +85,7 @@ class RoutineButton extends React.Component<Props, { alerting: false | Stage }> 
         stage,
         stages = [],
         auto = false,
-        after = 2500,
+        after = 5000,
         onAutoDismiss = () => {},
         onPressDismiss = () => {}
       } = config
