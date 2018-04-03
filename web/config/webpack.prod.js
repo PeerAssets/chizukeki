@@ -12,9 +12,12 @@ module.exports = {
   },
   plugins: [
     ...plugins,
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify('production')
+    }),
     new webpack.EnvironmentPlugin({
-      NODE_ENV: 'production',
-      PUBLIC_PATH: '/chizukeki'
+      PUBLIC_PATH: '/chizukeki',
+      KEY_GENERATOR: 'singleton'
     }),
     new UglifyJSPlugin({
       sourceMap: true

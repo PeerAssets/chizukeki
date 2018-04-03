@@ -1,10 +1,11 @@
 var webpack = require('webpack')
-const merge = require('webpack-merge')
-const common = require('./webpack.common.js')
+const { output, plugins, ...common } = require('./webpack.common.js')
 
-module.exports = merge(common, {
+module.exports = {
+  ...common,
   devtool: 'inline-cheap-module-source-map',
   output: {
+    ...output,
     publicPath: '/'
   },
   devServer: {
@@ -12,10 +13,14 @@ module.exports = merge(common, {
     historyApiFallback: true
   },
   plugins: [
+    ...plugins,
     new webpack.HotModuleReplacementPlugin(),
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify('development')
+    }),
     new webpack.EnvironmentPlugin({
-      NODE_ENV: 'development',
-      PUBLIC_PATH: '/'
+      PUBLIC_PATH: '/',
+      KEY_GENERATOR: 'singleton'
     })
   ]
-})
+}

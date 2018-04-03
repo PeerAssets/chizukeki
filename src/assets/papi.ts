@@ -1,5 +1,6 @@
 import configure from '../configure'
 import peercoin, { Wallet } from '../explorer'
+import { HTTP } from '../lib/utils'
 import { Omit } from '../generics/utils'
 
 import IssueMode from './issueModes'
@@ -66,21 +67,27 @@ class Papi {
   apiRequest<T = any>(call: ApiCalls, ...path){
     return getJSON<T>(`${this.apiUrl}/${ call }/${ path.join('/') }`)
   }
-  restlessRequest<T = any>(resource: Resource, queryOrId: string | object = {}){
+  restlessRequest<T = any>(resource: Resource, queryOrId: string | object = {}, params: object = {}){
     let path = typeof(queryOrId) === 'string' ?
       `/${queryOrId}` :
-      `?q=${ JSON.stringify(queryOrId) }`
+      // TODO results_per_page should be dynamic, implement proper paging
+      '?' + HTTP.stringifyQuery({
+        q: JSON.stringify(queryOrId),
+        ...params
+      })
     return getJSON<T>(`${this.restlessUrl}/${resource}${path}`)
   }
+  /*
   decks = async (): Promise<Array<Deck.Summary>> => {
-    let decks = await this.apiRequest('decks')
+    let decks = await this.apiRequest('decks', {}, { results_per_page: 100 })
     return decks.map(({ issue_mode, ...rest }) => ({ issueMode: issue_mode, ...rest }))
   }
+  */
   deckSummary = async (deckPrefix: string): Promise<Deck.Summary> => {
     let filters = [
       { name: "id", "op": "like", "val": `${deckPrefix}%`}
     ]
-    let { objects: decks } = await this.restlessRequest('decks', { filters, results_per_page: 1 })
+    let { objects: decks } = await this.restlessRequest('decks', { filters }, { results_per_page: 1 })
     let { issue_mode, ...deck } = decks[0]
     return { issueMode: issue_mode, ...deck } as Deck.Summary
   }
@@ -100,7 +107,7 @@ class Papi {
   }
   balances = async (address: string) => {
     let filters = [{ name: "account", "op": "like", "val": `${address}%`}]
-    let { objects: balances } = await this.restlessRequest('balances', { filters, results_per_page: 100 })
+    let { objects: balances } = await this.restlessRequest('balances', { filters }, { results_per_page: 100 })
     return balances
   }
   balance = async (address: string, assetId: string) => {
@@ -108,37 +115,35 @@ class Papi {
       { name: "account", "op": "like", "val": `${address}%`},
       { name: "short_id", "op": "like", "val": `${assetId.substring(0,10)}%`}
     ]
-    let { objects: balances } = await this.restlessRequest('balances', { filters, results_per_page: 1 })
+    let { objects: balances } = await this.restlessRequest('balances', { filters }, { results_per_page: 1 })
     return balances[0]
   }
   deckSummaries = async (address: string, deckPrefixes: Array<string>): Promise<Array<Deck.Summary>> => {
     let filters = [
       { "or": [
-        { name: "issuer", "op": "eq", "val": address},
+        { name: "issuer", "op": "eq", "val": address },
         ...deckPrefixes.map(deckPrefix => ({
-          name: "id",
+          "name": "id",
           "op": "like",
           "val": `${deckPrefix}%`
         }))
       ]}
     ]
-    let { objects: decks } = await this.restlessRequest('decks', { filters, results_per_page: 100 })
+    let { objects: decks } = await this.restlessRequest('decks', { filters }, { results_per_page: 100 })
     return decks.map(({ issue_mode, ...rest }) => ({ issueMode: issue_mode, ...rest }))
   }
   cards = async (address: string, deck_id?: string): Promise<Array<Omit<CardTransfer, 'transaction'>>> => {
-    let involved = {
-      "or": [
+    let filters: Array<object> = [ 
+      { name: "valid", "op": "eq", "val": true },
+       {"or": [
         { name: "sender", "op": "like", "val": `${address}%`},
         { name: "receiver", "op": "like", "val": `${address}%`},
-      ]
+      ]}
+    ]
+    if(deck_id){
+      filters.push({ name: "deck_id", "op": "eq", "val": deck_id })
     }
-    let filters = [ deck_id ? {
-      "and": [
-        { name: "deck_id", "op": "eq", "val": deck_id },
-        involved
-      ]
-    }: involved ]
-    let { objects: cards } = await this.restlessRequest('cards', { filters, results_per_page: 100 })
+    let { objects: cards } = await this.restlessRequest('cards', { filters }, { results_per_page: 100 })
     cards = cards.map(({ amount, ctype, ...card }) => {
       return {
         amount: card.receiver.startsWith(address) ? amount : -amount,

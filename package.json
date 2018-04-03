@@ -5,7 +5,6 @@
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "native": "tsc --watch --pretty --sourceMap --target es2015 --module commonjs",
-
     "web:start": "webpack-dev-server -d --config web/config/webpack.dev.js --colors",
     "web:build": "webpack -d --config web/config/webpack.prod.js --colors",
     "web:deploy": "bash web/deploy.sh",
@@ -60,8 +59,7 @@
     "uglifyjs-webpack-plugin": "^1.2.4",
     "url-loader": "^0.6.2",
     "webpack": "^3.9.1",
-    "webpack-dev-server": "^2.9.5",
-    "webpack-merge": "^4.1.2"
+    "webpack-dev-server": "^2.9.5"
   },
   "jest": {
     "preset": "react-native"

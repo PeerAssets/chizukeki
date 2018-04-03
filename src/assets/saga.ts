@@ -139,7 +139,13 @@ const syncAssets = fetchJSONRoutine.withPolling<
           balance.type = (deck.issuer === address) ? 'ISSUED' : 'RECEIVED'
           unissued = unissued.filter(i => i.deck.id !== deck.id)
         }
-        let cardTransfers = deck ? cards.filter(c => c.deck_id = deck.id) : []
+        let cardTransfers = deck ? cards
+            .filter(c => c.deck_id === deck.id)
+            .map(c => {
+              c.deck_name = deck.name
+              return c
+            }) :
+          []
         return { deck, balance, cardTransfers } as Summary.Asset
       }).filter(a => a.deck)
     return { assets: unissued.concat(assets) }

@@ -17,9 +17,7 @@ function byTimestampDesc(a: CardTransfer.Data, b: CardTransfer.Data){
 
 function mergeCardTransfers(assets: Summary.Props['assets']){
   return assets.reduce(
-    (transfers, a) => transfers.concat(
-      a.cardTransfers.map(t => (t.deck_name = a.deck.name, t))
-    ),
+    (transfers, a) => transfers.concat(a.cardTransfers),
     [] as CardTransfer.Data[]
   ).sort(byTimestampDesc)
 }

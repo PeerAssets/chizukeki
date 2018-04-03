@@ -22,6 +22,10 @@ import { Wrapper } from '../generics/Layout'
 import RoutineButton from '../generics/routine-button'
 import bitcore from '../lib/bitcore'
 
+const generateKey = process.env.KEY_GENERATOR === 'singleton' ?
+  (): string => new bitcore.PrivateKey().toString() :
+  (): string => new bitcore.HDPrivateKey().toString()
+
 type Format = 'hd' | 'wif' | 'raw' 
 const formatText = {
   hd: 'HD Key',
@@ -118,7 +122,7 @@ class LoadPrivateKey extends React.Component<
   }
   generateNew = () => this.props.loadPrivateKey(
     this.withData(
-      deriveFormat(new bitcore.HDPrivateKey().toString()).data
+      deriveFormat(generateKey()).data
     ) as LoadPrivateKey.Data,
     false
   )
@@ -170,7 +174,8 @@ class LoadPrivateKey extends React.Component<
                 FAILED='There was a Problem syncing!' />
               <View style={{ zIndex: 2, width: '100%', flexDirection: 'row', justifyContent: 'center', height: 1, overflow: 'visible' }}>
                 <Badge styleNames='light' style={styles.validBadge}>
-                  <Text numberOfLines={1} style={{ fontSize: 10 }}>or</Text>
+                  <Text numberOfLines={1} ellipsizeMode='clip'
+                    style={{ fontSize: 10, display: 'flex' } as any}>or</Text>
                 </Badge>
               </View>
               <Button
