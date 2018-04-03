@@ -88,7 +88,7 @@ const syncAsset = fetchJSONRoutine.withPolling<
 >({
   type: 'SYNC_ASSET',
   fetchJSON: function* ({ asset, address }): SagaIterator {
-    let [ deck, balance, cardTransfers ] = yield all([
+    let [ deck, balance = {}, cardTransfers ] = yield all([
       call(papi.deckDetails, asset.deck, asset.deck.issuer === address ? address : undefined),
       call(papi.balance, address, asset.deck.id),
       call(syncCards, address, asset.deck.id)
