@@ -93,6 +93,8 @@ const syncAsset = fetchJSONRoutine.withPolling<
       call(papi.balance, address, asset.deck.id),
       call(syncCards, address, asset.deck.id)
     ])
+    // todo page length should be config. If we don't have a full page, we have all the cards.
+    let _canLoadMoreCards = cardTransfers.length === 10
     balance.type = (balance.value === undefined) ?
       'UNISSUED' :
       (balance.value > 0 ? 'RECEIVED' : 'ISSUED')
@@ -100,7 +102,7 @@ const syncAsset = fetchJSONRoutine.withPolling<
       t.deck_name = deck.name,
       t
     ))
-    return { deck, balance, cardTransfers } as Summary.Asset
+    return { deck, balance, cardTransfers, _canLoadMoreCards } as Summary.Asset
   },
   pollingInterval: 1 * 60 * 1000, // poll every 1 minutes
 })
@@ -125,6 +127,8 @@ const syncAssets = fetchJSONRoutine.withPolling<
       call(papi.deckSummaries, address, rawBalances.map(b => b.short_id)),
       call(syncCards, address)
     ])
+    // todo page length should be config. If we don't have a full page, we have all the cards.
+    let _canLoadMoreCards = cards.length === 10
     let unissued: Array<Summary.Asset> = []
     let deckIdMap = decks.reduce((map, deck) => {
       if(deck.issuer === address){
@@ -147,7 +151,12 @@ const syncAssets = fetchJSONRoutine.withPolling<
           []
         return { deck, balance, cardTransfers } as Summary.Asset
       }).filter(a => a.deck)
-    return { assets: unissued.concat(assets) }
+    assets = unissued.concat(assets)
+    // we can know if more cards for an asset _can't_ be loaded here, but not if they _can_
+    if (_canLoadMoreCards === false) {
+      assets = assets.map(a => (a._canLoadMoreCards = false, a))
+    }
+    return { assets }
   },
   pollingInterval: 1 * 60 * 1000, // poll every 1 minutes
 })

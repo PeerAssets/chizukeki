@@ -54,7 +54,8 @@ function mergeLoadedCards(
   cardTransfers: Array<CardTransfer.Data>,
   deckId?: string
 ): Array<Summary.Asset> {
-  let _canLoadMoreCards = cardTransfers.length > 0
+  // TODO page length should be a config
+  let _canLoadMoreCards = cardTransfers.length === 10
   if(deckId){
     return assets.map(a => a.deck.id !== deckId ? a : {
       ...a,
@@ -64,7 +65,7 @@ function mergeLoadedCards(
       ),
       _canLoadMoreCards
     })
-  } else if (!_canLoadMoreCards) {
+  } else if (_canLoadMoreCards === false) {
     return assets.map(a => ({ ...a, _canLoadMoreCards }))
   } else {
     return assets.map(a => ({
@@ -79,12 +80,34 @@ function mergeLoadedCards(
   }
 }
 
+function mergeAsset(old: Summary.Asset, { cardTransfers, ...synced }: Summary.Asset) {
+  return {
+    ...old,
+    ...synced,
+    cardTransfers: mergeCards(
+      old.cardTransfers,
+      cardTransfers.map(withName(old))
+    )
+  }
+}
+function mergeAssets(old: Array<Summary.Asset>, synced: Array<Summary.Asset>) {
+  let syncedIds = synced.map(a => a.deck.id)
+  return old.filter(a => !syncedIds.includes(a.deck.id)) // this is prep for "cache spawned"
+    .concat(synced.map(s => {
+      // merge synced with current if relevent 
+      let o = old.filter(o => o.deck.id === s.deck.id)
+      return o.length ?
+        mergeAsset(o[0], s) : 
+        s
+    }))
+}
+
 function assetsReducer(state: State = initialState(), action: AnyAction): State {
   return syncAssets.routine.switch<State>(action, {
     started: payload => state,
     done: ({ assets }) => ({
       ...state,
-      assets
+      assets: state.assets ? mergeAssets(state.assets, assets): assets
     }),
     stopped: () => state,
     failed: () => state
@@ -94,7 +117,8 @@ function assetsReducer(state: State = initialState(), action: AnyAction): State 
     done: (asset) => ({
       ...state,
       assets: (state.assets ? state.assets.map(a =>
-        a.deck.id === asset.deck.id ? asset : a) : [ asset ])
+        a.deck.id === asset.deck.id ? mergeAsset(a, asset) : a
+      ) : [ asset ])
     }),
     stopped: () => state,
     failed: () => state
