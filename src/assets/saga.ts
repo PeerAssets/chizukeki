@@ -36,7 +36,7 @@ const sendAssets = fetchJSONRoutine<
     return {
       amount,
       fee,
-      addresses: [bitcore.assets.assetTag(deckSpawnTxn), ...Object.keys(amountsMap)],
+      addresses: [bitcore.assets.assetTag(deckSpawnTxn).toString(), ...Object.keys(amountsMap)],
       ...sent
     }
   }
