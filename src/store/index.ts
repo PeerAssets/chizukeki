@@ -20,14 +20,15 @@ const logoutMigration = state => ({})
 
 const migrations: any = {
   0: logoutMigration,
-  1: logoutMigration
+  1: logoutMigration,
+  2: logoutMigration
 }
 
 let persist = (key: string, reducer: Reducer<any>) => persistReducer({
   key,
   storage,
   blacklist: ['actionHistory'],
-  version: 1,
+  version: 2,
   migrate: createMigrate(migrations, { debug: false }),
 }, reducer)
 
