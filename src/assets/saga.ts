@@ -34,6 +34,7 @@ const sendAssets = fetchJSONRoutine<
     let hex = transaction.sign(signature).serialize()
     let sent = await peercoin._sendRawTransaction(hex)
     return {
+      assetAction: 'CardTransfer',
       amount,
       fee,
       addresses: [bitcore.assets.assetTag(deckSpawnTxn).toString(), ...Object.keys(amountsMap)],
@@ -61,6 +62,7 @@ const spawnDeck = fetchJSONRoutine<
     let hex = transaction.sign(signature).serialize()
     let sent = await peercoin._sendRawTransaction(hex)
     return {
+      assetAction: 'DeckSpawn',
       amount,
       addresses: [ bitcore.assets.configuration.deckSpawnTagHash ],
       fee,
