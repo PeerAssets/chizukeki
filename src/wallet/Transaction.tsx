@@ -53,9 +53,8 @@ class TransactionList extends React.Component<
   toggleFilter = () => this.setState({ showAssets: !this.state.showAssets })
   constructor(props){
     super(props)
-    this.state = { showAssets: false }
+    this.state = { showAssets: true }
   }
-  componentDid
   render() {
     let showAssets = this.state.showAssets
     let transactions = this.props.transactions
@@ -84,7 +83,7 @@ class TransactionList extends React.Component<
           enableEmptySections // silence error, shouldn't be necessary when react-native-web implements FlatList
           data={transactions}
           renderItem={({ item }) =>
-            <WalletTransaction key={item.id} hide={(!showAssets && item.assetAction)} {...item} />
+            <WalletTransaction key={item.id} hide={((!showAssets) && item.assetAction)} {...item} />
           }/>
       </Secondary>
     )
