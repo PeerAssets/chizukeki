@@ -1,5 +1,5 @@
 import * as React from 'react'
-import Modal from '../generics/modal'
+import Modal from '../generics/modal/modal'
 import { Text, Body, Input, Button, Item, Label } from 'native-base'
 import { View } from 'react-native';
 

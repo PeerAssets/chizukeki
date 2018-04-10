@@ -89,6 +89,11 @@ function deriveFormat(privateKey: string){
   return { data, error: undefined }
 }
 
+function _isFilled(d: Partial<LoadPrivateKey.Data>): d is LoadPrivateKey.Data {
+  let { privateKey, format, address, password } = d
+  return Boolean(privateKey && format && address && password)
+}
+
 class LoadPrivateKey extends React.Component<
   {
     syncStage?: string | undefined,
@@ -128,8 +133,8 @@ class LoadPrivateKey extends React.Component<
   )
   render() {
     let { pKeyInput, data, data: { privateKey, format, password } } = this.state
-    let load = LoadPrivateKey.isFilled(data) && (
-      () => LoadPrivateKey.isFilled(data) && this.props.loadPrivateKey(data)
+    let load = _isFilled(data) && (
+      () => _isFilled(data) && this.props.loadPrivateKey(data)
     )
     return (
       <Wrapper>
@@ -200,10 +205,7 @@ namespace LoadPrivateKey {
     format: Format,
     password: string
   }
-  export function isFilled(d: Partial<Data>): d is Data {
-    let { privateKey, format, address, password } = d
-    return Boolean(privateKey && format && address && password)
-  }
+  export const isFilled = _isFilled
   // todo after import WIF is a normal privateKey
   export function toString(privateKey: string, format: Format): string {
     switch(format){

@@ -1,9 +1,8 @@
 {
   "presets": ["react-native"],
-  "sourceMaps": true,
   "plugins": [
     "babel-plugin-react-native-nodeify-hack",
-    ["babel-plugin-rewrite-require", {
+    ["rewrite-require", {
       "aliases": {
         "crypto": "react-native-crypto",
         "stream": "stream-browserify",

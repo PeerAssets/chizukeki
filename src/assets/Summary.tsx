@@ -6,7 +6,7 @@ import { Button, Right, CardItem, Body, Text, Card, connectStyle, H2, H3, Icon, 
 import { Link } from '../routing/router'
 import { Wrapper, Main } from '../generics/Layout'
 import SyncButton from '../generics/sync-button'
-import Modal from '../generics/modal'
+import Modal from '../generics/modal/modal'
 import Wallet from '../wallet/Wallet'
 
 import { Deck } from './papi'
