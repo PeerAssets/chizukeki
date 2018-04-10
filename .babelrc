@@ -1,5 +1,6 @@
 {
   "presets": ["react-native"],
+  "sourceMaps": true,
   "plugins": [
     "babel-plugin-react-native-nodeify-hack",
     ["babel-plugin-rewrite-require", {
