@@ -7,7 +7,7 @@ import { Button, CardItem, Body, Text, Card, connectStyle, H2, Icon } from 'nati
 
 import { Wrapper, Main } from '../generics/Layout'
 import SyncButton from '../generics/sync-button'
-import Modal from '../generics/modal.web'
+import Modal from '../generics/modal'
 
 import { Wallet as WalletData } from '../explorer'
 

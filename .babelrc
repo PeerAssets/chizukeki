@@ -1,3 +1,13 @@
 {
-  "presets": ["react-native"]
+  "presets": ["react-native"],
+  "plugins": [
+    "babel-plugin-react-native-nodeify-hack",
+    ["babel-plugin-rewrite-require", {
+      "aliases": {
+        "crypto": "react-native-crypto",
+        "stream": "stream-browserify",
+        "vm": "vm-browserify"
+      }
+    }]
+  ]
 }

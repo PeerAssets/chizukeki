@@ -4,7 +4,7 @@ import { Button, CardItem, Body, Text, Card, connectStyle, H2, H3, Icon, Badge }
 
 import { Wrapper, Main } from '../generics/Layout'
 import SyncButton from '../generics/sync-button'
-import Modal from '../generics/modal.web'
+import Modal from '../generics/modal'
 
 import Summary from './AssetSummary'
 import SendAsset from './SendAsset'
