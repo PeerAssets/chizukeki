@@ -15,7 +15,10 @@ class UnlockModal extends React.Component<{
   password: string,
   error: string | undefined
 }>{
-  state = { password: '', error: undefined }
+  constructor(props){
+    super(props)
+    this.state = { password: '', error: undefined }
+  }
   close = async (something?: any) => {
     this.setState({ password: '', error: undefined })
     this.props.close()

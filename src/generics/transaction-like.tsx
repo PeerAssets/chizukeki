@@ -33,7 +33,7 @@ class Transaction extends React.Component<Props, { showDetails: boolean }> {
             </Body>
           </Left>
           <Right style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end' }}>
-            <Text styleNames='note' style={{ flex: 6, textAlign: 'right', height: '2em', position: 'relative', bottom: 2 }}>
+            <Text styleNames='note' style={{ flex: 6, textAlign: 'right', height: 30, position: 'relative', bottom: 2 }}>
               {moment(timestamp).fromNow()}
             </Text>
             { children ? (

@@ -4,7 +4,7 @@ import { Modal } from 'react-native'
 export default ({ open, onClose, ...props }) =>  (
   <Modal
     transparent={false}
-    visible={this.state.modalVisible}
+    visible={open}
     onRequestClose={onClose}
     {... { onDismiss: onClose }} // type issue
     {...props} />

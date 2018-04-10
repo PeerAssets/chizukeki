@@ -1,3 +1,4 @@
+import { TextEncoder, TextDecoder } from 'text-encoding'
 // Taken from https://gist.github.com/chrisveness/43bcda93af9f646d083fad678071b90a
 
 /**

@@ -49,7 +49,7 @@ let assetStyles = variables => {
               paddingBottom: 5,
               '.name': {
                 flex: 2,
-                fontSize: 'bold',
+                fontSize: 400,
                 paddingLeft: 10,
                 borderTopLeftRadius: 3,
                 borderBottomLeftRadius: 3,
