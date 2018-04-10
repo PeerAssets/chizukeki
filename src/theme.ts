@@ -3,10 +3,12 @@ import { Platform } from 'react-native'
 import deepmerge from 'deepmerge'
 import { getTheme, variables as nbVariables } from 'native-base'
 
+let web = Platform.OS === 'web'
+
 let textStyles = {
   '.bounded': {
     maxWidth: '100%',
-    whiteSpace: 'nowrap',
+    ...(web ? { whiteSpace: 'nowrap' } : {}),
     //overflow: 'hidden',
     //textOverflow: 'ellipsis',
   }

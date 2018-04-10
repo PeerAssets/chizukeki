@@ -22,22 +22,22 @@ class Transaction extends React.Component<Props, { showDetails: boolean }> {
     let textProps = { styleNames: io('success', 'dark') }
     return (
       <Card>
-        <CardItem>
-          <Left>
+        <CardItem style={{ display: 'flex', flexDirection: 'row' }}>
+          <Left style={{ flex: 2 }}>
             <Icon {...textProps} name={`arrow-circle-o-${io('down', 'up')}`} size={30} color={'black'} />
             <Body>
-              <Text {...textProps}>
+              <Text {...textProps} style={{ lineHeight: 20, paddingRight: 7 }}>
                 {io('+', '-')}
-                {amount.toString()} {asset}
+                {Math.abs(amount).toString()} {asset}
               </Text>
             </Body>
           </Left>
-          <Right style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end' }}>
-            <Text styleNames='note' style={{ flex: 6, textAlign: 'right', height: 30, position: 'relative', bottom: 2 }}>
+          <Right style={{ flex: 1, display: 'flex', flexDirection: 'row', alignItems: 'flex-end' }}>
+            <Text styleNames='note' style={{ flex: 4, textAlign: 'right', height: 30, position: 'relative', bottom: 2 }}>
               {moment(timestamp).fromNow()}
             </Text>
             { children ? (
-              <Button styleNames='transparent small dark' style={{ flex: 1, position: 'relative', left: 12, bottom: 5 }}
+              <Button styleNames='transparent small dark' style={{ flex: 1, position: 'relative', left: 8, bottom: 8 }}
                 onPress={this.toggleDetails} >
                 <Icon name={this.state.showDetails ? 'minus' : 'plus'} />
               </Button>

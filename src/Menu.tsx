@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Text, View, Dimensions } from 'react-native'
+import { Text, View, Platform } from 'react-native'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
@@ -7,11 +7,10 @@ import { withRouter } from 'react-router'
 import { Link } from './routing/router'
 
 import { Button, connectStyle, variables, Right, Icon } from 'native-base'
+import Header from './generics/header'
 
 let tabStyles = {
   link: {
-    color: variables.btnInfoColor,
-    textDecorationLine: 'none',
     height: '100%',
     justifyContent: 'center',
     flexDirection: 'column',
@@ -20,26 +19,22 @@ let tabStyles = {
     paddingRight: 15,
     backgroundColor: variables.btnInfoBg
   },
-  selected: {
+  linkText: {
+    color: variables.btnInfoColor,
+    textDecorationLine: 'none'
+  },
+  linkTextSelected: {
     color: variables.btnPrimaryColor,
-    backgroundColor: variables.btnPrimaryBg
+    textDecorationLine: 'none'
+  },
+  selected: {
+    backgroundColor: variables.btnPrimaryBg,
   },
 }
 
 let navStyles = {
   ...tabStyles,
   container: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    left: 0,
-    height: 50,
-    opacity: 1,
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-
-    zIndex: 1,
-    width: '100%',
     backgroundColor: variables.btnInfoBg
   },
 }
@@ -49,9 +44,10 @@ class Tab extends React.Component<{ name: string, link?: string, selected: strin
   render() {
     let { name, link = `/${this.props.name.toLowerCase()}`, style, selected } = this.props
     let linkStyle = Object.assign({}, style.link, selected === link ? style.selected : {})
+    let linkText = selected === link ? style.linkTextSelected : style.linkText
     return (
       <Link to={link} style={linkStyle}>
-        <Text>{name}</Text>
+        <Text style={linkText}>{name}</Text>
       </Link>
     )
   }
@@ -63,7 +59,7 @@ class Nav extends React.Component<{ location: { pathname: string }, style?: any,
   render() {
     let { style, location, logout } = this.props
     return (
-      <View style={style.container}>
+      <Header style={style.container}>
         <Tab name='Wallet' selected={location.pathname} />
         <Tab name='Assets' selected={location.pathname} />
         <Right>
@@ -71,7 +67,7 @@ class Nav extends React.Component<{ location: { pathname: string }, style?: any,
             <Icon name='sign-out' style={{color:'white'}} />
           </Link>
         </Right>
-      </View>
+      </Header>
     )
   }
 }

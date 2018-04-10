@@ -1,5 +1,10 @@
 import * as React from 'react'
-import { Dimensions, Text, View } from 'react-native';
+import { Dimensions, Text, View, ScrollView, Platform } from 'react-native';
+
+let contentContainerStyle = {
+  justifyContent: 'space-around' as 'space-around',
+  alignItems: 'center' as 'center',
+}
 
 let styles = {
   wrapper: {
@@ -8,18 +13,16 @@ let styles = {
     width: '100%',
     maxWidth: 900,
     padding: 15,
-    alignItems: 'flex-start' as 'flex-start',
-    justifyContent: 'space-around' as 'space-around'
+    ...contentContainerStyle
   },
   main: {
     flex: 5,
-    minWidth: 425,
+    minWidth: Platform.OS === 'web' ? 425 : 325,
     maxWidth: 600,
-    marginTop: -5,
+    marginTop: Platform.OS === 'web' ? -5 : 5,
     flexDirection: 'column' as 'column',
-    justifyContent: 'space-around' as 'space-around',
-    alignItems: 'center' as 'center',
     overflow: 'hidden' as 'hidden',
+    ...contentContainerStyle
   },
   secondary: {
     flex: 4,
@@ -37,7 +40,14 @@ function Layout(styles){
   )
 }
 
-const Wrapper = Layout(styles.wrapper)
+let InnerWrapper = Layout(styles.wrapper)
+function Wrapper(props){
+  return (
+    <ScrollView style={{ width: '100%' }} contentContainerStyle={contentContainerStyle} >
+      <InnerWrapper {...props}/>
+    </ScrollView>
+  )
+}
 const Main = Layout(styles.main)
 const Secondary = Layout(styles.secondary)
 
