@@ -34,8 +34,8 @@ type Fillable<T> = {
 }
 namespace Fillable {
   export function isFilled<T>(fillable: T | Fillable<T>): fillable is T {
-    for (let v of Object.values(fillable)){
-      if(v === null){
+    for (let v of Object.values(fillable)) {
+      if (v === null) {
         return false
       }
     }
@@ -84,7 +84,7 @@ class SpawnDeck extends React.Component<SpawnDeck.Props, State> {
     precision: null,
   }
   spawn = (privateKey: string) => {
-    if(isFilled(this.state)){
+    if (isFilled(this.state)) {
       let wallet = Object.assign({ privateKey }, this.props.wallet)
       this.props.spawn({ wallet, ...this.state })
     }
@@ -95,39 +95,37 @@ class SpawnDeck extends React.Component<SpawnDeck.Props, State> {
 
     return (
       <Card style={this.props.style}>
-        <CardItem styleNames='header'>
-          <Body style={{ flexDirection: 'row', width: '100%', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-            <H2 style={{ flexBasis: 200, paddingBottom: 15 }}>Spawn a new Deck</H2>
-          </Body>
+        <CardItem styleNames='header' style={{ paddingBottom: 0 }}>
+          <H2 style={{ flexBasis: 200, paddingBottom: 0 }}>Spawn a new Deck</H2>
         </CardItem>
-        <CardItem>
-          <Body style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%', flexWrap: 'wrap' }}>
-          <Form>
-            <Item styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300 }}>
-              <Label>Name</Label>
-              <Input
-                style={{ lineHeight: 14 }}
-                value={this.state.name}
-                onChangeText={name => this.setState({ name })} />
-            </Item>
-            <Item styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300 }}>
-              <Label>Decimal Precision</Label>
-              <Input
-                keyboardType='numeric'
-                placeholder='0'
-                style={{ lineHeight: 14 }}
-                value={precision !== null && Number.isFinite(precision) ? `${precision}` : ''}
-                onChangeText={_precision => {
-                  let precision = Number(_precision)
-                  this.setState({ precision: Number.isFinite(precision) ? precision : null })
-                }} />
-            </Item>
-            <Item styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300, minHeight: 50  }}>
-              <Label>Issue Mode</Label>
-              <IssueMode selected={this.state.issueMode}
-                select={(issueMode: IssueMode.Data) => this.setState({ issueMode }) } />
-            </Item>
-          </Form>
+        <CardItem style={{ flex: 0 }}>
+          <Body style={{ flexDirection: 'column', justifyContent: 'space-around', width: '100%', flexWrap: 'wrap', flex: 0 }}>
+            <Form>
+              <Item styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300 }}>
+                <Label>Name</Label>
+                <Input
+                  style={{ lineHeight: 14 }}
+                  value={this.state.name}
+                  onChangeText={name => this.setState({ name })} />
+              </Item>
+              <Item styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300 }}>
+                <Label>Decimal Precision</Label>
+                <Input
+                  keyboardType='numeric'
+                  placeholder='0'
+                  style={{ lineHeight: 14 }}
+                  value={precision !== null && Number.isFinite(precision) ? `${precision}` : ''}
+                  onChangeText={_precision => {
+                    let precision = Number(_precision)
+                    this.setState({ precision: Number.isFinite(precision) ? precision : null })
+                  }} />
+              </Item>
+              <Item styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300, minHeight: 50, flex: 0 }}>
+                <Label style={{ maxWidth: 100 }}>Issue Mode</Label>
+                <IssueMode style={{ width: 200, backgroundColor: variables.brandLight }} selected={this.state.issueMode}
+                  select={(issueMode: IssueMode.Data) => this.setState({ issueMode })} />
+              </Item>
+            </Form>
           </Body>
         </CardItem>
         <CardItem styleNames='footer'>

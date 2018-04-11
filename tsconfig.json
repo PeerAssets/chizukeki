@@ -4,6 +4,7 @@
     "outDir": "./dist/",
     "noImplicitAny": false,
     "strictNullChecks": true,
+    "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",

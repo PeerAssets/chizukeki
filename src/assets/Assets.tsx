@@ -4,7 +4,7 @@ import { Button, CardItem, Body, Text, Card, connectStyle, H2, Icon } from 'nati
 import { Wrapper, Main } from '../generics/Layout'
 import RoutineButton from '../generics/routine-button'
 import { Omit } from '../generics/utils'
-import Modal from '../generics/modal.web'
+import Modal from '../generics/modal/modal'
 import Wallet from '../wallet/Wallet'
 
 import Summary from './Summary'
@@ -44,7 +44,7 @@ class Assets extends React.Component<Assets.Props, {}> {
     return (
       <Wrapper>
         <Summary sync={syncAssets} assets={assets || []}>
-          <SpawnDeck style={{ width: '100%' }} wallet={wallet} spawn={actions.spawnDeck} stage={stages.spawnDeck} />
+          <SpawnDeck style={{ width: '100%', flex: 0 }} wallet={wallet} spawn={actions.spawnDeck} stage={stages.spawnDeck} />
         </Summary>
         <CardTransferList cardTransfers={cardTransfers} {...loadMoreCards} />
       </Wrapper>

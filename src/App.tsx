@@ -55,6 +55,7 @@ export default class App extends React.Component<{}> {
 const styles = StyleSheet.create({
   wrapper: {
     minHeight: '100%',
+    width: '100%',
     backgroundColor: '#DADADA'
   },
   background: {

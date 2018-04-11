@@ -1,9 +1,5 @@
 import * as React from 'react'
-import { View } from 'react-native'
-import { Button, Card, Left, Right, CardItem, Body, Text, H2, Icon } from 'native-base'
-
-import FlatList from 'react-native-web-lists/src/FlatList'
-import moment from 'moment'
+import { View, Button, Card, Left, Right, CardItem, Body, Text, H2, Icon } from 'native-base'
 
 import { Link } from '../routing/router'
 
@@ -39,17 +35,21 @@ namespace AssetSummary {
 
 
 function Balance({
-  balance: { type, value }, deck: { id, name }, style, styleNames = ''
-}: AssetSummary.Asset & { styleNames?: string, style?: any }) {
+  balance: { type, value }, deck: { id, name },
+  style, styleNames = '', children
+}: AssetSummary.Asset & { styleNames?: string, style?: any, children?: any }) {
   return (
     <CardItem style={style} styleNames={`balance ${type.toLowerCase()} ${styleNames}`}>
       <Text styleNames='name'>{name}</Text>
-      <Text styleNames='value'>
-        {value !== undefined ? Math.abs(value).toLocaleString('en') : '-'}
-      </Text>
-      <Text styleNames='type'>
-        {type.toLowerCase()}
-      </Text>
+      <Body styleNames='issuance'>
+        <Text styleNames='value'>
+          {value !== undefined ? Math.abs(value).toLocaleString('en') : '-'}
+        </Text>
+        <Text styleNames='type'>
+          {type === 'RECEIVED' ? 'balance' : type.toLowerCase()}
+        </Text>
+      </Body>
+      { children }
     </CardItem>
   )
 }
@@ -62,28 +62,34 @@ let styles = {
     display: 'flex' as 'flex',
     flexDirection: 'row' as 'row',
     flexWrap: 'wrap' as 'wrap',
-    justifyContent: 'space-between' as 'space-between'
+    justifyContent: 'flex-start' as 'flex-start',
+    alignItems: 'flex-start' as 'flex-start',
   },
 }
 
 
 // todo entangled with Asset
 function FocusedHead({ asset, sync }: AssetSummary.Props){
+  let headStyle = {
+    width: '100%',
+    display: 'flex',
+    paddingLeft: 0,
+    paddingRight: 0,
+    paddingTop: 0,
+    flex: 0,
+    justifyContent: 'space-between'
+  }
   return sync ? (
-    <CardItem styleNames='header' style={{ width: '100%' }}>
-      <Body style={{ justifyContent: 'space-between', flexWrap: 'wrap', flexDirection: 'row' }}>
-        <H2>{asset.deck.name}</H2>
-        <Right>
-          {sync ? <SyncButton whenMounted {...sync} /> : null}
-        </Right>
-      </Body>
+    <CardItem styleNames='header' style={headStyle as any}>
+      <H2>{asset.deck.name}</H2>
+      {sync ? <SyncButton whenMounted {...sync} /> : null}
     </CardItem>
   ) : null 
 }
 
 function DeckDetails({ deck }: { deck: Papi.Deck }){
   return (
-    <CardItem styleNames='footer' style={{ alignItems: 'flex-start', flexDirection: 'column', width: '100%' }}>
+    <Body styleNames='details' style={{ alignItems: 'flex-start', flexDirection: 'column', width: '100%' }}>
       <Text styleNames='note bounded' ellipsizeMode='middle' numberOfLines={1} >
         id: {deck.id}
       </Text>
@@ -91,10 +97,17 @@ function DeckDetails({ deck }: { deck: Papi.Deck }){
         issuer: {deck.issuer}
       </Text>
       <Text styleNames='note'>mode: {IssueModes.decode(deck.issueMode)}</Text>
-    </CardItem>
+    </Body>
   )
 }
 
+let actionStyle = {
+  position: 'absolute',
+  right: 0,
+  top: 3,
+  height: 40,
+  zIndex: 2
+}
 
 class AssetSummary extends React.Component<
   AssetSummary.Props,
@@ -112,17 +125,18 @@ class AssetSummary extends React.Component<
       <Body style={styles.card} {...props}>
         <FocusedHead asset={asset} sync={sync}/>
         { ('balance' in asset) ?
-          <Link to={`/assets/${deck.id}`} style={{ flex: 8 }} >
-            <Balance {...asset} />
+          <Link to={`/assets/${deck.id}`} style={{ width: '100%' }} {...sync ? { onPress: ()=>{} } : {}}>
+            <Balance {...asset}>
+              {this.state.showDetails && <DeckDetails deck={deck}/> }
+            </Balance>
           </Link> : null
         }
         { !sync ? (
-          <Button styleNames='transparent small dark' style={{ flex: 1 }}
+          <Button styleNames='transparent small dark' style={actionStyle as any}
             onPress={this.toggleDetails} >
             <Icon name={this.state.showDetails ? 'minus' : 'plus'} />
           </Button>
         ) : null}
-        {this.state.showDetails && <DeckDetails deck={deck}/> }
       </Body>
     )
   }

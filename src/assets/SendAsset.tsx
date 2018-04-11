@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { View } from 'react-native'
+import { View, Platform } from 'react-native'
 import RoutineButton from '../generics/routine-button'
 import {
   Container,
@@ -15,7 +15,7 @@ import {
   Input,
   Button,
   Item,
-  Right,
+  Left,
   Icon,
   Label,
   variables
@@ -51,7 +51,8 @@ namespace SendAsset {
 let smallTextStyle = {
   lineHeight: 14,
   fontSize: 12,
-  textOverflow: 'ellipsis',
+  flex: 0,
+  ...(Platform.OS === 'web' ? { textOverflow: 'ellipsis' } : {}),
 }
 
 function isFilled(s: SendAsset.Data): s is SendAsset.Data {
@@ -65,8 +66,9 @@ function Recipient(
   return (
     <CardItem styleNames='recipient'>
       <Body styleNames='row underlined'>
-        <Text style={smallTextStyle} styleNames='recipient column'>{address}</Text>
-        <Text style={smallTextStyle} styleNames='amount column'>{amount.toFixed(decimals)}</Text>
+        <Text ellipsizeMode='middle' numberOfLines={1}
+          style={[smallTextStyle, { flex: 2 }]} styleNames='recipient column'>{address}</Text>
+        <Text style={[smallTextStyle, { flex: 1 }]} styleNames='amount column'>{amount.toFixed(decimals)}</Text>
         <Button style={{ height: 30 }} styleNames='warning transparent' onPress={remove}>
           <Icon name='minus' />
         </Button>
@@ -183,16 +185,16 @@ class SendAsset extends React.Component<SendAsset.Props, SendAsset.Data> {
     let headers = { address: 'Add recipents to send a transaction',  }
 
     return (
-      <Card style={{width: '100%'}}>
+      <Card style={{width: '100%', flex: 0 }}>
         <CardItem styleNames='header'>
-          <Body styleNames='row'>
-            <H2 style={{ flexBasis: 200, paddingBottom: 15 }}>{transactionType} {name}</H2>
-          </Body>
+          <Left>
+            <H2 style={{ flexBasis: 200, paddingBottom: 0 }}>{transactionType} {name}</H2>
+          </Left>
         </CardItem>
         <CardItem>
           <Body styleNames='row'>
-            <Text styleNames='recipient column'>Recipient Addresses</Text>
-            <Text styleNames='amount column'>Amounts</Text>
+            <Text style={{ flex: 2 }} styleNames='recipient column'>Recipient Addresses</Text>
+            <Text style={{ flex: 1 }} styleNames='amount column'>Amounts</Text>
             <View style={{ justifyContent: 'space-between', paddingRight: 17, paddingTop: 8 }}>
               <Icon name='send' style={{ fontSize: 18 }} />
             </View>

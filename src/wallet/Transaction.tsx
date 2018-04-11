@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { View } from 'react-native'
+import { View, Platform } from 'react-native'
 import { Button, Card, CardItem, Text, H2, Badge, Switch } from 'native-base'
 
-import FlatList from 'react-native-web-lists/src/FlatList'
+import FlatList from '../generics/FlatList'
 import moment from 'moment'
 
 import { Secondary } from '../generics/Layout'
@@ -50,7 +50,8 @@ class TransactionList extends React.Component<
   { transactions: TransactionList.Data },
   { showAssets: boolean }
 > {
-  toggleFilter = () => this.setState({ showAssets: !this.state.showAssets })
+  toggleFilter = (showAssets = !this.state.showAssets) =>
+    this.setState({ showAssets })
   constructor(props){
     super(props)
     this.state = { showAssets: true }
@@ -73,15 +74,15 @@ class TransactionList extends React.Component<
             <H2>Transactions</H2>
             <Text styleNames='note'> {transactions.length} total </Text>
           </Text>
-          <Button styleNames='small info' onPress={this.toggleFilter}
+          <Button styleNames={`${Platform.OS === 'web' ? 'small' : ''} info`} onPress={() => this.toggleFilter()}
             style={{ paddingLeft: 0, paddingRight: 10 }} >
             <Text>Assets</Text>
-            <Switch value={showAssets} />
+            <Switch value={showAssets} onValueChange={this.toggleFilter} />
           </Button>
         </View>
         <FlatList
-          enableEmptySections // silence error, shouldn't be necessary when react-native-web implements FlatList
           data={transactions}
+          keyExtractor={t => t.id}
           renderItem={({ item }) =>
             <WalletTransaction key={item.id} hide={((!showAssets) && item.assetAction)} {...item} />
           }/>

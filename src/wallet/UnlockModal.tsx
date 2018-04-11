@@ -1,5 +1,5 @@
 import * as React from 'react'
-import Modal from '../generics/modal.web'
+import Modal from '../generics/modal/modal'
 import { Text, Body, Input, Button, Item, Label } from 'native-base'
 import { View } from 'react-native';
 
@@ -15,7 +15,10 @@ class UnlockModal extends React.Component<{
   password: string,
   error: string | undefined
 }>{
-  state = { password: '', error: undefined }
+  constructor(props){
+    super(props)
+    this.state = { password: '', error: undefined }
+  }
   close = async (something?: any) => {
     this.setState({ password: '', error: undefined })
     this.props.close()

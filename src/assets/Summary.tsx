@@ -6,7 +6,7 @@ import { Button, Right, CardItem, Body, Text, Card, connectStyle, H2, H3, Icon, 
 import { Link } from '../routing/router'
 import { Wrapper, Main } from '../generics/Layout'
 import SyncButton from '../generics/sync-button'
-import Modal from '../generics/modal.web'
+import Modal from '../generics/modal/modal'
 import Wallet from '../wallet/Wallet'
 
 import { Deck } from './papi'
@@ -22,21 +22,6 @@ namespace Summary {
     assets: Array<Asset>
     style?: any,
     sync: SyncButton.Logic
-  }
-}
-
-
-let styles = {
-  body: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    width: '100%'
-  },
-  column: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    margin: 7.5,
-    flex: 1,
   }
 }
 
@@ -68,16 +53,15 @@ class Summary extends React.Component<Summary.Props, {}> {
     let { UNISSUED, ISSUED, RECEIVED } = divideByOwnership(assets)
     return (
       <Main>
-        <Card styleNames='asset summary' style={{ width: '100%', padding: 10 }}>
-          <CardItem styleNames='header'>
-            <Body style={{ justifyContent: 'space-between', flexWrap: 'wrap', flexDirection: 'row' }}>
-              <H2>Your Assets</H2>
-              <Right>
-                <SyncButton {...sync} whenMounted />
-              </Right>
-            </Body>
-          </CardItem>
-        </Card>
+        <View style={{ width: '100%', padding: 10, display: 'flex', flexDirection: 'row' }}>
+          <Text>
+            <H2>Your Assets</H2>
+            <Text styleNames='note'> {assets.length} total </Text>
+          </Text>
+          <Right>
+            <SyncButton {...sync} whenMounted />
+          </Right>
+        </View>
         {(UNISSUED.length || ISSUED.length) ? (
           <Card styleNames='asset summary' style={{ width: '100%', padding: 10 }}>
             <CardItem styleNames='header' style={pad(10)}>

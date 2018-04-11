@@ -16,7 +16,7 @@ namespace SyncButton {
 
 const stageTexts = {
   DEFAULT: 'Syncing',
-  STOPPED: 'Syncing disabled',
+  STOPPED: 'Not Syncing',
   STARTED: 'Syncing',
   FAILED: 'Sync Failed',
 }

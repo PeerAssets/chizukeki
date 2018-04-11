@@ -3,7 +3,7 @@ import { mapObjIndexed } from 'ramda'
 import { Text, Button, Icon, Spinner, variables } from 'native-base'
 import { Routine } from './routine';
 import { lang } from 'moment';
-import { Dimensions } from 'react-native';
+import { Platform, Dimensions } from 'react-native';
 
 type Stage = 'STARTED' | 'DONE' | 'FAILED' | 'DEFAULT' | 'STOPPED'
 
@@ -40,7 +40,7 @@ function ButtonIcon(name: string){
 }
 
 const defaultIcons = {
-  STARTED: <Spinner size={30} color='white' />,
+  STARTED: <Spinner size={Platform.OS === 'ios' ? 0 : 30} color='white' />,
   DONE: ButtonIcon('check'),
   FAILED: ButtonIcon('close'),
   DEFAULT: undefined,

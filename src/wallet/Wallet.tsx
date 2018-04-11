@@ -7,7 +7,7 @@ import { Button, CardItem, Body, Text, Card, connectStyle, H2, Icon } from 'nati
 
 import { Wrapper, Main } from '../generics/Layout'
 import SyncButton from '../generics/sync-button'
-import Modal from '../generics/modal.web'
+import Modal from '../generics/modal/modal'
 
 import { Wallet as WalletData } from '../explorer'
 
@@ -15,8 +15,7 @@ import { WrapActionable } from './UnlockModal'
 
 class UnlockThenCopy extends React.Component<{ keys: Wallet.Keys }, { privateKey: string, alerting: boolean }> {
   state = { privateKey: '', alerting: false }
-  cache = (privateKey: string) => 
-    this.setState({ privateKey })
+  cache = (privateKey: string) => this.setState({ privateKey })
   copy = () => {
     let keys = this.props.keys
     let privateKey = Wallet.Keys.areLocked(keys) ? 
@@ -33,9 +32,9 @@ class UnlockThenCopy extends React.Component<{ keys: Wallet.Keys }, { privateKey
   render() {
     let alerting = this.state.alerting
     return [
-      <Modal key='modal' open={Boolean(this.state.privateKey)} onClose={this.copy}>
+      <Modal key='modal' open={Boolean(this.state.privateKey)} onClose={() => this.setState({ privateKey: '' })}>
         <Text> Unlocked! </Text>
-        <Button styleNames='iconLeft success' style={styles.column} onPress={this.copy}>
+        <Button styleNames='iconLeft success' style={{...styles.column, flex: 0 }} onPress={this.copy}>
           <Text> Copy Key to Clipboard </Text>
         </Button>
       </Modal>,
@@ -110,7 +109,7 @@ class Wallet extends React.Component<
     return (
       <Wrapper>
         <Main>
-          <Card style={{ width: '100%' }}>
+          <Card style={{ width: '100%', flex: 1, maxHeight: 265 }}>
             <CardItem styleNames='header'>
               <Balance balance={balance} style={style.column} />
             </CardItem>
@@ -124,7 +123,7 @@ class Wallet extends React.Component<
               <Address address={address} style={style.body} />
             </CardItem>
           </Card>
-          <SendTransaction {...sendTransaction} />
+          <SendTransaction {...sendTransaction} style={{ width: '100%', maxHeight: 265, }} />
         </Main>
         <TransactionList transactions={transactions} />
       </Wrapper>
