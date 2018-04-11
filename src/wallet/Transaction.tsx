@@ -2,7 +2,7 @@ import * as React from 'react'
 import { View, Platform } from 'react-native'
 import { Button, Card, CardItem, Text, H2, Badge, Switch } from 'native-base'
 
-import FlatList from 'react-native-web-lists/src/FlatList'
+import FlatList from '../generics/FlatList'
 import moment from 'moment'
 
 import { Secondary } from '../generics/Layout'
@@ -81,8 +81,8 @@ class TransactionList extends React.Component<
           </Button>
         </View>
         <FlatList
-          enableEmptySections // silence error, shouldn't be necessary when react-native-web implements FlatList
           data={transactions}
+          keyExtractor={t => t.id}
           renderItem={({ item }) =>
             <WalletTransaction key={item.id} hide={((!showAssets) && item.assetAction)} {...item} />
           }/>

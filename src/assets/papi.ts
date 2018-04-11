@@ -51,6 +51,7 @@ export type CardTransfer = {
 
   blockseq: number,
   blocknum: number,
+  cardseq: number,
 
   transaction: Wallet.Transaction
 }

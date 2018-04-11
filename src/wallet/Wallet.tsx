@@ -110,7 +110,7 @@ class Wallet extends React.Component<
     return (
       <Wrapper>
         <Main>
-          <Card style={{ width: '100%', flex: 1, maxHeight: 250 }}>
+          <Card style={{ width: '100%', flex: 1, maxHeight: 265 }}>
             <CardItem styleNames='header'>
               <Balance balance={balance} style={style.column} />
             </CardItem>
@@ -124,7 +124,7 @@ class Wallet extends React.Component<
               <Address address={address} style={style.body} />
             </CardItem>
           </Card>
-          <SendTransaction {...sendTransaction} style={{ width: '100%', maxHeight: 265 }} />
+          <SendTransaction {...sendTransaction} style={{ width: '100%', maxHeight: 265, }} />
         </Main>
         <TransactionList transactions={transactions} />
       </Wrapper>

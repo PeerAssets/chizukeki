@@ -44,7 +44,7 @@ class Assets extends React.Component<Assets.Props, {}> {
     return (
       <Wrapper>
         <Summary sync={syncAssets} assets={assets || []}>
-          <SpawnDeck style={{ width: '100%' }} wallet={wallet} spawn={actions.spawnDeck} stage={stages.spawnDeck} />
+          <SpawnDeck style={{ width: '100%', flex: 0 }} wallet={wallet} spawn={actions.spawnDeck} stage={stages.spawnDeck} />
         </Summary>
         <CardTransferList cardTransfers={cardTransfers} {...loadMoreCards} />
       </Wrapper>

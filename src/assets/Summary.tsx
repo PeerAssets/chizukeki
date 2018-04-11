@@ -26,21 +26,6 @@ namespace Summary {
 }
 
 
-let styles = {
-  body: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    width: '100%'
-  },
-  column: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    margin: 7.5,
-    flex: 1,
-  }
-}
-
-
 function divideByOwnership(assets: Array<Summary.Asset>) {
   let divided: Record<Summary.Asset['balance']['type'], Array<Summary.Asset>> = {
     UNISSUED: [],
@@ -68,16 +53,15 @@ class Summary extends React.Component<Summary.Props, {}> {
     let { UNISSUED, ISSUED, RECEIVED } = divideByOwnership(assets)
     return (
       <Main>
-        <Card styleNames='asset summary' style={{ width: '100%', padding: 10 }}>
-          <CardItem styleNames='header'>
-            <Body style={{ justifyContent: 'space-between', flexWrap: 'wrap', flexDirection: 'row' }}>
-              <H2>Your Assets</H2>
-              <Right>
-                <SyncButton {...sync} whenMounted />
-              </Right>
-            </Body>
-          </CardItem>
-        </Card>
+        <View style={{ width: '100%', padding: 10, display: 'flex', flexDirection: 'row' }}>
+          <Text>
+            <H2>Your Assets</H2>
+            <Text styleNames='note'> {assets.length} total </Text>
+          </Text>
+          <Right>
+            <SyncButton {...sync} whenMounted />
+          </Right>
+        </View>
         {(UNISSUED.length || ISSUED.length) ? (
           <Card styleNames='asset summary' style={{ width: '100%', padding: 10 }}>
             <CardItem styleNames='header' style={pad(10)}>

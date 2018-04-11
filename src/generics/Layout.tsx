@@ -3,7 +3,7 @@ import { Dimensions, Text, View, ScrollView, Platform } from 'react-native';
 
 let contentContainerStyle = {
   justifyContent: 'space-around' as 'space-around',
-  alignItems: 'center' as 'center',
+  alignItems: 'flex-start' as 'flex-start',
 }
 
 let styles = {

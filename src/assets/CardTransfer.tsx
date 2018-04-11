@@ -2,7 +2,7 @@ import * as React from 'react'
 import { View } from 'react-native'
 import { Button, Card, Left, CardItem, Body, Text, H2, Icon } from 'native-base'
 
-import FlatList from 'react-native-web-lists/src/FlatList'
+import FlatList from '../generics/FlatList'
 import moment from 'moment'
 
 import { Secondary } from '../generics/Layout'
@@ -17,7 +17,7 @@ namespace CardTransfer {
 import Transaction from '../generics/transaction-like'
 
 function CardTransfer({
-  item: { amount, deck_name = '', receiver, sender, transaction: { timestamp } }
+  item: { amount, deck_name = '', receiver, sender, transaction: { timestamp, id } }
 }: { item: CardTransfer.Data }) {
   return (
     <Transaction {...{ amount, timestamp }}
@@ -46,6 +46,7 @@ function CardTransferList({ cardTransfers, loadMore, canLoadMore, style = {}, st
       <FlatList
         enableEmptySections // silence error, shouldn't be necessary when react-native-web implements FlatList
         data={cardTransfers}
+        keyExtractor={t => t.transaction.id + t.cardseq}
         renderItem={CardTransfer}/>
       <RoutineButton
         onPress={canLoadMore ? loadMore : () => { }}

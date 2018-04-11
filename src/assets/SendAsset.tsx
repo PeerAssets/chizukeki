@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { View } from 'react-native'
+import { View, Platform } from 'react-native'
 import RoutineButton from '../generics/routine-button'
 import {
   Container,
@@ -15,7 +15,7 @@ import {
   Input,
   Button,
   Item,
-  Right,
+  Left,
   Icon,
   Label,
   variables
@@ -51,7 +51,7 @@ namespace SendAsset {
 let smallTextStyle = {
   lineHeight: 14,
   fontSize: 12,
-  textOverflow: 'ellipsis',
+  ...(Platform.OS === 'web' ? { textOverflow: 'ellipsis' } : {}),
 }
 
 function isFilled(s: SendAsset.Data): s is SendAsset.Data {
@@ -183,11 +183,11 @@ class SendAsset extends React.Component<SendAsset.Props, SendAsset.Data> {
     let headers = { address: 'Add recipents to send a transaction',  }
 
     return (
-      <Card style={{width: '100%'}}>
+      <Card style={{width: '100%', flex: 0 }}>
         <CardItem styleNames='header'>
-          <Body styleNames='row'>
-            <H2 style={{ flexBasis: 200, paddingBottom: 15 }}>{transactionType} {name}</H2>
-          </Body>
+          <Left>
+            <H2 style={{ flexBasis: 200, paddingBottom: 0 }}>{transactionType} {name}</H2>
+          </Left>
         </CardItem>
         <CardItem>
           <Body styleNames='row'>

@@ -28,47 +28,63 @@ let assetStyles = variables => {
   let typeBackgrounds = (background) => ({
     'NativeBase.Text': {
       '.name': {
-        backgroundColor: color(background).lighten(0.5).hex(),
+        backgroundColor: background,
       },
-      '.value': {
+    },
+    'NativeBase.Body': {
+      '.issuance': {
         backgroundColor: color(background).lighten(0.25).hex(),
       },
-      '.type': {
-        backgroundColor: background,
+      '.details': {
+        backgroundColor: color(background).lighten(0.575).hex(),
+        padding: 10,
+        'NativeBase.Text': {
+          color: variables.brandDark,
+        }
       }
     }
   })
   return {
     'NativeBase.Card': {
+      flex: 0,
       'NativeBase.Body': {
+        flex: 0,
         'NativeBase.CardItem': {
           // summary & detail
           '.balance': {
             padding: 0,
-            paddingBottom: 10,
+            marginBottom: 5,
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            borderRadius: 3,
+            overflow: 'hidden',
             'NativeBase.Text': {
-              paddingTop: 5,
-              paddingBottom: 5,
+              width: '100%',
+              textAlign: 'center',
               '.name': {
-                flex: 2,
-                fontSize: 400,
+                height: 35,
+                flex: 1,
+                textAlign: 'left',
+                fontWeight: 'bold',
                 paddingLeft: 10,
-                borderTopLeftRadius: 3,
-                borderBottomLeftRadius: 3,
-              },
-              '.value': {
-                flex: 1,
-                textAlign: 'center'
-              },
-              '.type': {
-                flex: 1,
-                color: variables.brandLight,
-                borderTopRightRadius: 3,
-                borderBottomRightRadius: 3,
-                textAlign: 'center',
-                paddingRight: 10,
-              },
+                paddingTop: 10,
+                paddingBottom: 5,
+              }
             },
+            'NativeBase.Body': {
+              width: '100%',
+              '.issuance': {
+                height: 35,
+                alignItems: 'center',
+                justifyContent: 'center',
+                display: 'flex',
+                flexDirection: 'row',
+                'NativeBase.Text': {
+                  padding: 5
+                }
+              }
+            }
           },
           '.focused': {
             'NativeBase.Text': {
@@ -168,11 +184,11 @@ export default (variables = nbVariables) => {
         flexDirection: 'column',
         alignItems: 'flex-start',
         'NativeBase.Label': {
-          fontSize: '14px'
+          fontSize: 14
         },
         'NativeBase.Input': {
           lineHeight: 14,
-          textOverflow: 'ellipsis',
+          ...(web ? { textOverflow: 'ellipsis' } : {}),
           width: '100%',
           height: 40
         }
