@@ -33,10 +33,12 @@ class UnlockThenCopy extends React.Component<{ keys: Wallet.Keys }, { privateKey
     let alerting = this.state.alerting
     return [
       <Modal key='modal' open={Boolean(this.state.privateKey)} onClose={() => this.setState({ privateKey: '' })}>
-        <Text> Unlocked! </Text>
-        <Button styleNames='iconLeft success' style={{...styles.column, flex: 0 }} onPress={this.copy}>
-          <Text> Copy Key to Clipboard </Text>
-        </Button>
+        <Body style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 175 }}>
+          <Text> Unlocked! </Text>
+          <Button styleNames='iconLeft success' style={{ ...styles.column, maxHeight: 50 }} onPress={this.copy}>
+            <Text> Copy Key to Clipboard </Text>
+          </Button>
+        </Body>
       </Modal>,
       <WrapActionable.IfLocked
         key='button'
