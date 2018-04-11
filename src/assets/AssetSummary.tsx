@@ -125,7 +125,7 @@ class AssetSummary extends React.Component<
       <Body style={styles.card} {...props}>
         <FocusedHead asset={asset} sync={sync}/>
         { ('balance' in asset) ?
-          <Link to={`/assets/${deck.id}`} style={{ flex: 1, maxWidth: '100%' }} {...sync ? { onPress: ()=>{} } : {}}>
+          <Link to={`/assets/${deck.id}`} style={{ width: '100%' }} {...sync ? { onPress: ()=>{} } : {}}>
             <Balance {...asset}>
               {this.state.showDetails && <DeckDetails deck={deck}/> }
             </Balance>

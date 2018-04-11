@@ -1,4 +1,4 @@
-import { createCipher } from 'crypto'
+import { createCipher, createDecipher } from 'crypto'
 // Taken from http://lollyrock.com/articles/nodejs-encryption/
 
 async function aesGcmEncrypt(plaintext, password) {

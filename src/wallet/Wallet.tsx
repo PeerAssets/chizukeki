@@ -15,8 +15,7 @@ import { WrapActionable } from './UnlockModal'
 
 class UnlockThenCopy extends React.Component<{ keys: Wallet.Keys }, { privateKey: string, alerting: boolean }> {
   state = { privateKey: '', alerting: false }
-  cache = (privateKey: string) => 
-    this.setState({ privateKey })
+  cache = (privateKey: string) => this.setState({ privateKey })
   copy = () => {
     let keys = this.props.keys
     let privateKey = Wallet.Keys.areLocked(keys) ? 
@@ -33,9 +32,9 @@ class UnlockThenCopy extends React.Component<{ keys: Wallet.Keys }, { privateKey
   render() {
     let alerting = this.state.alerting
     return [
-      <Modal key='modal' open={Boolean(this.state.privateKey)} onClose={this.copy}>
+      <Modal key='modal' open={Boolean(this.state.privateKey)} onClose={() => this.setState({ privateKey: '' })}>
         <Text> Unlocked! </Text>
-        <Button styleNames='iconLeft success' style={styles.column} onPress={this.copy}>
+        <Button styleNames='iconLeft success' style={{...styles.column, flex: 0 }} onPress={this.copy}>
           <Text> Copy Key to Clipboard </Text>
         </Button>
       </Modal>,
