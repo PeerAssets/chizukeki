@@ -13,6 +13,12 @@ namespace WalletTransaction {
   export type Data = Wallet.Transaction
 }
 
+function AssetAction({ assetAction }: { assetAction?: string }){
+  return assetAction ?
+    <Badge styleNames='info'><Text>{assetAction}</Text></Badge> :
+    null
+}
+
 function TransactionDetails({ confirmations, id, assetAction }: WalletTransaction.Data) {
   return (
     <CardItem styleNames='footer' style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
@@ -22,7 +28,7 @@ function TransactionDetails({ confirmations, id, assetAction }: WalletTransactio
       <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
         confirmations: {confirmations}
       </Text>
-      { assetAction && <Badge styleNames='info'><Text>{assetAction}</Text></Badge> }
+      <AssetAction assetAction={assetAction}/>
     </CardItem>
   )
 }
@@ -33,9 +39,8 @@ class WalletTransaction extends React.PureComponent<WalletTransaction.Data & { h
     if (hide) {
       return null
     }
-    let asset = item.assetAction ? <Text>PPC <Badge styleNames='info'><Text>asset</Text></Badge></Text> : 'PPC'
     return (
-      <Transaction asset={asset} {...item}>
+      <Transaction asset={<Text>PPC <AssetAction assetAction={item.assetAction}/></Text>} {...item}>
         <TransactionDetails {...item} />
       </Transaction>
     )
@@ -50,14 +55,14 @@ class TransactionList extends React.Component<
   { transactions: TransactionList.Data },
   { showAssets: boolean }
 > {
-  toggleFilter = (showAssets = !this.state.showAssets) =>
-    this.setState({ showAssets })
+  toggleFilter = (showAssets) => this.setState({ showAssets })
   constructor(props){
     super(props)
     this.state = { showAssets: true }
   }
   render() {
     let showAssets = this.state.showAssets
+    let toggle = (e) => e.preventDefault() && this.toggleFilter(!showAssets)
     let transactions = this.props.transactions
     let style = {
       width: '100%',
@@ -74,10 +79,10 @@ class TransactionList extends React.Component<
             <H2>Transactions</H2>
             <Text styleNames='note'> {transactions.length} total </Text>
           </Text>
-          <Button styleNames={`${Platform.OS === 'web' ? 'small' : ''} info`} onPress={() => this.toggleFilter()}
+          <Button styleNames={`${Platform.OS === 'web' ? 'small' : ''} info`} onPress={toggle}
             style={{ paddingLeft: 0, paddingRight: 10 }} >
-            <Text>Assets</Text>
-            <Switch value={showAssets} onValueChange={this.toggleFilter} />
+            <Text>Asset Actions</Text>
+            <Switch value={showAssets} onValueChange={toggle} />
           </Button>
         </View>
         <FlatList

@@ -3,7 +3,7 @@ import { Dimensions, Text, View, ScrollView, Platform } from 'react-native';
 
 let contentContainerStyle = {
   justifyContent: 'space-around' as 'space-around',
-  alignItems: 'flex-start' as 'flex-start',
+  alignItems: 'center' as 'center',
 }
 
 let styles = {
@@ -13,7 +13,8 @@ let styles = {
     width: '100%',
     maxWidth: 900,
     padding: 15,
-    ...contentContainerStyle
+    justifyContent: 'space-around' as 'space-around',
+    alignItems: 'flex-start' as 'flex-start',
   },
   main: {
     flex: 5,
@@ -22,7 +23,8 @@ let styles = {
     marginTop: Platform.OS === 'web' ? -5 : 5,
     flexDirection: 'column' as 'column',
     overflow: 'hidden' as 'hidden',
-    ...contentContainerStyle
+    justifyContent: 'space-around' as 'space-around',
+    alignItems: 'flex-start' as 'flex-start',
   },
   secondary: {
     flex: 4,

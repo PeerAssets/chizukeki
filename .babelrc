@@ -1,7 +1,12 @@
 {
   "presets": ["react-native"],
   "plugins": [
-    "babel-plugin-react-native-nodeify-hack",
+    "react-native-nodeify-hack",
+    ["transform-define", {
+      "process.env.NODE_ENV": "production",
+      "KEY_GENERATOR": "signleton",
+      "process.version": "v9.8.0"
+    }],
     ["rewrite-require", {
       "aliases": {
         "crypto": "react-native-crypto",
