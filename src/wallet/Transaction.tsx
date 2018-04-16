@@ -55,14 +55,15 @@ class TransactionList extends React.Component<
   { transactions: TransactionList.Data },
   { showAssets: boolean }
 > {
-  toggleFilter = (showAssets) => this.setState({ showAssets })
+  toggleFilter = (showAssets = !this.state.showAssets) =>
+    console.log({ showAssets }) ||
+    this.setState({ showAssets })
   constructor(props){
     super(props)
     this.state = { showAssets: true }
   }
   render() {
     let showAssets = this.state.showAssets
-    let toggle = (e) => e.preventDefault() && this.toggleFilter(!showAssets)
     let transactions = this.props.transactions
     let style = {
       width: '100%',
@@ -79,17 +80,17 @@ class TransactionList extends React.Component<
             <H2>Transactions</H2>
             <Text styleNames='note'> {transactions.length} total </Text>
           </Text>
-          <Button styleNames={`${Platform.OS === 'web' ? 'small' : ''} info`} onPress={toggle}
+          <Button styleNames={`${Platform.OS === 'web' ? 'small' : ''} info`} onPress={() => this.toggleFilter()}
             style={{ paddingLeft: 0, paddingRight: 10 }} >
             <Text>Asset Actions</Text>
-            <Switch value={showAssets} onValueChange={toggle} />
+            <Switch value={showAssets} />
           </Button>
         </View>
         <FlatList
-          data={transactions}
+          data={transactions.map(item => item.assetAction ? { hide: !showAssets, ...item } : item)}
           keyExtractor={t => t.id}
           renderItem={({ item }) =>
-            <WalletTransaction key={item.id} hide={((!showAssets) && item.assetAction)} {...item} />
+            <WalletTransaction key={item.id} {...item} />
           }/>
       </Secondary>
     )

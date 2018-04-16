@@ -3,8 +3,7 @@
   "plugins": [
     "react-native-nodeify-hack",
     ["transform-define", {
-      "process.env.NODE_ENV": "production",
-      "KEY_GENERATOR": "signleton",
+      "KEY_GENERATOR": "singleton",
       "process.version": "v9.8.0"
     }],
     ["rewrite-require", {
