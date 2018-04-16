@@ -56,7 +56,6 @@ class TransactionList extends React.Component<
   { showAssets: boolean }
 > {
   toggleFilter = (showAssets = !this.state.showAssets) =>
-    console.log({ showAssets }) ||
     this.setState({ showAssets })
   constructor(props){
     super(props)
