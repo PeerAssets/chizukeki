@@ -51,7 +51,13 @@ function applyTransaction(
     unspentOutputs: optimisticallyCacheUnspentOutputs(unspentOutputs, transaction.raw),
     balance,
     transactions: [
-      { balance, amount: - amount, confirmations: 0, ...transaction },
+      {
+        balance,
+        amount: - amount,
+        block: _meta.lastSeenBlock + 1,
+        confirmations: 0,
+        ...transaction
+      },
       ...transactions
     ]
   }
@@ -69,6 +75,17 @@ function byTimestampDesc(a: Wallet.Transaction, b: Wallet.Transaction){
   return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
 }
 
+function setConfirmationBy(lastSeenBlock: number) {
+  return ({ confirmations, ...transaction }: Wallet.Transaction) => {
+    let updated = lastSeenBlock - transaction.block
+    updated = updated > confirmations ? updated : confirmations
+    return {
+      ...transaction,
+      confirmations: updated
+    }
+  }
+}
+
 function applySync({ old, synced: { _meta, transactions, unspentOutputs, ...synced } }: {
   old: Wallet.Loading | Wallet.Data,
   synced: Wallet.Synced,
@@ -77,17 +94,23 @@ function applySync({ old, synced: { _meta, transactions, unspentOutputs, ...sync
     Wallet.isLoaded(old) ? old.transactions : [],
     transactions
   )
+  let lastSeenBlock = (
+    '_meta' in old && old._meta.lastSeenBlock > _meta.lastSeenBlock
+  ) ? old._meta.lastSeenBlock : _meta.lastSeenBlock
   return {
     ...old,
     ...synced,
     _meta: {
       created: '_meta' in old ? old._meta.created : _meta.updated,
+      lastSeenBlock,
       updated: _meta.updated,
       syncState: stillPending.length ? 'OPTIMISTICALLY_PENDING' : 'DEFAULT'
     },
     unspentOutputs: stillPending.length && 'unspentOutputs' in old ?
       old.unspentOutputs : unspentOutputs,
-    transactions: [ ...stillPending, ...transactions ].sort(byTimestampDesc)
+    transactions: [ ...stillPending, ...transactions ]
+      .sort(byTimestampDesc)
+      .map(setConfirmationBy(lastSeenBlock))
   }
 }
 

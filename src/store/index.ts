@@ -21,7 +21,8 @@ const logoutMigration = state => ({})
 const migrations: any = {
   0: logoutMigration,
   1: logoutMigration,
-  2: logoutMigration
+  2: logoutMigration,
+  3: logoutMigration,
 }
 
 let persist = (key: string, reducer: Reducer<any>) => persistReducer({

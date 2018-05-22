@@ -19,6 +19,7 @@ namespace Wallet {
     amount: number,
     fee: number,
     id: string,
+    block: number,
     confirmations: number,
     timestamp: Date,
     raw?: {
@@ -29,7 +30,10 @@ namespace Wallet {
     addresses: Array<string>,
     assetAction?: 'DeckSpawn' | 'CardTransfer'
   }
-  export type PendingTransaction = Pick<Transaction, 'id' | 'amount' | 'timestamp' | 'raw' | 'fee' | 'addresses'>
+  export type PendingTransaction = Pick<
+    Transaction,
+    'id' | 'amount' | 'timestamp' | 'raw' | 'fee' | 'addresses'
+  >
   export function empty(address: string): Wallet {
     return Object.assign(
       walletMeta(), {
@@ -48,6 +52,7 @@ type Wallet = {
   _meta: {
     created: Date,
     updated: Date,
+    lastSeenBlock: number,
     syncState: 'DEFAULT' | 'OPTIMISTICALLY_PENDING'
   },
   address: string,
@@ -59,12 +64,15 @@ type Wallet = {
   unspentOutputs: Array<Wallet.UTXO>
 }
 
-export function walletMeta(): Pick<Wallet, '_meta'> {
+export function walletMeta(
+  { lastSeenBlock = 0 }: { lastSeenBlock?: number } = {}
+): Pick<Wallet, '_meta'> {
   let created = new Date()
   return {
     _meta: {
       created,
       updated: created,
+      lastSeenBlock,
       syncState: 'DEFAULT'
     }
   }

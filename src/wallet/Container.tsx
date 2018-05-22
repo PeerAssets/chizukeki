@@ -34,7 +34,12 @@ function Container({ routineStages, actions, wallet }: Props){
       }}
       sync={{
         stage: routineStages.sync,
-        trigger: () => actions.triggerSync({ address: wallet.address }),
+        trigger: () => actions.triggerSync({
+          address: wallet.address,
+          cachedTransactionIds: wallet.transactions ? 
+            wallet.transactions.map(t => t.id) : 
+            undefined
+        }),
         stop: actions.stopSync
       }} />
   )

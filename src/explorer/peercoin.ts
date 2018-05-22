@@ -62,6 +62,7 @@ namespace RawTransaction {
     fee?: number
   }
   export type Relative = RawTransaction & {
+    block: number,
     type: 'CREDIT' | 'DEBIT' | 'UNINVOLVED',
     fee: number,
     inputTotal: number,
@@ -152,6 +153,7 @@ namespace normalize {
     let assetAction = bitcore.assets.assetActionType(new bitcore.Transaction(raw.hex))
     return {
       id,
+      block: raw.block,
       confirmations,
       addresses,
       amount: Satoshis.toAmount(amount),
@@ -181,10 +183,11 @@ namespace normalize {
   export function wallet(
     { last_txs, balance, ...rest }: GetAddress.Response,
     txs: Array<RawTransaction.Relative>,
-    unspentOutputs: Array<Wallet.UTXO>
+    unspentOutputs: Array<Wallet.UTXO>,
+    lastSeenBlock: number
   ): Wallet {
     let wallet: Wallet = Object.assign(
-      walletMeta(),
+      walletMeta({ lastSeenBlock }),
       rest,
       {
         balance: Number(balance),
@@ -314,7 +317,7 @@ class PeercoinExplorer {
     let inputTotal = info.inputs.reduce((total, i) => plus(total, i.amount), 0)
     let fee = Satoshis.btc.toAmount(minus(inputTotal, info.total))
     inputTotal = Satoshis.btc.toAmount(inputTotal)
-    return Object.assign(raw, { type, fee, inputTotal, addresses })
+    return Object.assign(raw, { type, fee, inputTotal, addresses, block: info.block })
   }
 
   getRelativeTransaction = async (id: string, address: string) => {
@@ -325,8 +328,14 @@ class PeercoinExplorer {
     return normalize.transaction(address, transaction)
   }
 
-  wallet = async (address: string) => {
-    let resp = await this.getAddress(address)
+  wallet = async (address: string, cached: Array<string> = []) => {
+    let [ resp, lastSeenBlock ] = await Promise.all([
+      this.getAddress(address),
+      this.apiRequest<number>('getblockcount', {})
+    ])
+    if(isError(lastSeenBlock)){
+      lastSeenBlock = 0
+    }
     if(isError(resp)){
       if(resp.error === "address not found."){
         return Wallet.empty(address)
@@ -334,11 +343,18 @@ class PeercoinExplorer {
       throw Error(resp.error)
     } else {
       let transactions = await Promise.all(
-        resp.last_txs.map(txn => this.getRelativeRawTransaction(txn.addresses, address))
+        resp.last_txs
+          .filter(txn => !cached.includes(txn.addresses))
+          .map(txn => this.getRelativeRawTransaction(txn.addresses, address))
       )
       let unspent = await defaultOnError(this.listUnspent(address), [])
       // TODO retry sync, background sync? redux-offline?
-      return normalize.wallet(resp, transactions.filter(t => !isError(t)) as Array<RawTransaction.Relative>, unspent)
+      return normalize.wallet(
+        resp,
+        transactions.filter(t => !isError(t)) as Array<RawTransaction.Relative>,
+        unspent,
+        lastSeenBlock
+      )
     }
   }
 
