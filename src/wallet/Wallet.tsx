@@ -1,9 +1,10 @@
 import * as React from 'react'
+import moment from 'moment'
 import { View, Clipboard } from 'react-native'
 import PrivateKey from './LoadPrivateKey'
 import TransactionList from './Transaction'
 import SendTransaction from './SendTransaction'
-import { Button, CardItem, Body, Text, Card, connectStyle, H2, Icon } from 'native-base'
+import { Button, CardItem, Body, Text, Card, connectStyle, H2, Icon, Left, Right } from 'native-base'
 
 import { Wrapper, Main } from '../generics/Layout'
 import SyncButton from '../generics/sync-button'
@@ -107,7 +108,16 @@ class Wallet extends React.Component<
   }
 > {
   render() {
-    let { address, transactions = [], balance = 0, style, keys, sync, sendTransaction } = this.props
+    let { 
+      _meta,
+      address,
+      transactions = [],
+      balance = 0,
+      style,
+      keys,
+      sync,
+      sendTransaction
+    } = this.props
     return (
       <Wrapper>
         <Main>
@@ -121,7 +131,10 @@ class Wallet extends React.Component<
                 <SyncButton style={style.column} {...sync} />
               </Body>
             </CardItem>
-            <CardItem styleNames='footer'>
+            <Text styleNames='note' style={{ textAlign: 'center' }}>
+              Block {_meta.lastSeenBlock} seen {moment(_meta.updated).fromNow()}
+            </Text>
+            <CardItem styleNames='footer' style={{ paddingTop: 5 }}>
               <Address address={address} style={style.body} />
             </CardItem>
           </Card>

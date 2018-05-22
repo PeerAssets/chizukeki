@@ -63,12 +63,16 @@ function applyTransaction(
   }
 }
 
-function stillPendingTransactions(
+function sortOld(
   old: Array<Wallet.Transaction>,
   synced: Array<Wallet.Transaction>
 ){
   let syncedIds = synced.map(t => t.id)
-  return old.filter(t => !syncedIds.includes(t.id))
+  let notSynced = old.filter(t => !syncedIds.includes(t.id))
+  return {
+    stillPending: notSynced.filter(t => !t.confirmations),
+    confirmed: notSynced.filter(t => t.confirmations),
+  }
 }
 
 function byTimestampDesc(a: Wallet.Transaction, b: Wallet.Transaction){
@@ -90,7 +94,7 @@ function applySync({ old, synced: { _meta, transactions, unspentOutputs, ...sync
   old: Wallet.Loading | Wallet.Data,
   synced: Wallet.Synced,
 }): Wallet.Data {
-  let stillPending = stillPendingTransactions(
+  let { stillPending, confirmed } = sortOld(
     Wallet.isLoaded(old) ? old.transactions : [],
     transactions
   )
@@ -108,9 +112,11 @@ function applySync({ old, synced: { _meta, transactions, unspentOutputs, ...sync
     },
     unspentOutputs: stillPending.length && 'unspentOutputs' in old ?
       old.unspentOutputs : unspentOutputs,
-    transactions: [ ...stillPending, ...transactions ]
-      .sort(byTimestampDesc)
-      .map(setConfirmationBy(lastSeenBlock))
+    transactions: [
+      ...stillPending,
+      ...confirmed.map(setConfirmationBy(lastSeenBlock)),
+      ...transactions.map(setConfirmationBy(lastSeenBlock))
+    ].sort(byTimestampDesc)
   }
 }
 

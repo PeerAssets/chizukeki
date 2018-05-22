@@ -15,7 +15,9 @@ namespace WalletTransaction {
 
 function AssetAction({ assetAction }: { assetAction?: string }){
   return assetAction ?
-    <Badge styleNames='info'><Text>{assetAction}</Text></Badge> :
+    <Badge styleNames='info' style={{ height: 22 }}>
+      <Text style={{ fontSize: 12 }}>{assetAction}</Text>
+    </Badge> :
     null
 }
 
@@ -26,7 +28,7 @@ function TransactionDetails({ confirmations, id, assetAction }: WalletTransactio
         id: {id}
       </Text>
       <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
-        confirmations: {confirmations}
+        confirmations: {confirmations || 'pending'}
       </Text>
       <AssetAction assetAction={assetAction}/>
     </CardItem>

@@ -37,7 +37,9 @@ function Container({ routineStages, actions, wallet }: Props){
         trigger: () => actions.triggerSync({
           address: wallet.address,
           cachedTransactionIds: wallet.transactions ? 
-            wallet.transactions.map(t => t.id) : 
+            wallet.transactions
+              .filter(t => t.confirmations > 10)
+              .map(t => t.id) : 
             undefined
         }),
         stop: actions.stopSync
