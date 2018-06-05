@@ -14,6 +14,8 @@ import { logger } from './utils'
 import * as Wallet from '../wallet/redux'
 import * as Assets from '../assets/redux'
 
+import configure from '../configure'
+
 export const history = (createHistory as any)({ basename: process.env.PUBLIC_PATH || '/' })
 
 const logoutMigration = state => ({})
@@ -43,10 +45,14 @@ const reducer = combineReducers({
 
 const saga = createSagaMiddleware()
 
+const middleware = configure.fromEnv().DEPLOYMENT_MODE !== 'PRODUCTION' ?
+  applyMiddleware(saga, logger, routerMiddleware(history)) :
+  applyMiddleware(saga, routerMiddleware(history))
+
 export default function configureStore() {
   let store = createStore(
     reducer,
-    applyMiddleware(saga, logger, routerMiddleware(history)),
+    middleware
   )
   let persistor = persistStore(store)
 

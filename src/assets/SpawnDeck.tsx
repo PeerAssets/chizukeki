@@ -29,11 +29,17 @@ import Wallet from '../wallet/Wallet'
 
 import IssueMode from './IssueMode'
 
-type Fillable<T> = {
-  [k in keyof T]: null | T[k]
+// TODO update to ts 2.8
+type Diff<T extends string, U extends string> = (
+  {[P in T]: P } & {[P in U]: never } & { [x: string]: never }
+)[T]  
+type Omit<T, K extends keyof T> = Pick<T, Diff<keyof T, K>>;  
+
+type Fillable<T, K extends keyof T = keyof T> = Omit<T, K> & {
+  [k in K]: null | T[k]
 }
 namespace Fillable {
-  export function isFilled<T>(fillable: T | Fillable<T>): fillable is T {
+  export function isFilled<T, K extends keyof T = keyof T>(fillable: T | Fillable<T, K>): fillable is T {
     for (let v of Object.values(fillable)) {
       if (v === null) {
         return false
@@ -60,10 +66,10 @@ namespace SpawnDeck {
   }
 }
 
-type State = SpawnDeck.Data | Fillable<SpawnDeck.Data>
+type State = SpawnDeck.Data | Fillable<SpawnDeck.Data, 'name' | 'issueMode'>
 
 function isFilled(state: State): state is SpawnDeck.Data {
-  return Fillable.isFilled<SpawnDeck.Data>(state)
+  return Fillable.isFilled<SpawnDeck.Data, 'name' | 'issueMode'>(state)
 }
 
 function SpawnButton(props: { stage: string | undefined, disabled: boolean, onPress: () => any }) {
@@ -78,10 +84,10 @@ function SpawnButton(props: { stage: string | undefined, disabled: boolean, onPr
 }
 
 class SpawnDeck extends React.Component<SpawnDeck.Props, State> {
-  state = {
+  state: State = {
     name: '',
     issueMode: null,
-    precision: null,
+    precision: 0,
   }
   spawn = (privateKey: string) => {
     if (isFilled(this.state)) {
@@ -91,7 +97,7 @@ class SpawnDeck extends React.Component<SpawnDeck.Props, State> {
   }
   render() {
     let { wallet: { keys, balance } } = this.props
-    let { precision } = this.state
+    let { precision = 0 } = this.state
 
     return (
       <Card style={this.props.style}>
@@ -105,7 +111,7 @@ class SpawnDeck extends React.Component<SpawnDeck.Props, State> {
                 <Label>Name</Label>
                 <Input
                   style={{ lineHeight: 14 }}
-                  value={this.state.name}
+                  value={this.state.name || ''}
                   onChangeText={name => this.setState({ name })} />
               </Item>
               <Item styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300 }}>
@@ -114,10 +120,10 @@ class SpawnDeck extends React.Component<SpawnDeck.Props, State> {
                   keyboardType='numeric'
                   placeholder='0'
                   style={{ lineHeight: 14 }}
-                  value={precision !== null && Number.isFinite(precision) ? `${precision}` : ''}
+                  value={Number.isFinite(precision) ? `${precision}` : '0'}
                   onChangeText={_precision => {
-                    let precision = Number(_precision)
-                    this.setState({ precision: Number.isFinite(precision) ? precision : null })
+                    let precision = Number(_precision) || 0
+                    this.setState({ precision })
                   }} />
               </Item>
               <Item styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300, minHeight: 50, flex: 0 }}>
