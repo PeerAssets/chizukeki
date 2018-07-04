@@ -79,7 +79,9 @@ function Recipient(
   )
 }
 
-class AddRecipient extends React.Component<{ decimals: number, add: (r: Recipient) => any }, Recipient> {
+class AddRecipient extends React.Component<{
+  decimals: number, add: (r: Recipient) => any, disabled: boolean
+}, Recipient> {
   state = {
     address: '',
     amount: 0,
@@ -116,37 +118,48 @@ class AddRecipient extends React.Component<{ decimals: number, add: (r: Recipien
     let ok = this.ok()
     return (
       <CardItem>
-        <Body styleNames='row'>
-          <Field styleNames='stacked column collapsing'>
-            {ref => [
-              <Label key={0}>To address</Label>,
-              <Input
-                key={1}
-                ref={ref}
-                style={smallTextStyle}
-                value={address}
-                placeholder='...'
-                onChangeText={address => this.setState({ address })} />
-            ]}
-          </Field>
-          <Field styleNames='stacked column collapsing'>
-            {ref => [
-              <Label key={0}>Amount</Label>,
-              <Input
-                key={1}
-                ref={ref}
-                keyboardType='numeric'
-                placeholder='0.00'
-                style={smallTextStyle}
-                value={`${this.state.amount || ''}`}
-                onChangeText={this.setAmount} />
-            ]}
-          </Field>
-          <Button style={{ height: 63, paddingTop: 20 }}
-            styleNames={`${ok ? 'success' : 'dark'} transparent`} onPress={this.add}>
-            <Icon name='plus' style={{ opacity: ok ? 1 : 0.5 }}/>
-          </Button>
-        </Body>
+        { this.props.disabled
+          ? <View style={{
+              backgroundColor: 'rgb(240, 173, 78)',
+              width: '100%',
+              height: 40,
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+              <Text style={{ color: 'white' }}>You can only make 40 card transfers at a time</Text>
+            </View>
+          : <Body styleNames='row'>
+              <Field styleNames='stacked column collapsing'>
+                {ref => [
+                  <Label key={0}>To address</Label>,
+                  <Input
+                    key={1}
+                    ref={ref}
+                    style={smallTextStyle}
+                    value={address}
+                    placeholder='...'
+                    onChangeText={address => this.setState({ address })} />
+                ]}
+              </Field>
+              <Field styleNames='stacked column collapsing'>
+                {ref => [
+                  <Label key={0}>Amount</Label>,
+                  <Input
+                    key={1}
+                    ref={ref}
+                    keyboardType='numeric'
+                    placeholder='0.00'
+                    style={smallTextStyle}
+                    value={`${this.state.amount || ''}`}
+                    onChangeText={this.setAmount} />
+                ]}
+              </Field>
+              <Button style={{ height: 63, paddingTop: 20 }}
+                styleNames={`${ok ? 'success' : 'dark'} transparent`} onPress={this.add}>
+                <Icon name='plus' style={{ opacity: ok ? 1 : 0.5 }} />
+              </Button>
+            </Body>
+        }
       </CardItem>
     )
 
@@ -212,7 +225,9 @@ class SendAsset extends React.Component<SendAsset.Props, SendAsset.Data> {
         </CardItem>
         {Object.entries(amountsMap).map(([ address, amount ]) =>
           <Recipient key={address} {...{ decimals, address, amount, remove: remove(address) }} />)}
-        <AddRecipient decimals={decimals} add={({ address, amount }: Recipient) =>
+        <AddRecipient
+            disabled={Object.keys(amountsMap).length >= 40}
+            decimals={decimals} add={({ address, amount }: Recipient) =>
             this.setState({ amountsMap: { ...amountsMap, [address]: amount } })} />
         <CardItem styleNames='footer'>
           <Body>
