@@ -29,11 +29,13 @@ import Wallet from '../wallet/Wallet'
 
 import IssueMode from './IssueMode'
 
-// TODO update to ts 2.8
-type Diff<T extends string, U extends string> = (
+import Field from '../generics/Field'
+
+type Key = string
+type Diff<T extends Key, U extends Key> = (
   {[P in T]: P } & {[P in U]: never } & { [x: string]: never }
-)[T]  
-type Omit<T, K extends keyof T> = Pick<T, Diff<keyof T, K>>;  
+)[T]
+type Omit<T, K extends keyof T> = Pick<T, Diff<keyof T, K>>;
 
 type Fillable<T, K extends keyof T = keyof T> = Omit<T, K> & {
   [k in K]: null | T[k]
@@ -107,30 +109,41 @@ class SpawnDeck extends React.Component<SpawnDeck.Props, State> {
         <CardItem style={{ flex: 0 }}>
           <Body style={{ flexDirection: 'column', justifyContent: 'space-around', width: '100%', flexWrap: 'wrap', flex: 0 }}>
             <Form>
-              <Item styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300 }}>
-                <Label>Name</Label>
-                <Input
-                  style={{ lineHeight: 14 }}
-                  value={this.state.name || ''}
-                  onChangeText={name => this.setState({ name })} />
-              </Item>
-              <Item styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300 }}>
-                <Label>Decimal Precision</Label>
-                <Input
-                  keyboardType='numeric'
-                  placeholder='0'
-                  style={{ lineHeight: 14 }}
-                  value={Number.isFinite(precision) ? `${precision}` : '0'}
-                  onChangeText={_precision => {
-                    let precision = Number(_precision) || 0
-                    this.setState({ precision })
-                  }} />
-              </Item>
-              <Item styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300, minHeight: 50, flex: 0 }}>
-                <Label style={{ maxWidth: 100 }}>Issue Mode</Label>
-                <IssueMode style={{ width: 200, backgroundColor: variables.brandLight }} selected={this.state.issueMode}
-                  select={(issueMode: IssueMode.Data) => this.setState({ issueMode })} />
-              </Item>
+              <Field styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300 }}>
+                {ref => [
+                  <Label key={0}>Name</Label>,
+                  <Input
+                    key={1}
+                    ref={ref}
+                    style={{ lineHeight: 14 }}
+                    value={this.state.name || ''}
+                    onChangeText={name => this.setState({ name })} />
+                ]}
+              </Field>
+              <Field styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300 }}>
+                {ref => [
+                  <Label>Decimal Precision</Label>,
+                  <Input
+                    ref={ref}
+                    keyboardType='numeric'
+                    placeholder='0'
+                    style={{ lineHeight: 14 }}
+                    value={Number.isFinite(precision) ? `${precision}` : '0'}
+                    onChangeText={_precision => {
+                      let precision = Number(_precision) || 0
+                      this.setState({ precision })
+                    }} />
+                ]}
+              </Field>
+              <Field styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300, minHeight: 50, flex: 0 }}>
+                {ref => [
+                  <Label key={0} style={{ maxWidth: 100 }}>Issue Mode</Label>,
+                  <IssueMode key={1} ref={ref}
+                    style={{ width: 200, backgroundColor: variables.brandLight }}
+                    selected={this.state.issueMode}
+                    select={(issueMode: IssueMode.Data) => this.setState({ issueMode })} />
+                ]}
+              </Field>
             </Form>
           </Body>
         </CardItem>

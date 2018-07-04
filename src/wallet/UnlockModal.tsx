@@ -1,4 +1,5 @@
 import * as React from 'react'
+import Field from '../generics/Field'
 import Modal from '../generics/modal/modal'
 import { Text, Body, Input, Button, Item, Label } from 'native-base'
 import { View } from 'react-native';
@@ -32,16 +33,21 @@ class UnlockModal extends React.Component<{
     return (
       <Modal open={open} onClose={this.close} >
         <Body style={{ flexDirection: 'column', justifyContent: 'center', width: '100%', flexWrap: 'wrap' }}>
-          <Item styleNames='fixedLabel' style={{ minWidth: 300 }}>
-            <Label>Password</Label>
-            <Input
-              clearTextOnFocus
-              secureTextEntry
-              placeholder='password'
-              style={{ lineHeight: 14, }}
-              value={this.state.password}
-              onChangeText={password => this.setState({ password })} />
-          </Item>
+          <Field styleNames='fixedLabel' style={{ minWidth: 300 }}>
+            { ref => [
+              <Label key={0}>Password</Label>,
+              <Input
+                key={1}
+                ref={ref}
+                clearTextOnFocus
+                secureTextEntry
+                placeholder='password'
+                style={{ lineHeight: 14, }}
+                value={this.state.password}
+                onChangeText={password => this.setState({ password })} />
+              ]
+            }
+          </Field>
           <View style={{ justifyContent: 'center', marginTop: 7.5, marginBottom: 7.5 }}>
             {this.state.error !== undefined ? <Text styleNames='danger'>Unlock failed, please try again</Text> : null }
           </View>

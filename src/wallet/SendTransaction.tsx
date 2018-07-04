@@ -19,6 +19,7 @@ import {
   Label,
   variables
 } from 'native-base'
+import Field from '../generics/Field'
 
 import bitcore from '../lib/bitcore'
 import { Wrapper } from '../generics/Layout'
@@ -60,7 +61,7 @@ class SendTransaction extends React.Component<SendTransaction.Props, State> {
     amount: undefined,
   }
   send = (privateKey: string) => {
-    if(isFilled(this.state)){
+    if (isFilled(this.state)) {
       let wallet = Object.assign({ privateKey }, this.props.wallet)
       this.props.send({ wallet, ...this.state })
     }
@@ -77,22 +78,30 @@ class SendTransaction extends React.Component<SendTransaction.Props, State> {
         </CardItem>
         <CardItem>
           <Body style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%', flexWrap: 'wrap' }}>
-            <Item styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300 }}>
-              <Label>To address</Label>
-              <Input
-                style={{ lineHeight: 14 }}
-                value={this.state.toAddress}
-                onChangeText={toAddress => this.setState({ toAddress })} />
-            </Item>
-            <Item styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300 }}>
-              <Label>PPC</Label>
-              <Input
-                keyboardType='numeric'
-                placeholder='0.00'
-                style={{ lineHeight: 14 }}
-                value={this.state.amount}
-                onChangeText={amount => this.setState({ amount: Number(amount) || undefined })} />
-            </Item>
+            <Field styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300 }}>
+              {ref => [
+                <Label key={0}>To address</Label>,
+                <Input
+                  key={1}
+                  ref={ref}
+                  style={{ lineHeight: 14 }}
+                  value={this.state.toAddress}
+                  onChangeText={toAddress => this.setState({ toAddress })} />
+              ]}
+            </Field>
+            <Field styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300 }}>
+              {ref => [
+                <Label key={0}>PPC</Label>,
+                <Input
+                  key={1}
+                  ref={ref}
+                  keyboardType='numeric'
+                  placeholder='0.00'
+                  style={{ lineHeight: 14 }}
+                  value={this.state.amount}
+                  onChangeText={amount => this.setState({ amount: Number(amount) || undefined })} />
+              ]}
+            </Field>
           </Body>
         </CardItem>
         <CardItem styleNames='footer'>

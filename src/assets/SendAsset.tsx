@@ -30,6 +30,8 @@ import Wallet from '../wallet/Wallet'
 import Summary from './Summary'
 import { Deck } from './papi'
 
+import Field from '../generics/Field'
+
 type Recipient = { address: string, amount: number }
 
 namespace SendAsset {
@@ -115,23 +117,31 @@ class AddRecipient extends React.Component<{ decimals: number, add: (r: Recipien
     return (
       <CardItem>
         <Body styleNames='row'>
-          <Item styleNames='stacked column collapsing'>
-            <Label>To address</Label>
-            <Input
-              style={smallTextStyle}
-              value={address}
-              placeholder='...'
-              onChangeText={address => this.setState({ address })} />
-          </Item>
-          <Item styleNames='stacked column collapsing'>
-            <Label>Amount</Label>
-            <Input
-              keyboardType='numeric'
-              placeholder='0.00'
-              style={smallTextStyle}
-              value={`${this.state.amount || ''}`}
-              onChangeText={this.setAmount} />
-          </Item>
+          <Field styleNames='stacked column collapsing'>
+            {ref => [
+              <Label key={0}>To address</Label>,
+              <Input
+                key={1}
+                ref={ref}
+                style={smallTextStyle}
+                value={address}
+                placeholder='...'
+                onChangeText={address => this.setState({ address })} />
+            ]}
+          </Field>
+          <Field styleNames='stacked column collapsing'>
+            {ref => [
+              <Label key={0}>Amount</Label>,
+              <Input
+                key={1}
+                ref={ref}
+                keyboardType='numeric'
+                placeholder='0.00'
+                style={smallTextStyle}
+                value={`${this.state.amount || ''}`}
+                onChangeText={this.setAmount} />
+            ]}
+          </Field>
           <Button style={{ height: 63, paddingTop: 20 }}
             styleNames={`${ok ? 'success' : 'dark'} transparent`} onPress={this.add}>
             <Icon name='plus' style={{ opacity: ok ? 1 : 0.5 }}/>

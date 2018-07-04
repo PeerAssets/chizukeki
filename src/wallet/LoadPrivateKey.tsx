@@ -1,5 +1,6 @@
-import * as React from 'react'; import { Component } from 'react';
-import { Dimensions, View, TouchableOpacity, ActivityIndicator } from 'react-native';
+import * as React from 'react';
+import { Component } from 'react';
+import { TextInput, Dimensions, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import {
   Badge,
   Container,
@@ -18,6 +19,7 @@ import {
   variables
 } from 'native-base'
 
+import Field from '../generics/Field'
 import { Wrapper } from '../generics/Layout'
 import RoutineButton from '../generics/routine-button'
 import bitcore from '../lib/bitcore'
@@ -94,17 +96,19 @@ function _isFilled(d: Partial<LoadPrivateKey.Data>): d is LoadPrivateKey.Data {
   return Boolean(privateKey && format && address && password)
 }
 
-class LoadPrivateKey extends React.Component<
-  {
-    syncStage?: string | undefined,
-    loadPrivateKey: (data: LoadPrivateKey.Data, syncNeeded?: boolean) => void
-  }, {
-    pKeyInput: string,
-    data: Partial<LoadPrivateKey.Data>,
-    error: string | undefined
-  }
-  > {
-  state = {
+interface LoadPrivateKeyProps {
+  syncStage?: string | undefined,
+  loadPrivateKey: (data: LoadPrivateKey.Data, syncNeeded?: boolean) => void
+}
+
+interface State {
+  pKeyInput: string,
+  data: Partial < LoadPrivateKey.Data >,
+  error: string | undefined
+}
+
+class LoadPrivateKey extends React.Component<LoadPrivateKeyProps, State> {
+  state: State = {
     pKeyInput: '',
     error: undefined,
     data: {
@@ -146,31 +150,40 @@ class LoadPrivateKey extends React.Component<
           </CardItem>
           <CardItem>
             <Body style={styles.row}>
-              <Item style={{ width: '100%', flexDirection: 'row', flexWrap: 'wrap' }}>
-                <Icon styleNames='active' name='key' />
-                <Input
-                  placeholder={`Paste WIF, HD Key, or Raw Private Key here`}
-                  style={{ fontSize: 12, lineHeight: 14, minWidth: 200 }}
-                  value={pKeyInput}
-                  onChangeText={privateKey => this.processKeyChange(privateKey)}/>
-                  { format && <SelectedFormat selected={format} style={styles.right} /> }
-              </Item>
-              <Item style={{ width: '100%', flexDirection: 'row', flexWrap: 'wrap' }}>
-                <Icon styleNames='active' name='lock' style={{ width: 32, textAlign: 'center' }} />
-                <Input
-                  placeholder={'Add a password'}
-                  secureTextEntry
-                  style={{ fontSize: 12, lineHeight: 14 }}
-                  value={password}
-                  onChangeText={this.setPassword} />
-              </Item>
+              <Field style={{ width: '100%', flexDirection: 'row', flexWrap: 'wrap' }}>
+                { ref => [
+                    <Icon key={0} styleNames='active' name='key' />,
+                    <Input 
+                      key={1}
+                      ref={ref}
+                      placeholder={`Paste WIF, HD Key, or Raw Private Key here`}
+                      style={{ fontSize: 12, lineHeight: 14, minWidth: 200 }}
+                      value={pKeyInput}
+                      onChangeText={privateKey => this.processKeyChange(privateKey)}/>,
+                    format && <SelectedFormat selected={format} style={styles.right} />
+                ]}
+              </Field>
+              <Field style={{ width: '100%', flexDirection: 'row', flexWrap: 'wrap' }}>
+                { ref => [
+                  <Icon key={0} styleNames='active' name='lock' style={{ width: 32, textAlign: 'center' }} />,
+                  <Input
+                    key={1}
+                    ref={ref}
+                    placeholder={'Add a password'}
+                    secureTextEntry
+                    style={{ fontSize: 12, lineHeight: 14 }}
+                    value={password}
+                    onChangeText={this.setPassword} />
+                  ]
+                }
+              </Field>
             </Body>
           </CardItem>
           <CardItem styleNames='footer'>
             <Body style={styles.row}>
               <RoutineButton
                 style={styles.importButton}
-                disabled={(!load) || this.state.error}
+                disabled={Boolean((!load) || this.state.error)}
                 onPress={load || (() => {})}
                 stage={this.props.syncStage}
                 DEFAULT='Import Key and Sync'
