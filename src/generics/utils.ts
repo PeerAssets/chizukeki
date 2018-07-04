@@ -18,7 +18,7 @@ function trackRoutineStages<Key extends string>(routineMap: object, stateKey = '
       for (let [key, routine] of Object.entries(routineMap)) {
         let stage = routine.stage(action)
         if(stage){
-          stages[key] = routine.stage(action)
+          stages[key] = stage
           break
         }
       }

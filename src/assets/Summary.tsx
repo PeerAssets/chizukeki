@@ -59,7 +59,7 @@ class Summary extends React.Component<Summary.Props, {}> {
             <Text styleNames='note'> {assets.length} total </Text>
           </Text>
           <Right>
-            <SyncButton {...sync} whenMounted />
+            <SyncButton {...sync} />
           </Right>
         </View>
         {(UNISSUED.length || ISSUED.length) ? (
