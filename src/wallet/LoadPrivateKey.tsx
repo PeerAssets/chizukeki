@@ -160,7 +160,7 @@ class LoadPrivateKey extends React.Component<LoadPrivateKeyProps, State> {
                       style={{ fontSize: 12, lineHeight: 14, minWidth: 200 }}
                       value={pKeyInput}
                       onChangeText={privateKey => this.processKeyChange(privateKey)}/>,
-                    format && <SelectedFormat selected={format} style={styles.right} />
+                    format && <SelectedFormat key={3} selected={format} style={styles.right} />
                 ]}
               </Field>
               <Field style={{ width: '100%', flexDirection: 'row', flexWrap: 'wrap' }}>

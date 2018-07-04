@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { sortWith, descend, prop } from 'ramda'
 import { View } from 'react-native'
 import { Button, Card, Left, CardItem, Body, Text, H2, Icon } from 'native-base'
 
@@ -9,12 +10,16 @@ import { Secondary } from '../generics/Layout'
 import RoutineButton from '../generics/routine-button'
 
 import { CardTransfer as CardTransferData } from './papi'
+import Transaction from '../generics/transaction-like'
 
 namespace CardTransfer {
   export type Data = CardTransferData
 }
 
-import Transaction from '../generics/transaction-like'
+const sortDesc = sortWith([
+  'blocknum', 'blockseq', 'cardseq'
+].map(key => descend(prop(key))))
+
 
 function CardTransfer({
   item: { amount, deck_name = '', receiver, sender, transaction: { timestamp, id } }
@@ -45,7 +50,7 @@ function CardTransferList({ cardTransfers, loadMore, canLoadMore, style = {}, st
       </Text>
       <FlatList
         enableEmptySections // silence error, shouldn't be necessary when react-native-web implements FlatList
-        data={cardTransfers}
+        data={sortDesc(cardTransfers)}
         keyExtractor={t => t.transaction.id + t.cardseq}
         renderItem={CardTransfer}/>
       <RoutineButton

@@ -53,8 +53,11 @@ export default class Field extends React.Component<FieldProps> {
   }
   render() {
       let { children, onPress, ...props } = this.props
-      return <Item onPress={this.onPress} {...props}>
-        {children(n => n ? this.focusable = n : null)}
-      </Item>
+
+      return (
+        <Item onPress={this.onPress} {...props} accessible={false}>
+          {children(n => n ? this.focusable = n : null)}
+        </Item>
+      )
   }
 }

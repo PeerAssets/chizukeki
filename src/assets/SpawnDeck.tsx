@@ -122,8 +122,9 @@ class SpawnDeck extends React.Component<SpawnDeck.Props, State> {
               </Field>
               <Field styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300 }}>
                 {ref => [
-                  <Label>Decimal Precision</Label>,
+                  <Label key={0} >Decimal Precision</Label>,
                   <Input
+                    key={1} 
                     ref={ref}
                     keyboardType='numeric'
                     placeholder='0'

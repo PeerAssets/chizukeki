@@ -11,15 +11,11 @@ import Summary from './Summary'
 import SpawnDeck from './SpawnDeck'
 import CardTransferList, { CardTransfer } from './CardTransfer'
 
-function byTimestampDesc(a: CardTransfer.Data, b: CardTransfer.Data){
-  return new Date(b.transaction.timestamp).getTime() - new Date(a.transaction.timestamp).getTime()
-}
-
 function mergeCardTransfers(assets: Summary.Props['assets']){
   return assets.reduce(
     (transfers, a) => transfers.concat(a.cardTransfers),
     [] as CardTransfer.Data[]
-  ).sort(byTimestampDesc)
+  )
 }
 
 @connectStyle('PeerKeeper.Assets', {})
