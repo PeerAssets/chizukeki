@@ -18,16 +18,21 @@ class Transaction extends React.Component<Props, { showDetails: boolean }> {
   }
   render() {
     let { amount, asset, timestamp, addresses, children } = this.props
+    let selfSend = (yes, no) => !amount ? yes : no
     let io = (inbound, outbound) => amount > 0 ? inbound : outbound
-    let textProps = { styleNames: io('success', 'dark') }
+    let textProps = { styleNames: selfSend('disabled', io('success', 'dark')) }
     return (
       <Card>
         <CardItem style={{ display: 'flex', flexDirection: 'row' }}>
           <Left style={{ flex: 7 }}>
-            <Icon {...textProps} name={`arrow-circle-o-${io('down', 'up')}`} size={30} color={'black'} />
+            <Icon {...textProps} name={
+              selfSend(
+                'minus-circle',
+                `arrow-circle-o-${io('down', 'up')}`
+              )} size={30} color={'black'} />
             <Body>
               <Text {...textProps} style={{ lineHeight: 20, paddingRight: 7 }}>
-                {io('+', '-')}
+                {selfSend('', io('+', '-'))}
                 {Math.abs(amount).toString()} {asset}
               </Text>
             </Body>
@@ -48,7 +53,7 @@ class Transaction extends React.Component<Props, { showDetails: boolean }> {
           style={{ paddingTop: 0, maxWidth: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
           {addresses.map((address, i) => (
             <Text key={address} styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
-              {io('from', 'to')} {address}
+              {selfSend('self send', `${io('from', 'to')} ${address}`)}
             </Text>
           ))}
         </CardItem>

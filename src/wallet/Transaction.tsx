@@ -42,7 +42,9 @@ class WalletTransaction extends React.PureComponent<WalletTransaction.Data & { h
       return null
     }
     return (
-      <Transaction asset={<Text>PPC <AssetAction assetAction={item.assetAction}/></Text>} {...item}>
+      <Transaction
+        {...item}
+        asset={<Text>PPC <AssetAction assetAction={item.assetAction}/></Text>}>
         <TransactionDetails {...item} />
       </Transaction>
     )

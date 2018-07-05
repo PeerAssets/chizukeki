@@ -25,7 +25,7 @@ function CardTransfer({
   item: { amount, deck_name = '', receiver, sender, transaction: { timestamp, id } }
 }: { item: CardTransfer.Data }) {
   return (
-    <Transaction {...{ amount, timestamp }}
+    <Transaction {...{ amount: sender === receiver ? 0 : amount, timestamp }}
       asset={deck_name}
       addresses={[ amount > 0 ? sender : receiver ]} />
   )

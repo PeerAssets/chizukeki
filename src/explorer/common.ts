@@ -1,7 +1,7 @@
 import { Satoshis, HTTP } from '../lib/utils'
 
 namespace Wallet {
-  export type UTXO = {
+  export interface UTXO {
     txid: string,
     scriptPubKey: string | {
       addresses: Array<string>,
@@ -14,7 +14,7 @@ namespace Wallet {
     amount: number,
     // unused address, confirmations
   }
-  export type Transaction = {
+  export interface Transaction {
     balance: number,
     amount: number,
     fee: number,
@@ -48,7 +48,7 @@ namespace Wallet {
   }
 }
 
-type Wallet = {
+interface Wallet {
   _meta: {
     created: Date,
     updated: Date,
