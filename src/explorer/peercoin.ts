@@ -338,7 +338,7 @@ class PeercoinExplorer {
     }
     if(isError(resp)){
       if(resp.error === "address not found."){
-        return Wallet.empty(address)
+        return Wallet.empty(address, { lastSeenBlock })
       }
       throw Error(resp.error)
     } else {

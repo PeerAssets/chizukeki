@@ -3,12 +3,17 @@ import { Button, Card, Left, CardItem, Body, Text, H2, Icon, Right } from 'nativ
 import moment from 'moment'
 
 type Props = {
+  selfSend: boolean,
   amount: number,
   timestamp: Date,
   addresses: Array<string>,
   asset: string | React.ReactNode,
   children?: any
 }
+
+let Address = props => (
+  <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1} {...props}/>
+)
 
 class Transaction extends React.Component<Props, { showDetails: boolean }> {
   toggleDetails = () => this.setState({ showDetails: !this.state.showDetails })
@@ -17,22 +22,21 @@ class Transaction extends React.Component<Props, { showDetails: boolean }> {
     this.state = { showDetails: false }
   }
   render() {
-    let { amount, asset, timestamp, addresses, children } = this.props
-    let selfSend = (yes, no) => !amount ? yes : no
+    let { selfSend, amount, asset, timestamp, addresses, children } = this.props
     let io = (inbound, outbound) => amount > 0 ? inbound : outbound
-    let textProps = { styleNames: selfSend('warning', io('success', 'dark')) }
+    let textProps = { styleNames: selfSend ? 'warning' : io('success', 'dark') }
     return (
       <Card>
         <CardItem style={{ display: 'flex', flexDirection: 'row' }}>
           <Left style={{ flex: 7 }}>
             <Icon {...textProps} name={
-              selfSend(
-                'minus-circle',
+              selfSend ?
+                'minus-circle' :
                 `arrow-circle-o-${io('down', 'up')}`
-              )} size={30} color={'black'} />
+              } size={30} color={'black'} />
             <Body>
               <Text {...textProps} style={{ lineHeight: 20, paddingRight: 7 }}>
-                {selfSend('', io('+', '-'))}
+                {selfSend ? '' : io('+', '-')}
                 {Math.abs(amount).toString()} {asset}
               </Text>
             </Body>
@@ -49,13 +53,14 @@ class Transaction extends React.Component<Props, { showDetails: boolean }> {
             ) : null}
           </Right>
         </CardItem>
-        <CardItem
-          style={{ paddingTop: 0, maxWidth: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-          {addresses.map((address, i) => (
-            <Text key={address} styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
-              {selfSend('self send', `${io('from', 'to')} ${address}`)}
-            </Text>
-          ))}
+        <CardItem style={{ paddingTop: 0, maxWidth: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+          {
+            selfSend ?
+              <Address>self send</Address> : 
+              addresses.map((address, i) => (
+                <Address key={i}>{io('from', 'to')} {address}</Address>
+              ))
+          }
         </CardItem>
         { this.state.showDetails ? children : null}
       </Card>

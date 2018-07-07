@@ -34,9 +34,9 @@ namespace Wallet {
     Transaction,
     'id' | 'amount' | 'timestamp' | 'raw' | 'fee' | 'addresses'
   >
-  export function empty(address: string): Wallet {
+  export function empty(address: string, meta?: { lastSeenBlock?: number }): Wallet {
     return Object.assign(
-      walletMeta(), {
+      walletMeta(meta), {
         address,
         balance: 0,
         sent: 0,

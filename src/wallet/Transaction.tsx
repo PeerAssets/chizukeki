@@ -7,7 +7,7 @@ import moment from 'moment'
 
 import { Secondary } from '../generics/Layout'
 import Transaction from '../generics/transaction-like'
-import { Wallet } from '../explorer'
+import { Wallet, Satoshis } from '../explorer/common'
 
 namespace WalletTransaction {
   export type Data = Wallet.Transaction
@@ -21,7 +21,9 @@ function AssetAction({ assetAction }: { assetAction?: string }){
     null
 }
 
-function TransactionDetails({ confirmations, id, assetAction }: WalletTransaction.Data) {
+function TransactionDetails({
+  confirmations, id, assetAction, amount, fee
+}: WalletTransaction.Data) {
   return (
     <CardItem styleNames='footer' style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
       <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
@@ -30,6 +32,12 @@ function TransactionDetails({ confirmations, id, assetAction }: WalletTransactio
       <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
         confirmations: {confirmations || 'pending'}
       </Text>
+      <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
+        amount: {amount}
+      </Text>
+      <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
+        fee: {fee}
+      </Text>
       <AssetAction assetAction={assetAction}/>
     </CardItem>
   )
@@ -37,15 +45,21 @@ function TransactionDetails({ confirmations, id, assetAction }: WalletTransactio
 
 class WalletTransaction extends React.PureComponent<WalletTransaction.Data & { hide?: boolean }> {
   render() {
-    let { hide, ...item } = this.props
+    let { hide, amount, ...item } = this.props
+    // include fee in debit display
+    let totalAmount = (amount <= 0) ?
+      Satoshis.toAmount(Satoshis.fromAmount(amount) - Satoshis.fromAmount(item.fee)) :
+      amount
     if (hide) {
       return null
     }
     return (
       <Transaction
+        selfSend={!Boolean(amount)}
+        amount={totalAmount}
         {...item}
         asset={<Text>PPC <AssetAction assetAction={item.assetAction}/></Text>}>
-        <TransactionDetails {...item} />
+        <TransactionDetails amount={amount} {...item} />
       </Transaction>
     )
   }

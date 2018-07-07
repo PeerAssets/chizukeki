@@ -24,8 +24,11 @@ const sortDesc = sortWith([
 function CardTransfer({
   item: { amount, deck_name = '', receiver, sender, transaction: { timestamp, id } }
 }: { item: CardTransfer.Data }) {
+  // TODO selfSend should be more flexible to allow for sending to both self and others... I guess
+  let selfSend = sender === receiver
   return (
-    <Transaction {...{ amount: sender === receiver ? 0 : amount, timestamp }}
+    <Transaction {...{ amount: selfSend ? 0 : amount, timestamp, selfSend }}
+      timestamp={timestamp}
       asset={deck_name}
       addresses={[ amount > 0 ? sender : receiver ]} />
   )
