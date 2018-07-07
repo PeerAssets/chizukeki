@@ -56,8 +56,8 @@ export default function configureStore() {
   )
   let persistor = persistStore(store)
 
-  saga.run(Wallet.saga)
   saga.run(Assets.saga)
+  saga.run(Wallet.saga)
 
   return { store, persistor }
 }

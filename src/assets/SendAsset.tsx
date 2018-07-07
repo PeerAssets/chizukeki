@@ -190,8 +190,8 @@ class SendAsset extends React.Component<SendAsset.Props, SendAsset.Data> {
   }
   render() {
     let {
-      asset: { deck: { name, decimals }, balance: { type } },
-      wallet: { keys, balance }
+      asset: { deck: { name, decimals }, balance: { type, value: balance = 0 } },
+      wallet: { keys }
     } = this.props
 
     let amountsMap = this.state.amountsMap

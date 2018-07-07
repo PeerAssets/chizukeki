@@ -1,5 +1,5 @@
 import { fork, all, put, call, takeLatest } from 'redux-saga/effects'
-import fetchJSONRoutine from '../generics/fetch-routine'
+import fetchJSONRoutine, { interval } from '../generics/fetch-routine'
 import { peercoin, Wallet as ExplorerWallet } from '../explorer'
 import LocalWallet from './Wallet'
 
@@ -15,7 +15,7 @@ const syncWallet = fetchJSONRoutine.withPolling<
 >({
   type: 'SYNC_WALLET',
   fetchJSON: ({ address, cachedTransactionIds }) => peercoin.wallet(address, cachedTransactionIds),
-  pollingInterval: 1 * 60 * 1000, // poll every minute
+  pollingInterval: interval({ seconds: 30 })
 })
 
 const sendTransaction = fetchJSONRoutine<

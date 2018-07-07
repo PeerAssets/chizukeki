@@ -20,7 +20,7 @@ class Transaction extends React.Component<Props, { showDetails: boolean }> {
     let { amount, asset, timestamp, addresses, children } = this.props
     let selfSend = (yes, no) => !amount ? yes : no
     let io = (inbound, outbound) => amount > 0 ? inbound : outbound
-    let textProps = { styleNames: selfSend('disabled', io('success', 'dark')) }
+    let textProps = { styleNames: selfSend('warning', io('success', 'dark')) }
     return (
       <Card>
         <CardItem style={{ display: 'flex', flexDirection: 'row' }}>

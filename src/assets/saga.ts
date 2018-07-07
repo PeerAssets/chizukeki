@@ -1,6 +1,6 @@
 import { SagaIterator } from 'redux-saga'
 import { select, fork, all, put, call, takeLatest } from 'redux-saga/effects'
-import fetchJSONRoutine from '../generics/fetch-routine'
+import fetchJSONRoutine, { interval } from '../generics/fetch-routine'
 import { peercoin, Wallet } from '../explorer'
 import bitcore from '../lib/bitcore'
 
@@ -106,7 +106,7 @@ const syncAsset = fetchJSONRoutine.withPolling<
     ))
     return { deck, balance, cardTransfers, _canLoadMoreCards } as Summary.Asset
   },
-  pollingInterval: 1 * 60 * 1000, // poll every 1 minutes
+  pollingInterval: interval({ seconds: 30 })
 })
 
 /*
@@ -160,7 +160,7 @@ const syncAssets = fetchJSONRoutine.withPolling<
     }
     return { assets }
   },
-  pollingInterval: 1 * 60 * 1000, // poll every 1 minutes
+  pollingInterval: interval({ seconds: 30 })
 })
 
 const loadMoreCards = fetchJSONRoutine<
@@ -181,8 +181,12 @@ const loadMoreCards = fetchJSONRoutine<
 export default function * (){
   yield all([
     syncAssets.trigger(),
-    sendAssets.trigger(),
+    syncAssets.poll(),
+
     syncAsset.trigger(),
+    syncAsset.poll(),
+
+    sendAssets.trigger(),
     spawnDeck.trigger(),
     loadMoreCards.trigger()
   ])

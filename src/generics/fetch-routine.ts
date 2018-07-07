@@ -138,4 +138,12 @@ namespace fetchJSONRoutine {
   }
 }
 
+export function interval({ hours = 0, minutes = 0, seconds = 0 }: Partial<Record<'hours' | 'minutes' | 'seconds', number>>){
+  return (
+    (hours * 60 
+      + minutes) * 60
+    + seconds
+  ) * 1000 
+}
+
 export default fetchJSONRoutine

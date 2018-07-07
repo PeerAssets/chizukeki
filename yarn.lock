@@ -1805,9 +1805,9 @@ binary-extensions@^1.0.0:
   version "1.11.0"
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-1.11.0.tgz#46aa1751fb6a2f93ee5e689bb1087d4b14c6c205"
 
-bitcore-lib@micimize/bitcore-lib:
+"bitcore-lib@git://github.com/micimize/bitcore-lib.git#3046ec24dee23c8766ee486ac1562a760f207a4e":
   version "0.15.0"
-  resolved "https://codeload.github.com/micimize/bitcore-lib/tar.gz/878616c844678422787a62da0e849edd7c387e03"
+  resolved "git://github.com/micimize/bitcore-lib.git#3046ec24dee23c8766ee486ac1562a760f207a4e"
   dependencies:
     bn.js "=4.11.8"
     bs58 "=4.0.1"

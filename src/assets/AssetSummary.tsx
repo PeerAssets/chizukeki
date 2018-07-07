@@ -35,20 +35,24 @@ namespace AssetSummary {
 
 
 function Balance({
+  currentlyOnPage = false,
   balance: { type, value }, deck: { id, name },
   style, styleNames = '', children
-}: AssetSummary.Asset & { styleNames?: string, style?: any, children?: any }) {
+}: AssetSummary.Asset & { styleNames?: string, style?: any, children?: any, currentlyOnPage: boolean }) {
   return (
     <CardItem style={style} styleNames={`balance ${type.toLowerCase()} ${styleNames}`}>
-      <Text styleNames='name'>{name}</Text>
-      <Body styleNames='issuance'>
-        <Text styleNames='value'>
-          {value !== undefined ? Math.abs(value).toLocaleString('en') : '-'}
-        </Text>
-        <Text styleNames='type'>
-          {type === 'RECEIVED' ? 'balance' : type.toLowerCase()}
-        </Text>
-      </Body>
+      <Link to={`/assets/${id}`} {...currentlyOnPage ? { onPress: ()=>{} } : {}}
+          style={{ width: '100%', display: 'flex', flexDirection: 'column' }} >
+        <Text styleNames='name' style={{ width: '100%' }}>{name}</Text>
+        <Body styleNames='issuance'>
+          <Text styleNames='value'>
+            {value !== undefined ? Math.abs(value).toLocaleString('en') : '-'}
+          </Text>
+          <Text styleNames='type'>
+            {type === 'RECEIVED' ? 'balance' : type.toLowerCase()}
+          </Text>
+        </Body>
+      </Link>
       { children }
     </CardItem>
   )
@@ -125,11 +129,10 @@ class AssetSummary extends React.Component<
       <Body style={styles.card} {...props}>
         <FocusedHead asset={asset} sync={sync}/>
         { ('balance' in asset) ?
-          <Link to={`/assets/${deck.id}`} style={{ width: '100%' }} {...sync ? { onPress: ()=>{} } : {}}>
-            <Balance {...asset}>
+            <Balance {...asset} currentlyOnPage={Boolean(sync)}>
               {this.state.showDetails && <DeckDetails deck={deck}/> }
             </Balance>
-          </Link> : null
+          : null
         }
         { !sync ? (
           <Button styleNames='transparent small dark' style={actionStyle as any}

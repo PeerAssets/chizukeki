@@ -4,7 +4,12 @@ const logger: Middleware =
   <S>({ getState }: MiddlewareAPI<S>) =>
     (next: Dispatch<S>) =>
       <A extends Action>(action: A): A => {
-        if((window as any).debugging){
+        if(
+          (window as any).debugging && (
+            (window as any).debugging === true ||
+            action.type.startsWith((window as any).debugging)
+          )
+        ){
           debugger
         }
         console.log('will dispatch', action)
