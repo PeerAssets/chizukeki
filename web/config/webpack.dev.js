@@ -20,7 +20,17 @@ module.exports = {
     }),
     new webpack.EnvironmentPlugin({
       PUBLIC_PATH: '/',
-      KEY_GENERATOR: 'singleton'
+      KEY_GENERATOR: 'singleton',
+      VALID_ISSUE_MODES: [
+        'NONE',
+        'CUSTOM',
+        'ONCE',
+        'MULTI',
+        'MONO',
+        'UNFLUSHABLE',
+        'SUBSCRIPTION',
+        'SINGLET',
+      ].join(',')
     })
   ]
 }

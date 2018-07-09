@@ -1,6 +1,13 @@
 {
   "presets": ["react-native"],
   "plugins": [
+    ["transform-define", {
+      "process.env.NODE_ENV": "PRODUCTION",
+      "process.version": "v9.8.0",
+      "process.env.KEY_GENERATOR": "SINGLETON",
+      "process.env.PUBLIC_PATH": "/",
+      "process.env.VALID_ISSUE_MODES": "NONE,CUSTOM,ONCE,MULTI,MONO,UNFLUSHABLE,SUBSCRIPTION,SINGLET"
+    }],
     "babel-plugin-react-native-nodeify-hack",
     ["rewrite-require", {
       "aliases": {

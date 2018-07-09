@@ -1,3 +1,5 @@
+import IssueMode from './assets/issueModes'
+
 const deckSpawnTagHashes = {
   'MAINNET_PRODUCTION': 'PAprodbYvZqf4vjhef49aThB9rSZRxXsM6',
   'MAINNET_TESTING': 'PAtesth4QreCwMzXJjYHBcCVKbC4wjbYKP',
@@ -12,6 +14,7 @@ function getDeckSpawnTagHash(network: 'MAINNET' | 'TESTNET', mode: 'PRODUCTION' 
 namespace Configuration {
   export type Network = 'MAINNET' | 'TESTNET'
   export type DeploymentMode = 'PRODUCTION' | 'TESTING'
+  export type KeyGenerator = 'SINGLETON' | 'HD'
 
   //todo io-ts
   export function validator<T>(name: string, options: Array<T>, defaultValue?: T) {
@@ -49,15 +52,20 @@ namespace Configuration {
 
   export const network = validator<Network>('network', [ 'MAINNET', 'TESTNET' ], 'TESTNET')
   export const deploymentMode = validator<DeploymentMode>('network', [ 'PRODUCTION', 'TESTING' ], 'PRODUCTION')
+  export const keyGenerator = validator<KeyGenerator>('key_generator', [ 'SINGLETON', 'HD' ], 'SINGLETON')
+  // todo write actual issue modes validator
 
   type FullConfiguration = {
-    NETWORK: "MAINNET" | "TESTNET"
-    DEPLOYMENT_MODE: "PRODUCTION" | "TESTING"
+    NETWORK: Network
+    DEPLOYMENT_MODE: DeploymentMode
     ASSETS: {
       deckSpawnTagHash: string
       minTagFee: number
       transferPPCAmount: number
     }
+    PUBLIC_PATH: "/" | string
+    KEY_GENERATOR: KeyGenerator
+    VALID_ISSUE_MODES: Array<IssueMode>
   }
 
   var cachedFromEnv: FullConfiguration
@@ -72,7 +80,20 @@ namespace Configuration {
       minTagFee: 0.01,
       transferPPCAmount: 0.01
     }
-    cachedFromEnv = { NETWORK, DEPLOYMENT_MODE, ASSETS }
+    let PUBLIC_PATH = process.env.PUBLIC_PATH || '/'
+    let KEY_GENERATOR = keyGenerator.fromEnv()
+    console.log(process.env.VALID_ISSUE_MODES)
+    let VALID_ISSUE_MODES = (
+      process.env.VALID_ISSUE_MODES || ''
+    ).split(',') as Array<IssueMode>
+    cachedFromEnv = {
+      NETWORK,
+      DEPLOYMENT_MODE,
+      ASSETS,
+      PUBLIC_PATH,
+      KEY_GENERATOR,
+      VALID_ISSUE_MODES
+    }
     return cachedFromEnv
   }
 }

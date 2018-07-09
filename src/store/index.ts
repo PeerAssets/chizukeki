@@ -16,7 +16,7 @@ import * as Assets from '../assets/redux'
 
 import configure from '../configure'
 
-export const history = (createHistory as any)({ basename: process.env.PUBLIC_PATH || '/' })
+export const history = (createHistory as any)({ basename: configure.fromEnv().PUBLIC_PATH })
 
 const logoutMigration = state => ({})
 

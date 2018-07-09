@@ -24,7 +24,9 @@ import { Wrapper } from '../generics/Layout'
 import RoutineButton from '../generics/routine-button'
 import bitcore from '../lib/bitcore'
 
-const generateKey = process.env.KEY_GENERATOR === 'singleton' ?
+import configure from '../configure'
+
+const generateKey = configure.fromEnv().KEY_GENERATOR === 'SINGLETON' ?
   (): string => new bitcore.PrivateKey().toString() :
   (): string => new bitcore.HDPrivateKey().toString()
 

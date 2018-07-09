@@ -4,8 +4,12 @@ import { Picker as RNPicker, Platform } from 'react-native';
 // TODO this errors, maybe because of react-native-web
 import { Picker as NBPicker, Right, Radio, Text } from 'native-base'
 import IssueModes from './issueModes'
+import configure from '../configure'
 
-let web = Platform.OS === 'web'
+const valid = mode =>
+  configure.fromEnv().VALID_ISSUE_MODES.includes(mode)
+
+const web = Platform.OS === 'web'
 const Picker = web ? RNPicker : NBPicker
 
 let styles = {
@@ -31,9 +35,11 @@ class IssueMode extends React.Component<IssueMode.Props, {}> {
         onValueChange={mode => select(IssueModes.encode(mode))}
         mode='dropdown'
         {...props}>
-        { Object.keys(IssueModes.nameToEncodingMap).map((mode: IssueModes) =>
-          <Picker.Item key={mode} label={mode} value={mode}/>
-        ) }
+        {
+          Object.keys(IssueModes.nameToEncodingMap)
+            .filter(valid)
+            .map((mode: IssueModes) => <Picker.Item key={mode} label={mode} value={mode}/>)
+        }
       </Picker>
     )
   }
