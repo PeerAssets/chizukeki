@@ -33,6 +33,7 @@ namespace Satoshis {
       satoshis: Satoshis.fromAmount(amount)
     }
   }
+
 }
 
 namespace HTTP {

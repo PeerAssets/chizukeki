@@ -24,7 +24,7 @@ function getDeckSpawnTagHash(PPCtestnet = false, PAtest = false) {
 
 const defaultConfig = {
   minTagFee: 0.01,
-  txnFee: 0.01,
+  transferPPCAmount: 0.01,
   deckSpawnTagHash: getDeckSpawnTagHash()
 }
 
@@ -37,7 +37,7 @@ function extendBitcore(bitcore, configuration = defaultConfig) {
         return {
           ...this,
           minTagFee: Satoshis.fromAmount(this.minTagFee),
-          txnFee: Satoshis.fromAmount(this.txnFee)
+          transferPPCAmount: Satoshis.fromAmount(this.transferPPCAmount)
         }
       },
     }, configuration),
@@ -46,7 +46,7 @@ function extendBitcore(bitcore, configuration = defaultConfig) {
     // Deck spawn functions
     //
     createDeckSpawnTransaction(utxo, changeAddress: string, name: string, numberOfDecimals: number, issueModes: number) {
-      let { minTagFee, txnFee, deckSpawnTagHash } = this.configuration.withFeesInSatoshis()
+      let { minTagFee, transferPPCAmount, deckSpawnTagHash } = this.configuration.withFeesInSatoshis()
       let deckSpawnTxn = new bitcore.Transaction()
         .from(arrayify(utxo))                               // vin[0]: Owner signature
         .to(deckSpawnTagHash, minTagFee)                                                // vout[0]: Deck spawn P2TH
@@ -75,7 +75,7 @@ function extendBitcore(bitcore, configuration = defaultConfig) {
     // Card transfer functions
     //
     createCardTransferTransaction(utxo, changeAddress: string, amountsMap: Record<string, number>, deckSpawnTxn) {
-      let { minTagFee, txnFee } = this.configuration.withFeesInSatoshis()
+      let { minTagFee, transferPPCAmount } = this.configuration.withFeesInSatoshis()
       var receivers: Array<string> = [];
       var amounts: Array<number> = [];
       for (let a in amountsMap) {
@@ -90,7 +90,7 @@ function extendBitcore(bitcore, configuration = defaultConfig) {
 
       // vout[2] - vout[n+2] -> the receivers
       for (let i = 0; i < receivers.length; i++){
-        cardTransferTxn.to(receivers[i], txnFee);  // vout[2]-vout[n+2]: Receiving parties
+        cardTransferTxn.to(receivers[i], transferPPCAmount);  // vout[2]-vout[n+2]: Receiving parties
       }
 
       // free format from here, typically a change Output

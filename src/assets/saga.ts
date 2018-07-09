@@ -29,14 +29,16 @@ const sendAssets = fetchJSONRoutine<
       amountsMap,
       deckSpawnTxn
     )
-    let { minTagFee: amount, txnFee: fee } = bitcore.assets.configuration
+    let fee = transaction.getFee()
+    let { minTagFee: amount } = bitcore.assets.configuration
     let signature = new bitcore.PrivateKey(privateKey)
-    let hex = transaction.sign(signature).serialize()
+    // setting fee explicitly might be unneeded
+    let hex = transaction.fee(fee).sign(signature).serialize()
     let sent = await peercoin._sendRawTransaction(hex)
     return {
       assetAction: 'CardTransfer',
       amount,
-      fee,
+      fee: Satoshis.toAmount(fee),
       addresses: [bitcore.assets.assetTag(deckSpawnTxn).toString(), ...Object.keys(amountsMap)],
       ...sent
     }
@@ -57,15 +59,17 @@ const spawnDeck = fetchJSONRoutine<
       precision,
       issueMode
     )
-    let { minTagFee: amount, txnFee: fee } = bitcore.assets.configuration
+    let fee = transaction.getFee()
+    let { minTagFee: amount } = bitcore.assets.configuration
     let signature = new bitcore.PrivateKey(privateKey)
-    let hex = transaction.sign(signature).serialize()
+    // setting fee explicitly might be unneeded
+    let hex = transaction.fee(fee).sign(signature).serialize()
     let sent = await peercoin._sendRawTransaction(hex)
     return {
       assetAction: 'DeckSpawn',
       amount,
       addresses: [ bitcore.assets.configuration.deckSpawnTagHash ],
-      fee,
+      fee: Satoshis.toAmount(fee),
       ...sent
     }
   }

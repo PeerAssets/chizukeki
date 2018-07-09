@@ -271,19 +271,20 @@ class PeercoinExplorer {
   }
 
   sendRawTransaction = async (
-    { unspentOutputs, toAddress, amount, changeAddress, privateKey, fee = 0.01, }: RawTransaction.ToSend
+    { unspentOutputs, toAddress, amount, changeAddress, privateKey }: RawTransaction.ToSend
   ): Promise<Wallet.PendingTransaction> => {
     let signature = new bitcore.PrivateKey(privateKey)
     let transaction = new bitcore.Transaction()
       .from(unspentOutputs.map(Satoshis.toBitcoreUtxo))
       .to(toAddress, Satoshis.fromAmount(amount))
       .change(changeAddress)
-      .fee(Satoshis.fromAmount(fee))
+
+    let fee = transaction.getFee()
     // TODO need to update available unspent transactions after send locally?
-    let sent = await this._sendRawTransaction(transaction.sign(signature).serialize())
+    let sent = await this._sendRawTransaction(transaction.fee(fee).sign(signature).serialize())
     return {
       amount,
-      fee,
+      fee: Satoshis.toAmount(fee),
       addresses: [ toAddress ],
       ...sent
     }

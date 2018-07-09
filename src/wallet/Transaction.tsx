@@ -36,7 +36,7 @@ function TransactionDetails({
         amount: {amount}
       </Text>
       <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
-        fee: {fee}
+        fee: { amount < 0 ? -fee : fee }
       </Text>
       <AssetAction assetAction={assetAction}/>
     </CardItem>

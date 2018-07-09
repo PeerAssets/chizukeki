@@ -53,17 +53,17 @@ class Tab extends React.Component<{ name: string, link?: string, selected: strin
   }
 }
 
-@connectStyle('PeerKeeper.Nav.Tab', navStyles)
-class Nav extends React.Component<{ location: { pathname: string }, style?: any, logout: () => any }> {
+// removed style connection because of withRouter rerendering issues
+class Nav extends React.Component<{ location: { pathname: string }, logout: () => any }> {
   constructor(props){ super(props) }
   render() {
-    let { style, location, logout } = this.props
+    let { location, logout } = this.props
     return (
-      <Header style={style.container}>
+      <Header style={navStyles.container}>
         <Tab name='Wallet' selected={location.pathname} />
         <Tab name='Assets' selected={location.pathname} />
         <Right>
-          <Link onPress={logout} to='/login' style={style.link}>
+          <Link onPress={logout} to='/login' style={navStyles.link}>
             <Icon name='sign-out' style={{color:'white'}} />
           </Link>
         </Right>

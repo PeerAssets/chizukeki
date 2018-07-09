@@ -56,7 +56,7 @@ namespace Configuration {
     ASSETS: {
       deckSpawnTagHash: string
       minTagFee: number
-      txnFee: number
+      transferPPCAmount: number
     }
   }
 
@@ -70,7 +70,7 @@ namespace Configuration {
     let ASSETS = {
       deckSpawnTagHash: getDeckSpawnTagHash(NETWORK, DEPLOYMENT_MODE),
       minTagFee: 0.01,
-      txnFee: 0.01
+      transferPPCAmount: 0.01
     }
     cachedFromEnv = { NETWORK, DEPLOYMENT_MODE, ASSETS }
     return cachedFromEnv

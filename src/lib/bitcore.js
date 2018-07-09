@@ -107,4 +107,6 @@ bitcore.Transaction.prototype.getUnspentOutput = function(outputIndex) {
   });
 }
 
+bitcore.Transaction.FEE_PER_KB = 10000 // 0.01 PPC
+
 export default addPeerassets(bitcore, configure.fromEnv().ASSETS)
