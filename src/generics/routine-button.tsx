@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { mapObjIndexed } from 'ramda'
-import { Text, Button, Icon, Spinner, variables } from 'native-base'
+import { Text, Button, Icon, Spinner, variables, Toast } from 'native-base'
 import { Routine } from './routine';
 import { lang } from 'moment';
 import { Platform, Dimensions } from 'react-native';
+import ToastConfig from './toast-config';
 
 type Stage = 'STARTED' | 'DONE' | 'FAILED' | 'DEFAULT' | 'STOPPED'
 
@@ -21,6 +22,7 @@ namespace RoutineButton {
     stage: string | undefined
     onPress: () => any
     icons?: Partial<Record<Stage, string | React.ReactElement<any> | undefined>>
+    toasts?: Partial<Record<Stage, ToastConfig>>
     dismiss?: DismissProps
     STARTED?: string
     DONE?: string
@@ -54,6 +56,7 @@ function normalizeIcons(icons: Props['icons'] = {}){
   )
 }
 
+Object.assign(window,{Toast})
 class RoutineButton extends React.Component<Props, { alerting: false | Stage }> {
   
   state = { alerting: (false as false | Stage) }
@@ -66,6 +69,26 @@ class RoutineButton extends React.Component<Props, { alerting: false | Stage }> 
       (this.props.stage !== stage)
     ){
       this.setState({ alerting: stage })
+    }
+    if (
+      (['DONE', 'FAILED', 'STOPPED'].includes(stage)) &&
+      this.props.stage !== stage &&
+      this.props.toasts
+    ) {
+      let toast = this.props.toasts[stage]
+      if (toast) {
+        let config = ToastConfig(toast)
+        if (stage === 'DONE' && !config.type) {
+          config.type = 'success'
+        }
+        if (stage === 'FAILED' && !config.type) {
+          config.type = 'danger'
+        }
+        if (stage === 'STOPPED' && !config.type) {
+          config.type = 'warning'
+        }
+        Toast.show(config)
+      }
     }
   }
 

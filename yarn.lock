@@ -5539,9 +5539,9 @@ nanomatch@^1.2.9:
     lodash "^4.10.1"
     prop-types "^15.5.10"
 
-"native-base@git://github.com/micimize/NativeBase.git#bab6882be240ef906c667b4486a9433386cfa916":
+"native-base@git://github.com/micimize/NativeBase.git#034b010c76e1c422e8b9751d8e338ae217646a31":
   version "2.3.5"
-  resolved "git://github.com/micimize/NativeBase.git#bab6882be240ef906c667b4486a9433386cfa916"
+  resolved "git://github.com/micimize/NativeBase.git#034b010c76e1c422e8b9751d8e338ae217646a31"
   dependencies:
     blueimp-md5 "^2.5.0"
     clamp "^1.0.1"

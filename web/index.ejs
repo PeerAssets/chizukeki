@@ -5,6 +5,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title><%= htmlWebpackPlugin.options.title %></title>
+    <style>
+      html {
+        min-height: 100%;
+      }
+    </style>
   </head>
   <body>
     <% if (process.env.PUBLIC_PATH === '/chizukeki' ){ %>

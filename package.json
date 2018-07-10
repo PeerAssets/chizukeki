@@ -32,7 +32,7 @@
     "jest": "21.2.1",
     "lodash": "^4.17.4",
     "moment": "^2.20.1",
-    "native-base": "git://github.com/micimize/NativeBase.git#bab6882be240ef906c667b4486a9433386cfa916",
+    "native-base": "git://github.com/micimize/NativeBase.git#034b010c76e1c422e8b9751d8e338ae217646a31",
     "number-precision": "^1.2.0",
     "process": "^0.11.10",
     "prop-types": "^15.6.0",

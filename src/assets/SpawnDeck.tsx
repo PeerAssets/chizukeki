@@ -74,10 +74,13 @@ function isFilled(state: State): state is SpawnDeck.Data {
   return Fillable.isFilled<SpawnDeck.Data, 'name' | 'issueMode'>(state)
 }
 
-function SpawnButton(props: { stage: string | undefined, disabled: boolean, onPress: () => any }) {
+function SpawnButton({ deck, ...props }: {
+  deck: State, stage: string | undefined, disabled: boolean, onPress: () => any
+}) {
   return <RoutineButton
     styleNames='block'
     icons={{ DEFAULT: 'send' }}
+    toasts={{ DONE: `Spawned deck ${deck.name}` }}
     DEFAULT='Spawn Deck'
     STARTED='Spawning'
     DONE='Spawned!'
@@ -157,7 +160,8 @@ class SpawnDeck extends React.Component<SpawnDeck.Props, State> {
               Component={SpawnButton}
               componentProps={{
                 disabled: (!isFilled(this.state)),
-                stage: this.props.stage
+                stage: this.props.stage,
+                deck: this.state
               }}
             />
           </Body>

@@ -201,6 +201,7 @@ export default (variables = nbVariables) => {
     "NativeBase.Spinner": Object.assign(spinnerStyles, basicTextStyles),
 
     'PeerKeeper.Assets': assetStyles(variables),
-    'PeerKeeper.Asset': assetStyles(variables)
+    'PeerKeeper.Asset': assetStyles(variables),
+
   })
 }

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { View, Platform } from 'react-native'
-import { Button, Card, CardItem, Text, H2, Badge, Switch } from 'native-base'
+import { Button, Card, CardItem, Text, H2, Badge, Switch, Toast } from 'native-base'
 
 import FlatList from '../generics/FlatList'
 import moment from 'moment'
@@ -73,8 +73,14 @@ class TransactionList extends React.Component<
   { transactions: TransactionList.Data },
   { showAssets: boolean }
 > {
-  toggleFilter = (showAssets = !this.state.showAssets) =>
+  toggleFilter = (showAssets = !this.state.showAssets) => {
     this.setState({ showAssets })
+    Toast.show({
+      text: `${ showAssets ? 'Showing' : 'Hiding'} Asset Transactions`,
+      position: 'bottom'
+    })
+
+  }
   constructor(props){
     super(props)
     this.state = { showAssets: true }

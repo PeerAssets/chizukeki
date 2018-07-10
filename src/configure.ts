@@ -82,7 +82,6 @@ namespace Configuration {
     }
     let PUBLIC_PATH = process.env.PUBLIC_PATH || '/'
     let KEY_GENERATOR = keyGenerator.fromEnv()
-    console.log(process.env.VALID_ISSUE_MODES)
     let VALID_ISSUE_MODES = (
       process.env.VALID_ISSUE_MODES || ''
     ).split(',') as Array<IssueMode>

@@ -166,10 +166,18 @@ class AddRecipient extends React.Component<{
   }
 }
 
-function SendButton(props: { stage: undefined | string, DEFAULT: string, disabled: boolean, onPress: () => any }){
+function SendButton({ totalAmount, name, ...props }: {
+  totalAmount: number,
+  name: string,
+  stage: undefined | string,
+  DEFAULT: string,
+  disabled: boolean,
+  onPress: () => any
+}){
   return (
     <RoutineButton styleNames='block'
       icons={{ DEFAULT: 'send' }}
+      toasts={{ DONE: `Sent ${totalAmount} ${name}` }}
       STARTED='Sending'
       DONE='Sent!'
       FAILED='Invalid Transaction'
@@ -240,6 +248,8 @@ class SendAsset extends React.Component<SendAsset.Props, SendAsset.Data> {
                 disabled: (!isFilled(this.state)) || (!canSendAmount) || !Deck.isFull(this.props.asset.deck),
                 stage: this.props.stage,
                 DEFAULT: !canSendAmount ? 'Insufficient Funds!' : `${transactionType} Asset`,
+                totalAmount,
+                name
               }}
             />
           </Body>
