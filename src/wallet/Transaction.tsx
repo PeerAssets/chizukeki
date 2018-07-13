@@ -22,8 +22,8 @@ function AssetAction({ assetAction }: { assetAction?: string }){
 }
 
 function TransactionDetails({
-  confirmations, id, assetAction, amount, fee
-}: WalletTransaction.Data) {
+  confirmations, id, assetAction, amount, fee, asset
+}: WalletTransaction.Data & { asset?: boolean }) {
   return (
     <CardItem styleNames='footer' style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
       <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
@@ -32,13 +32,17 @@ function TransactionDetails({
       <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
         confirmations: {confirmations || 'pending'}
       </Text>
-      <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
-        amount: {amount}
-      </Text>
-      <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
-        fee: { amount < 0 ? -fee : fee }
-      </Text>
-      <AssetAction assetAction={assetAction}/>
+      {
+        !asset && <>
+          <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
+            amount: {amount}
+          </Text>
+          <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
+            fee: { amount < 0 ? -fee : fee }
+          </Text>
+          <AssetAction assetAction={assetAction}/>
+        </>
+      }
     </CardItem>
   )
 }
@@ -120,5 +124,5 @@ class TransactionList extends React.Component<
   }
 }
 
-export { WalletTransaction }
+export { WalletTransaction, TransactionDetails }
 export default TransactionList

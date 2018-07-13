@@ -12,6 +12,8 @@ import RoutineButton from '../generics/routine-button'
 import { CardTransfer as CardTransferData } from './papi'
 import Transaction from '../generics/transaction-like'
 
+import { TransactionDetails } from '../wallet/Transaction'
+
 namespace CardTransfer {
   export type Data = CardTransferData
   export type Pending = Pick<Data,
@@ -31,18 +33,22 @@ const sortDesc = sortWith([
 
 
 function CardTransfer({
-  item: { amount, deck_name = '', receiver, sender, ...transfer }
+  item: { amount, deck_name = '', receiver, sender, txid, ...transfer }
 }: { item: CardTransfer.Data | CardTransfer.Pending }) {
   // TODO selfSend should be more flexible to allow for sending to both self and others... I guess
+
+  let transaction = ('transaction' in transfer) && transfer.transaction
   let selfSend = sender === receiver
-  let timestamp = ('transaction' in transfer)
-    ? transfer.transaction.timestamp
+  let timestamp = transaction
+    ? transaction.timestamp
     : 'pending'
   return (
     <Transaction {...{ amount: selfSend ? 0 : amount, timestamp, selfSend }}
       timestamp={timestamp}
       asset={deck_name}
-      addresses={[ amount > 0 ? sender : receiver ]} />
+      addresses={[ amount > 0 ? sender : receiver ]}>
+      { transaction && <TransactionDetails asset {...transaction}/> }
+    </Transaction>
   )
 }
 
