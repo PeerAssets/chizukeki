@@ -117,7 +117,7 @@ class Papi {
       { name: "account", "op": "like", "val": `${address}%`},
       { name: "short_id", "op": "like", "val": `${assetId.substring(0,10)}%`}
     ]
-    let { objects: balances } = await this.restlessRequest('balances', { filters }, { results_per_page: 1 })
+    let { objects: balances } = await this.restlessRequest('balances', { filters })
     return mergeByShortId(balances)[0]
   }
   deckSummaries = async (address: string, deckPrefixes: Array<string>): Promise<Array<Deck.Summary>> => {

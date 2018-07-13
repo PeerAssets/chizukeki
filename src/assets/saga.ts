@@ -168,7 +168,6 @@ const syncAsset = fetchJSONRoutine.withPolling<
       t.deck_name = deck.name,
       t
     ))
-    console.log(balance)
     return { deck, balance, cardTransfers, _canLoadMoreCards } as Summary.Asset
   },
   pollingInterval: interval({ seconds: 30 })
