@@ -11,10 +11,19 @@ import Summary from './Summary'
 import SpawnDeck from './SpawnDeck'
 import CardTransferList, { CardTransfer } from './CardTransfer'
 
+function mergePendingCardTransfers(assets: Summary.Props['assets']){
+  return assets.reduce(
+    (transfers, a) => transfers.concat(a.pendingCardTransfers),
+    [] as CardTransfer.Pending[]
+  )
+}
+
 function mergeCardTransfers(assets: Summary.Props['assets']){
   return assets.reduce(
     (transfers, a) => transfers.concat(a.cardTransfers),
-    [] as CardTransfer.Data[]
+    mergePendingCardTransfers(assets) as Array<
+      CardTransfer.Pending | CardTransfer.Data
+    >
   )
 }
 

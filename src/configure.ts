@@ -15,6 +15,7 @@ namespace Configuration {
   export type Network = 'MAINNET' | 'TESTNET'
   export type DeploymentMode = 'PRODUCTION' | 'TESTING'
   export type KeyGenerator = 'SINGLETON' | 'HD'
+  export type NodeEnv = 'PRODUCTION' | 'DEVELOPMENT'
 
   //todo io-ts
   export function validator<T>(name: string, options: Array<T>, defaultValue?: T) {
@@ -53,9 +54,11 @@ namespace Configuration {
   export const network = validator<Network>('network', [ 'MAINNET', 'TESTNET' ], 'TESTNET')
   export const deploymentMode = validator<DeploymentMode>('network', [ 'PRODUCTION', 'TESTING' ], 'PRODUCTION')
   export const keyGenerator = validator<KeyGenerator>('key_generator', [ 'SINGLETON', 'HD' ], 'SINGLETON')
+  export const nodeEnv = validator<NodeEnv>('NODE_ENV', [ 'PRODUCTION', 'DEVELOPMENT' ], 'DEVELOPMENT')
   // todo write actual issue modes validator
 
   type FullConfiguration = {
+    NODE_ENV: NodeEnv
     NETWORK: Network
     DEPLOYMENT_MODE: DeploymentMode
     ASSETS: {
@@ -82,10 +85,12 @@ namespace Configuration {
     }
     let PUBLIC_PATH = process.env.PUBLIC_PATH || '/'
     let KEY_GENERATOR = keyGenerator.fromEnv()
+    let NODE_ENV = nodeEnv.fromEnv()
     let VALID_ISSUE_MODES = (
       process.env.VALID_ISSUE_MODES || ''
     ).split(',') as Array<IssueMode>
     cachedFromEnv = {
+      NODE_ENV,
       NETWORK,
       DEPLOYMENT_MODE,
       ASSETS,

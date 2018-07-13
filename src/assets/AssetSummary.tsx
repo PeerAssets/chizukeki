@@ -20,9 +20,11 @@ namespace AssetSummary {
   }
   export type Asset = {
     _canLoadMoreCards?: boolean,
+    _pending?: boolean,
     balance: Balance,
     deck: Papi.Deck,
     cardTransfers: CardTransferList.Data
+    pendingCardTransfers: CardTransferList.Pending
   }
   export type Props = {
     sync?: SyncButton.Logic
@@ -33,12 +35,25 @@ namespace AssetSummary {
   })
 }
 
+interface BalanceProps extends AssetSummary.Asset {
+  styleNames?: string,
+  style?: any,
+  children?: any,
+  currentlyOnPage: boolean,
+  pendingCardTransfers: CardTransferList.Pending,
+}
 
 function Balance({
   currentlyOnPage = false,
-  balance: { type, value }, deck: { id, name },
+  pendingCardTransfers,
+  balance: { type: _type, value }, deck: { id, name },
   style, styleNames = '', children
-}: AssetSummary.Asset & { styleNames?: string, style?: any, children?: any, currentlyOnPage: boolean }) {
+}: BalanceProps) {
+  let pending = pendingCardTransfers.reduce(
+    (pending, t) => pending + t.amount, 0
+  )
+  let balance = pending ? (value || 0) + pending : value
+  let type = _type === 'UNISSUED' && pending ? 'ISSUED' : _type 
   return (
     <CardItem style={style} styleNames={`balance ${type.toLowerCase()} ${styleNames}`}>
       <Link to={`/assets/${id}`} {...currentlyOnPage ? { onPress: ()=>{} } : {}}
@@ -46,10 +61,11 @@ function Balance({
         <Text styleNames='name' style={{ width: '100%' }}>{name}</Text>
         <Body styleNames='issuance'>
           <Text styleNames='value'>
-            {value !== undefined ? Math.abs(value).toLocaleString('en') : '-'}
+            {balance !== undefined ? Math.abs(balance).toLocaleString('en') : '-'}
           </Text>
           <Text styleNames='type'>
             {type === 'RECEIVED' ? 'balance' : type.toLowerCase()}
+            {pending ? <Text style={{ fontSize: 12, position: 'absolute', opacity: 0.5 }}> (pending)</Text> : null}
           </Text>
         </Body>
       </Link>

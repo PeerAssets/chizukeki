@@ -80,10 +80,28 @@ function mergeLoadedCards(
   }
 }
 
+function mergePendingCards(
+  assets: Array<Summary.Asset>,
+  pendingCards: Array<CardTransfer.Pending> = [],
+): Array<Summary.Asset> {
+  if (pendingCards.length === 0){
+    return assets
+  }
+  return [...assets.map(asset => asset.deck.id === pendingCards[0].deck_id
+    ? Object.assign({}, asset, {
+      pendingCardTransfers: [...pendingCards, ...asset.pendingCardTransfers]
+    })
+    : asset
+  )]
+}
+
 function mergeAsset(old: Summary.Asset, { cardTransfers, ...synced }: Summary.Asset) {
+  let syncedIds = cardTransfers.map(t => t.txid)
+  let pendingCardTransfers = old.pendingCardTransfers.filter(t => !syncedIds.includes(t.txid))
   return {
     ...old,
     ...synced,
+    pendingCardTransfers,
     cardTransfers: mergeCards(
       old.cardTransfers,
       cardTransfers.map(withName(old))
@@ -128,6 +146,14 @@ function assetsReducer(state: State = initialState(), action: AnyAction): State 
     done: ({ cardTransfers, deckId }) => ({
       ...state,
       assets: state.assets ? mergeLoadedCards(state.assets, cardTransfers, deckId) : null
+    }),
+    failed: () => state
+  }) ||
+  sendAssets.routine.switch<State>(action, {
+    started: payload => state,
+    done: ({ _cardTransfers: pending }) => ({
+      ...state,
+      assets: state.assets ? mergePendingCards(state.assets, pending) : null
     }),
     failed: () => state
   }) ||

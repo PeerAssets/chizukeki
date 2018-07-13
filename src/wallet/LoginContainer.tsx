@@ -7,10 +7,12 @@ import { lockKey } from '../lib/encrypt-key'
 
 import PrivateKey from './LoadPrivateKey'
 import * as Redux from './redux'
+import { routines as assetRoutines } from '../assets/redux'
 import Wallet from './Wallet' 
 import LoadPrivateKey from './LoadPrivateKey';
 
 let { sync } = Redux.routines
+let syncAssets = assetRoutines.syncAssets
 
 type Props = {
   wallet: Wallet.Data
@@ -19,10 +21,11 @@ type Props = {
   }
   actions: {
     sync: typeof sync.trigger
+    syncAssets: typeof syncAssets.trigger
   } 
 }
 
-function lockPrivateKey(sync: Props['actions']['sync']){
+function lockPrivateKey(sync: Props['actions']['sync'], syncAssets: Props['actions']['syncAssets']){
   return async ({ privateKey, password, format, address }: LoadPrivateKey.Data, syncNeeded: boolean = true) => {
     if(password){
       let locked = await lockKey(privateKey, password)
@@ -30,6 +33,7 @@ function lockPrivateKey(sync: Props['actions']['sync']){
     } else {
       sync({ keys: { format, private: privateKey }, address })
     }
+    syncAssets({ address })
   }
 }
 
@@ -38,7 +42,9 @@ function Container({ stages, actions, wallet }: Props){
   if(Wallet.isLoaded(wallet)){
     return <Redirect to='/wallet'/>
   }
-  return <PrivateKey syncStage={stages.sync} loadPrivateKey={lockPrivateKey(actions.sync)} />
+  return <PrivateKey
+    syncStage={stages.sync}
+    loadPrivateKey={lockPrivateKey(actions.sync, actions.syncAssets)} />
 }
 
 export default connect(
@@ -50,5 +56,6 @@ export default connect(
   },
   (dispatch: Dispatch<any>) => ({ actions: bindActionCreators({
     sync: sync.trigger,
+    syncAssets: syncAssets.trigger,
   }, dispatch) })
 )(Container)

@@ -41,7 +41,7 @@ namespace SendAsset {
     }
   }
   // todo proper deckSpawn typing
-  export type Payload = Data & { wallet: Wallet.Unlocked, deckSpawn: any }
+  export type Payload = Data & { wallet: Wallet.Unlocked, deck: Deck.Full }
   export type Props = {
     stage?: string | undefined,
     send: (data: Payload) => any,
@@ -193,7 +193,7 @@ class SendAsset extends React.Component<SendAsset.Props, SendAsset.Data> {
     let { wallet, asset, send } = this.props
     if(isFilled(this.state) && Deck.isFull(asset.deck)){
       let wallet = Object.assign({ privateKey }, this.props.wallet)
-      send({ wallet, ...this.state, deckSpawn: asset.deck.spawnTransaction })
+      send({ wallet, ...this.state, deck: asset.deck })
     }
   }
   render() {
@@ -214,7 +214,6 @@ class SendAsset extends React.Component<SendAsset.Props, SendAsset.Data> {
 
     let recipientCount = Object.keys(amountsMap).length 
     let headers = { address: 'Add recipents to send a transaction',  }
-
     return (
       <Card style={{width: '100%', flex: 0 }}>
         <CardItem styleNames='header'>

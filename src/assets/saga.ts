@@ -15,14 +15,40 @@ import SpawnDeck from './SpawnDeck'
 
 import { mergeByShortId } from './utils'
 
+type PendingCardTransfer = Pick<CardTransfer,
+  | 'amount'
+  | 'txid'
+  | 'deck_id' 
+  | 'deck_name' 
+  | 'sender'
+  | 'receiver'
+>
+
+function pendingCardTransfers(
+  sender: string,
+  txid: string,
+  deck_id: string,
+  deck_name: string,
+  amountsMap: SendAsset.Payload['amountsMap']
+): PendingCardTransfer[] {
+  return Object.keys(amountsMap).map(receiver => ({
+    txid,
+    deck_id,
+    deck_name,
+    receiver,
+    sender,
+    amount: -amountsMap[receiver],
+  }))
+}
+
 const sendAssets = fetchJSONRoutine<
   SendAsset.Payload,
-  Wallet.PendingTransaction,
+  Wallet.PendingTransaction & { _cardTransfers: PendingCardTransfer[] },
   Error
 >({
   type: 'SEND_ASSETS',
-  fetchJSON: async ({ wallet: { address, unspentOutputs, privateKey }, amountsMap, deckSpawn }) => {
-    let deckSpawnTxn = new bitcore.Transaction(deckSpawn.hex)
+  fetchJSON: async ({ wallet: { address, unspentOutputs, privateKey }, amountsMap, deck }) => {
+    let deckSpawnTxn = new bitcore.Transaction(deck.spawnTransaction.hex)
     let transaction = bitcore.assets.createCardTransferTransaction(
       unspentOutputs.map(Satoshis.toBitcoreUtxo),
       address,
@@ -40,7 +66,16 @@ const sendAssets = fetchJSONRoutine<
       amount,
       fee: Satoshis.toAmount(fee),
       addresses: [bitcore.assets.assetTag(deckSpawnTxn).toString(), ...Object.keys(amountsMap)],
-      ...sent
+      ...sent,
+
+      // used by asset reducer, excluded by wallet reducer
+      _cardTransfers: pendingCardTransfers(
+        address,
+        sent.id,
+        deck.id,
+        deck.name,
+        amountsMap
+      )
     }
   }
 })
@@ -138,7 +173,12 @@ const syncAssets = fetchJSONRoutine.withPolling<
     let unissued: Array<Summary.Asset> = []
     let deckIdMap = decks.reduce((map, deck) => {
       if(deck.issuer === address){
-        unissued.push({ deck, balance: { type: 'UNISSUED' }, cardTransfers: [] })
+        unissued.push({
+          deck,
+          balance: { type: 'UNISSUED' },
+          cardTransfers: [],
+          pendingCardTransfers: []
+        })
       }
       map[deck.id.substr(0, 10)] = deck
       return map
@@ -155,7 +195,7 @@ const syncAssets = fetchJSONRoutine.withPolling<
               return c
             }) :
           []
-        return { deck, balance, cardTransfers } as Summary.Asset
+        return { deck, balance, cardTransfers, pendingCardTransfers: [] } as Summary.Asset
       }).filter(a => a.deck)
     assets = unissued.concat(assets)
     // we can know if more cards for an asset _can't_ be loaded here, but not if they _can_
@@ -180,6 +220,12 @@ const loadMoreCards = fetchJSONRoutine<
   }
 })
 
+function* cleanup(){
+  yield takeLatest('HARD_LOGOUT', () => (
+    put(syncAssets.routine.stop()),
+    put(syncAsset.routine.stop())
+  ))
+}
 
 // TODO cleanup copypasta
 export default function * (){
@@ -192,7 +238,9 @@ export default function * (){
 
     sendAssets.trigger(),
     spawnDeck.trigger(),
-    loadMoreCards.trigger()
+    loadMoreCards.trigger(),
+
+    cleanup()
   ])
 }
 

@@ -41,6 +41,7 @@ type Deck = Deck.Summary | Deck.Full
 
 export type CardTransfer = {
   type: 'CardBurn' | 'CardIssue' | 'CardTransfer'
+
   amount: number,
   txid: string,
   id: string,

@@ -43,7 +43,7 @@ class Asset extends React.Component<Asset.Props, {}> {
         </Main>
         { ('cardTransfers' in asset) &&
           <CardTransferList style={{ width: '100%' }}
-            cardTransfers={asset.cardTransfers}
+            cardTransfers={[...asset.pendingCardTransfers, ...asset.cardTransfers]}
             canLoadMore={'_canLoadMoreCards' in asset ? Boolean(asset._canLoadMoreCards) : true}
             stage={loadMoreCards}
             loadMore={() => actions.loadMoreCards({

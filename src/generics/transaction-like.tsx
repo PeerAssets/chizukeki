@@ -5,7 +5,7 @@ import moment from 'moment'
 type Props = {
   selfSend: boolean,
   amount: number,
-  timestamp: Date,
+  timestamp: Date | string,
   addresses: Array<string>,
   asset: string | React.ReactNode,
   children?: any
@@ -43,7 +43,9 @@ class Transaction extends React.Component<Props, { showDetails: boolean }> {
           </Left>
           <Right style={{ flex: 4, display: 'flex', flexDirection: 'row', alignItems: 'flex-end', flexBasis: 20 }}>
             <Text styleNames='note' style={{ flex: 4, textAlign: 'right', height: 30, position: 'relative', bottom: 2  }}>
-              {moment(timestamp).fromNow().replace('a few ', '')}
+              {timestamp === 'pending'
+                ? timestamp
+                : moment(timestamp).fromNow().replace('a few ', '')}
             </Text>
             { children ? (
               <Button styleNames='transparent small dark' style={{ flex: 1, position: 'relative', left: 8, bottom: 8 }}

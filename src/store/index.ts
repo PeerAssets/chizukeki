@@ -25,6 +25,7 @@ const migrations: any = {
   1: logoutMigration,
   2: logoutMigration,
   3: logoutMigration,
+  4: logoutMigration,
 }
 
 let persist = (key: string, reducer: Reducer<any>) => persistReducer({
@@ -45,7 +46,7 @@ const reducer = combineReducers({
 
 const saga = createSagaMiddleware()
 
-const middleware = configure.fromEnv().DEPLOYMENT_MODE !== 'PRODUCTION' ?
+const middleware = configure.fromEnv().NODE_ENV !== 'PRODUCTION' ?
   applyMiddleware(saga, logger, routerMiddleware(history)) :
   applyMiddleware(saga, routerMiddleware(history))
 

@@ -4,7 +4,7 @@ import Wallet from './Wallet'
 import { trackRoutineStages } from '../generics/utils'
 import saga, { syncWallet, sendTransaction } from './saga'
 import { AnyAction } from 'typescript-fsa';
-import { init } from 'ramda';
+import { init, omit } from 'ramda';
 
 import { sendAssets, spawnDeck } from '../assets/saga'
 
@@ -127,10 +127,12 @@ function logout(state: State){
 function walletReducer(state: State = initialState(), action: AnyAction): State {
   let transactionSwitch = {
     started: payload => state,
-    done: (payload) => ({
+    done: payload => ({
       ...state,
       // an unloaded wallet here shouldn't be possible
-      wallet: Wallet.isLoaded(state.wallet) ? applyTransaction(state.wallet, payload) : state.wallet,
+      wallet: Wallet.isLoaded(state.wallet) ?
+        applyTransaction(state.wallet, omit(['_cardTransfers'], payload) as any) :
+        state.wallet,
     }),
     failed: () => state
   }
