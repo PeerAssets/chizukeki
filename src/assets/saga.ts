@@ -12,17 +12,9 @@ import { Satoshis } from '../lib/utils'
 import Summary from './Summary'
 import SendAsset from './SendAsset'
 import SpawnDeck from './SpawnDeck'
+import CardTransferList from './CardTransfer'
 
 import { mergeByShortId } from './utils'
-
-type PendingCardTransfer = Pick<CardTransfer,
-  | 'amount'
-  | 'txid'
-  | 'deck_id' 
-  | 'deck_name' 
-  | 'sender'
-  | 'receiver'
->
 
 function pendingCardTransfers(
   sender: string,
@@ -30,7 +22,7 @@ function pendingCardTransfers(
   deck_id: string,
   deck_name: string,
   amountsMap: SendAsset.Payload['amountsMap']
-): PendingCardTransfer[] {
+): CardTransferList.Pending {
   return Object.keys(amountsMap).map(receiver => ({
     txid,
     deck_id,
@@ -43,7 +35,7 @@ function pendingCardTransfers(
 
 const sendAssets = fetchJSONRoutine<
   SendAsset.Payload,
-  Wallet.PendingTransaction & { _cardTransfers: PendingCardTransfer[] },
+  Wallet.PendingTransaction & { _cardTransfers: CardTransferList.Pending },
   Error
 >({
   type: 'SEND_ASSETS',
@@ -80,9 +72,34 @@ const sendAssets = fetchJSONRoutine<
   }
 })
 
+/*
+  export type Asset = {
+    _canLoadMoreCards?: boolean,
+    _pending?: boolean,
+    balance: Balance,
+    deck: Papi.Deck,
+    cardTransfers: CardTransferList.Data
+    pendingCardTransfers: CardTransferList.Pending
+  }
+*/
+
+type PendingAsset = Summary.Asset & { _pending: true }
+
+function pendingAsset(deck: Deck.Summary): PendingAsset {
+  return {
+    _pending: true,
+    balance: {
+      type: 'UNISSUED'
+    },
+    deck,
+    pendingCardTransfers: [],
+    cardTransfers: [],
+  }
+}
+
 const spawnDeck = fetchJSONRoutine<
   SpawnDeck.Payload,
-  Wallet.PendingTransaction,
+  Wallet.PendingTransaction & { _pendingAsset: PendingAsset },
   Error
 >({
   type: 'SPAWN_DECK',
@@ -105,7 +122,15 @@ const spawnDeck = fetchJSONRoutine<
       amount,
       addresses: [ bitcore.assets.configuration.deckSpawnTagHash ],
       fee: Satoshis.toAmount(fee),
-      ...sent
+      ...sent,
+      _pendingAsset: pendingAsset({
+        name,
+        issueMode,
+        id: sent.id,
+        issuer: address,
+        decimals: precision,
+        subscribed: false,
+      })
     }
   }
 })
@@ -143,6 +168,7 @@ const syncAsset = fetchJSONRoutine.withPolling<
       t.deck_name = deck.name,
       t
     ))
+    console.log(balance)
     return { deck, balance, cardTransfers, _canLoadMoreCards } as Summary.Asset
   },
   pollingInterval: interval({ seconds: 30 })

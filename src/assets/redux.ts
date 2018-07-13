@@ -96,7 +96,7 @@ function mergePendingCards(
 }
 
 function mergeAsset(
-  old: Summary.Asset,
+  { _pending, ...old }: Summary.Asset,
   { deck, cardTransfers, ...synced }: Summary.Asset
 ) {
   let syncedIds = cardTransfers.map(t => t.txid)
@@ -114,7 +114,8 @@ function mergeAsset(
 }
 function mergeAssets(old: Array<Summary.Asset>, synced: Array<Summary.Asset>) {
   let syncedIds = synced.map(a => a.deck.id)
-  return old.filter(a => !syncedIds.includes(a.deck.id)) // this is prep for "cache spawned"
+  // retain cached pending decks, then merge 
+  return old.filter(a => !syncedIds.includes(a.deck.id))
     .concat(synced.map(s => {
       // merge synced with current if relevent 
       let o = old.filter(o => o.deck.id === s.deck.id)
@@ -158,6 +159,14 @@ function assetsReducer(state: State = initialState(), action: AnyAction): State 
     done: ({ _cardTransfers: pending }) => ({
       ...state,
       assets: state.assets ? mergePendingCards(state.assets, pending) : null
+    }),
+    failed: () => state
+  }) ||
+  spawnDeck.routine.switch<State>(action, {
+    started: payload => state,
+    done: ({ _pendingAsset: pending }) => ({
+      ...state,
+      assets: state.assets ? [ pending, ...state.assets ] : null
     }),
     failed: () => state
   }) ||

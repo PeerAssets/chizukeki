@@ -58,10 +58,12 @@ class Assets extends React.Component<Assets.Props, {}> {
 }
 
 namespace Assets {
-  export type Data = {
+  interface AssetData {
     assets: Summary.Props['assets'] | null
   }
-  export type Props = Data & {
+  export type Data = AssetData
+
+  interface AssetProps extends Data {
     wallet: Wallet.Data
     stages: any
     actions: {
@@ -73,6 +75,7 @@ namespace Assets {
     }
     style?: any
   }
+  export type Props = AssetProps
 }
 
 export default Assets

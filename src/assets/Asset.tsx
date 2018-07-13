@@ -59,7 +59,7 @@ class Asset extends React.Component<Asset.Props, {}> {
 }
 
 namespace Asset {
-  export type Props = {
+  interface AssetProps {
     asset: Summary.Asset | { deck: Deck }
     sync: SyncButton.Logic
     stages: Record<'sendAssets' | 'loadMoreCards', string | undefined>,
@@ -70,6 +70,7 @@ namespace Asset {
     wallet: SendAsset.Props['wallet']
     style?: any
   }
+  export type Props = AssetProps
 }
 
 export default Asset

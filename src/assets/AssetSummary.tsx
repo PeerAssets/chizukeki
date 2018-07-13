@@ -12,13 +12,13 @@ import CardTransferList from './CardTransfer'
 
 namespace AssetSummary {
   export type BalanceType = 'UNISSUED' | 'ISSUED' | 'RECEIVED'
-  export type Balance = {
+  export interface Balance {
     type: BalanceType
     value?: number
     account?: string
     _raw?: any // store list of raw balances
   }
-  export type Asset = {
+  export interface Asset {
     _canLoadMoreCards?: boolean,
     _pending?: boolean,
     balance: Balance,
@@ -26,6 +26,7 @@ namespace AssetSummary {
     cardTransfers: CardTransferList.Data
     pendingCardTransfers: CardTransferList.Pending
   }
+  
   export type Props = {
     sync?: SyncButton.Logic
   } & ({
@@ -43,8 +44,15 @@ interface BalanceProps extends AssetSummary.Asset {
   pendingCardTransfers: CardTransferList.Pending,
 }
 
+function Pending({ style, pending, ...props }) {
+  return pending ? (
+    <Text style={{ fontSize: 12, opacity: 0.5, ...style }} {...props}> (pending)</Text>
+  ) : null
+}
+
 function Balance({
   currentlyOnPage = false,
+  _pending: deckSpawnPending,
   pendingCardTransfers,
   balance: { type: _type, value }, deck: { id, name },
   style, styleNames = '', children
@@ -56,16 +64,21 @@ function Balance({
   let type = _type === 'UNISSUED' && pending ? 'ISSUED' : _type 
   return (
     <CardItem style={style} styleNames={`balance ${type.toLowerCase()} ${styleNames}`}>
-      <Link to={`/assets/${id}`} {...currentlyOnPage ? { onPress: ()=>{} } : {}}
+      <Link
+          to={`/assets/${deckSpawnPending ? '' : id}`}
+          {...currentlyOnPage ? { onPress: ()=>{} } : {}}
           style={{ width: '100%', display: 'flex', flexDirection: 'column' }} >
-        <Text styleNames='name' style={{ width: '100%' }}>{name}</Text>
+        <Text styleNames='name' style={{ width: '100%' }}>
+          {name}
+          <Pending pending={deckSpawnPending} style={{ position: 'absolute' }}/>
+        </Text>
         <Body styleNames='issuance'>
           <Text styleNames='value'>
             {balance !== undefined ? Math.abs(balance).toLocaleString('en') : '-'}
           </Text>
           <Text styleNames='type'>
             {type === 'RECEIVED' ? 'balance' : type.toLowerCase()}
-            {pending ? <Text style={{ fontSize: 12, position: 'absolute', opacity: 0.5 }}> (pending)</Text> : null}
+            <Pending pending={pending} style={{ position: 'absolute' }}/>
           </Text>
         </Body>
       </Link>

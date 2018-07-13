@@ -14,7 +14,6 @@ const routines = {
 }
 
 type Stages = { routineStages: { [key in keyof typeof routines]: string | undefined } }
-
 export type State = { wallet: null | Wallet.Loading | Wallet.Data } & Stages
 
 let initialState = () => ({
@@ -131,7 +130,7 @@ function walletReducer(state: State = initialState(), action: AnyAction): State 
       ...state,
       // an unloaded wallet here shouldn't be possible
       wallet: Wallet.isLoaded(state.wallet) ?
-        applyTransaction(state.wallet, omit(['_cardTransfers'], payload) as any) :
+        applyTransaction(state.wallet, omit(['_cardTransfers', '_pendingAsset'], payload) as any) :
         state.wallet,
     }),
     failed: () => state

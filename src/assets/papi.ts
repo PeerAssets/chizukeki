@@ -5,6 +5,8 @@ import { Omit } from '../generics/utils'
 
 import IssueMode from './issueModes'
 
+import { mergeByShortId } from './utils'
+
 async function getJSON<T = any>(url: string, emptyErrorMessage?: void | string) {
   let response = await fetch(url)
   let body: T = await response.json()
@@ -19,7 +21,7 @@ type ApiCalls = 'decks'
 type Resource = 'decks' | 'cards' | 'balances'
 
 namespace Deck {
-  export type Summary = {
+  interface DeckSummary {
     id: string
     name: string
     issuer: string
@@ -27,11 +29,13 @@ namespace Deck {
     decimals: number
     subscribed: boolean
   }
-  export type Full = Summary & {
+  export type Summary = DeckSummary
+  interface FullDeck extends Summary {
     supply: number
     spawnTransaction: any
     balances: { [address: string]: number }
   }
+  export type Full = FullDeck
   export function isFull(deck: Deck): deck is Deck.Full {
     return deck.hasOwnProperty('spawnTransaction')
   }
@@ -39,7 +43,7 @@ namespace Deck {
 
 type Deck = Deck.Summary | Deck.Full
 
-export type CardTransfer = {
+export interface CardTransfer {
   type: 'CardBurn' | 'CardIssue' | 'CardTransfer'
 
   amount: number,
@@ -114,7 +118,7 @@ class Papi {
       { name: "short_id", "op": "like", "val": `${assetId.substring(0,10)}%`}
     ]
     let { objects: balances } = await this.restlessRequest('balances', { filters }, { results_per_page: 1 })
-    return balances[0]
+    return mergeByShortId(balances)[0]
   }
   deckSummaries = async (address: string, deckPrefixes: Array<string>): Promise<Array<Deck.Summary>> => {
     let filters = [
