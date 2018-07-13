@@ -95,12 +95,16 @@ function mergePendingCards(
   )]
 }
 
-function mergeAsset(old: Summary.Asset, { cardTransfers, ...synced }: Summary.Asset) {
+function mergeAsset(
+  old: Summary.Asset,
+  { deck, cardTransfers, ...synced }: Summary.Asset
+) {
   let syncedIds = cardTransfers.map(t => t.txid)
   let pendingCardTransfers = old.pendingCardTransfers.filter(t => !syncedIds.includes(t.txid))
   return {
     ...old,
     ...synced,
+    deck: { ...old.deck, ...deck },
     pendingCardTransfers,
     cardTransfers: mergeCards(
       old.cardTransfers,
