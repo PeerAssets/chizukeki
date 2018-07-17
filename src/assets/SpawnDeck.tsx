@@ -139,15 +139,10 @@ class SpawnDeck extends React.Component<SpawnDeck.Props, State> {
                     }} />
                 ]}
               </Field>
-              <Field styleNames='fixedLabel' style={{ marginLeft: 15, minWidth: 300, minHeight: 50, flex: 0 }}>
-                {ref => [
-                  <Label key={0} style={{ maxWidth: 100 }}>Issue Mode</Label>,
-                  <IssueMode key={1} ref={ref}
-                    style={{ width: 200, backgroundColor: variables.brandLight }}
-                    selected={this.state.issueMode}
-                    select={(issueMode: IssueMode.Data) => this.setState({ issueMode })} />
-                ]}
-              </Field>
+              <IssueMode
+                style={{ padding: 15, width: '100%' }}
+                value={this.state.issueMode || 0x0}
+                onChange={(issueMode: IssueMode.Data) => this.setState({ issueMode })} />
             </Form>
           </Body>
         </CardItem>
