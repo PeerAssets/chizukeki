@@ -35,19 +35,21 @@ import Field from '../generics/Field'
 type Recipient = { address: string, amount: number }
 
 namespace SendAsset {
-  export type Data = {
+  export interface Data {
+    assetSpecificData: string
     amountsMap: {
       [address: string]: number
     }
   }
   // todo proper deckSpawn typing
   export type Payload = Data & { wallet: Wallet.Unlocked, deck: Deck.Full }
-  export type Props = {
+  interface SendAssetProps {
     stage?: string | undefined,
     send: (data: Payload) => any,
     wallet: Wallet.Data,
     asset: Summary.Asset
   }
+  export type Props = SendAssetProps
 }
 
 let smallTextStyle = {
@@ -55,6 +57,11 @@ let smallTextStyle = {
   fontSize: 12,
   flex: 0,
   ...(Platform.OS === 'web' ? { textOverflow: 'ellipsis' } : {}),
+}
+
+let grid = {
+  row: { marginRight: -7.5, marginLeft: -7.5 },
+  column: { marginRight: 7.5, marginLeft: 7.5 },
 }
 
 function isFilled(s: SendAsset.Data): s is SendAsset.Data {
@@ -128,8 +135,8 @@ class AddRecipient extends React.Component<{
             }}>
               <Text style={{ color: 'white' }}>You can only make 40 card transfers at a time</Text>
             </View>
-          : <Body styleNames='row'>
-              <Field styleNames='stacked column collapsing'>
+          : <Body styleNames='row' style={grid.row}>
+              <Field styleNames='stacked column collapsing' style={grid.column}>
                 {ref => [
                   <Label key={0}>To address</Label>,
                   <Input
@@ -141,7 +148,7 @@ class AddRecipient extends React.Component<{
                     onChangeText={address => this.setState({ address })} />
                 ]}
               </Field>
-              <Field styleNames='stacked column collapsing'>
+              <Field styleNames='stacked column collapsing' style={grid.column}>
                 {ref => [
                   <Label key={0}>Amount</Label>,
                   <Input
@@ -154,8 +161,16 @@ class AddRecipient extends React.Component<{
                     onChangeText={this.setAmount} />
                 ]}
               </Field>
-              <Button style={{ height: 63, paddingTop: 20 }}
-                styleNames={`${ok ? 'success' : 'dark'} transparent`} onPress={this.add}>
+              <Button
+                style={{
+                  ...grid.column,
+                  height: 43,
+                  marginTop: 20,
+                  flexGrow: 1,
+                  justifyContent: 'center'
+                }}
+                disabled={!ok}
+                styleNames={`${ok ? 'success' : 'dark'} bordered`} onPress={this.add}>
                 <Icon name='plus' style={{ opacity: ok ? 1 : 0.5 }} />
               </Button>
             </Body>
@@ -187,6 +202,7 @@ function SendButton({ totalAmount, name, ...props }: {
 
 class SendAsset extends React.Component<SendAsset.Props, SendAsset.Data> {
   state: SendAsset.Data = {
+    assetSpecificData: '',
     amountsMap: {},
   }
   send = (privateKey: string) => {
@@ -202,7 +218,7 @@ class SendAsset extends React.Component<SendAsset.Props, SendAsset.Data> {
       wallet: { keys }
     } = this.props
 
-    let amountsMap = this.state.amountsMap
+    let { assetSpecificData, amountsMap } = this.state
     let totalAmount = Object.values(this.state.amountsMap).reduce((s, v) => s + v, 0)
     let transactionType = type === 'RECEIVED' ? 'Send' : 'Issue'
     let canSendAmount = (transactionType === 'Issue' || (totalAmount < balance))
@@ -236,6 +252,29 @@ class SendAsset extends React.Component<SendAsset.Props, SendAsset.Data> {
             disabled={Object.keys(amountsMap).length >= 40}
             decimals={decimals} add={({ address, amount }: Recipient) =>
             this.setState({ amountsMap: { ...amountsMap, [address]: amount } })} />
+        <CardItem>
+          <Body styleNames='row' style={{ paddingTop: 0 }}>
+            <Field styleNames='stacked column collapsing'>
+              {ref => [
+                <Label key={0}>Asset Specific Data</Label>,
+                <Input
+                  multiline
+                  numberOfLines={3}
+                  key={1}
+                  ref={ref}
+                  style={[
+                    smallTextStyle,
+                    { marginTop: 5, paddingTop: 5 },
+                    Platform.OS === 'web' ? { resize: 'vertical' } as any : {}
+                  ]}
+                  value={assetSpecificData}
+                  placeholder='add a note or metadata'
+                  onChangeText={assetSpecificData => this.setState({ assetSpecificData })}
+                  />
+              ]}
+            </Field>
+          </Body>
+        </CardItem>
         <CardItem styleNames='footer'>
           <Body>
             <WrapActionable.IfLocked

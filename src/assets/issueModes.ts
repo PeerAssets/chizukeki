@@ -86,9 +86,7 @@ namespace IssueMode {
   }
   export function decode(modeEncoding: Encoding | number){
     let modes: IssueMode | IssueMode[] = encodingToNameMap[modeEncoding]
-    console.log(modes)
     if (!modes) {
-    
       modes = reverse( // reverse twice so SUBSCRIPTION and SINGLET absorb their sub-modes
         reverse(_Modes)
           .filter(modeBits => {
@@ -96,7 +94,6 @@ namespace IssueMode {
             if (included) {
               modeEncoding = modeEncoding ^ modeBits // remove bits from encoding for combos
             }
-            console.log(modeEncoding)
             return included
           })
           .map(mode => encodingToNameMap[mode])
