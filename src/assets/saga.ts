@@ -21,7 +21,8 @@ function pendingCardTransfers(
   txid: string,
   deck_id: string,
   deck_name: string,
-  amountsMap: SendAsset.Payload['amountsMap']
+  amountsMap: SendAsset.Payload['amountsMap'],
+  asset_specific_data: string,
 ): CardTransferList.Pending {
   return Object.keys(amountsMap).map(receiver => ({
     txid,
@@ -30,6 +31,7 @@ function pendingCardTransfers(
     receiver,
     sender,
     amount: -amountsMap[receiver],
+    asset_specific_data
   }))
 }
 
@@ -39,13 +41,17 @@ const sendAssets = fetchJSONRoutine<
   Error
 >({
   type: 'SEND_ASSETS',
-  fetchJSON: async ({ wallet: { address, unspentOutputs, privateKey }, amountsMap, deck }) => {
+  fetchJSON: async ({
+    wallet: { address, unspentOutputs, privateKey },
+    assetSpecificData, amountsMap, deck
+  }) => {
     let deckSpawnTxn = new bitcore.Transaction(deck.spawnTransaction.hex)
     let transaction = bitcore.assets.createCardTransferTransaction(
       unspentOutputs.map(Satoshis.toBitcoreUtxo),
       address,
       amountsMap,
-      deckSpawnTxn
+      deckSpawnTxn,
+      assetSpecificData
     )
     let fee = transaction.getFee()
     let { minTagFee: amount } = bitcore.assets.configuration
@@ -66,7 +72,8 @@ const sendAssets = fetchJSONRoutine<
         sent.id,
         deck.id,
         deck.name,
-        amountsMap
+        amountsMap,
+        assetSpecificData
       )
     }
   }
@@ -103,13 +110,17 @@ const spawnDeck = fetchJSONRoutine<
   Error
 >({
   type: 'SPAWN_DECK',
-  fetchJSON: async ({ wallet: { address, unspentOutputs, privateKey }, name, precision, issueMode }) => {
+  fetchJSON: async ({
+    wallet: { address, unspentOutputs, privateKey },
+    name, precision, issueMode, assetSpecificData
+  }) => {
     let transaction = bitcore.assets.createDeckSpawnTransaction(
       unspentOutputs.map(Satoshis.toBitcoreUtxo),
       address,
       name,
       precision,
-      issueMode
+      issueMode,
+      assetSpecificData
     )
     let fee = transaction.getFee()
     let { minTagFee: amount } = bitcore.assets.configuration
@@ -130,6 +141,7 @@ const spawnDeck = fetchJSONRoutine<
         issuer: address,
         decimals: precision,
         subscribed: false,
+        assetSpecificData
       })
     }
   }

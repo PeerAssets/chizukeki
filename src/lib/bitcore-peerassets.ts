@@ -45,12 +45,15 @@ function extendBitcore(bitcore, configuration = defaultConfig) {
     //
     // Deck spawn functions
     //
-    createDeckSpawnTransaction(utxo, changeAddress: string, name: string, numberOfDecimals: number, issueModes: number) {
+    createDeckSpawnTransaction(
+      utxo, changeAddress: string, name: string, numberOfDecimals: number,
+      issueModes: number, assetSpecificData: string
+    ) {
       let { minTagFee, transferPPCAmount, deckSpawnTagHash } = this.configuration.withFeesInSatoshis()
       let deckSpawnTxn = new bitcore.Transaction()
         .from(arrayify(utxo))                               // vin[0]: Owner signature
         .to(deckSpawnTagHash, minTagFee)                                                // vout[0]: Deck spawn P2TH
-        .addData(this.createDeckSpawnMessage(name, numberOfDecimals, issueModes))  // vout[1]: Asset data
+        .addData(this.createDeckSpawnMessage(name, numberOfDecimals, issueModes, assetSpecificData))  // vout[1]: Asset data
         // free format from here, typically a change Output
         .change(changeAddress)
       return deckSpawnTxn
@@ -74,7 +77,10 @@ function extendBitcore(bitcore, configuration = defaultConfig) {
     //
     // Card transfer functions
     //
-    createCardTransferTransaction(utxo, changeAddress: string, amountsMap: Record<string, number>, deckSpawnTxn) {
+    createCardTransferTransaction(
+      utxo, changeAddress: string, amountsMap: Record<string, number>,
+      deckSpawnTxn, assetSpecificData: string
+    ) {
       let { minTagFee, transferPPCAmount } = this.configuration.withFeesInSatoshis()
       var receivers: Array<string> = [];
       var amounts: Array<number> = [];
@@ -86,7 +92,7 @@ function extendBitcore(bitcore, configuration = defaultConfig) {
       var cardTransferTxn = new bitcore.Transaction()
         .from(utxo)                             // vin[0]: Sending party signature
         .to(this.assetTag(deckSpawnTxn), minTagFee)  // vout[0]: Asset P2TH
-        .addData(this.createCardTransferMessage(amounts, deckSpawnTxn));  // vout[1]: Transfer data
+        .addData(this.createCardTransferMessage(amounts, deckSpawnTxn, assetSpecificData));  // vout[1]: Transfer data
 
       // vout[2] - vout[n+2] -> the receivers
       for (let i = 0; i < receivers.length; i++){
@@ -134,11 +140,12 @@ function extendBitcore(bitcore, configuration = defaultConfig) {
     //
     // Internal functions
     //
-    createDeckSpawnMessage(name, numberOfDecimals, issueModes) {
+    createDeckSpawnMessage(name, numberOfDecimals, issueModes, assetSpecificData) {
       var ds = new pb.DeckSpawn();
       ds.setVersion(1);
       ds.setName(name);
       ds.setNumberOfDecimals(numberOfDecimals);
+      ds.setAssetSpecificData(assetSpecificData);
 
       if (typeof issueModes == 'number') {
         ds.setIssueMode(issueModes);
@@ -184,7 +191,7 @@ function extendBitcore(bitcore, configuration = defaultConfig) {
       return new bitcore.PrivateKey(bn).toPublicKey().toAddress();
     },
 
-    createCardTransferMessage(amounts, deckSpawnTxn) {
+    createCardTransferMessage(amounts, deckSpawnTxn, assetSpecificData) {
       var decoded = this.decodeDeckSpawnTransaction(deckSpawnTxn);
       if (!decoded) return undefined;
 
@@ -192,6 +199,7 @@ function extendBitcore(bitcore, configuration = defaultConfig) {
       ct.setAmountList(amounts);
       ct.setNumberOfDecimals(decoded.numberOfDecimals);
       ct.setVersion(1);
+      ct.setAssetSpecificData(assetSpecificData);
 
       return new Buffer(ct.serializeBinary());
     },
@@ -202,7 +210,8 @@ function extendBitcore(bitcore, configuration = defaultConfig) {
       return {
         amounts: ds.getAmountList(),
         version: ds.getVersion(),
-        numberOfDecimals: ds.getNumberOfDecimals()
+        numberOfDecimals: ds.getNumberOfDecimals(),
+        assetSpecificData: ds.getAssetSpecificData()
       }
     }
 

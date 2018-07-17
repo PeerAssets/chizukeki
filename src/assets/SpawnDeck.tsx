@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Dimensions, View, TouchableOpacity, ActivityIndicator, StyleProp } from 'react-native';
+import { Dimensions, View, TouchableOpacity, ActivityIndicator, StyleProp, Platform } from 'react-native';
 import RoutineButton from '../generics/routine-button'
 import {
   Form,
@@ -55,7 +55,8 @@ namespace SpawnDeck {
   export type Data = {
     name: string,
     precision: number,
-    issueMode: IssueMode.Data
+    issueMode: IssueMode.Data,
+    assetSpecificData: string
   }
   export type Props = {
     stage?: string | undefined,
@@ -90,6 +91,7 @@ function SpawnButton({ deck, ...props }: {
 
 class SpawnDeck extends React.Component<SpawnDeck.Props, State> {
   state: State = {
+    assetSpecificData: '',
     name: '',
     issueMode: null,
     precision: 0,
@@ -143,6 +145,24 @@ class SpawnDeck extends React.Component<SpawnDeck.Props, State> {
                 style={{ padding: 15, width: '100%' }}
                 value={this.state.issueMode || 0x0}
                 onChange={(issueMode: IssueMode.Data) => this.setState({ issueMode })} />
+              <Field styleNames='stacked'>
+                {ref => [
+                  <Label key={0} style={{ fontSize: 17 }}>Asset Specific Data</Label>,
+                  <Input
+                    multiline
+                    numberOfLines={3}
+                    key={1}
+                    ref={ref}
+                    style={[
+                      { marginTop: 5, paddingTop: 5 },
+                      Platform.OS === 'web' ? { resize: 'vertical' } as any : {}
+                    ]}
+                    value={this.state.assetSpecificData}
+                    placeholder='add a note or metadata'
+                    onChangeText={assetSpecificData => this.setState({ assetSpecificData })}
+                  />
+                ]}
+              </Field>
             </Form>
           </Body>
         </CardItem>

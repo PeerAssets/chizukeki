@@ -28,6 +28,7 @@ namespace Deck {
     issueMode: IssueMode.Encoding
     decimals: number
     subscribed: boolean
+    assetSpecificData: string
   }
   export type Summary = DeckSummary
   interface FullDeck extends Summary {
@@ -45,6 +46,8 @@ type Deck = Deck.Summary | Deck.Full
 
 export interface CardTransfer {
   type: 'CardBurn' | 'CardIssue' | 'CardTransfer'
+
+  asset_specific_data: string,
 
   amount: number,
   txid: string,
@@ -90,8 +93,8 @@ class Papi {
       { name: "id", "op": "like", "val": `${deckPrefix}%`}
     ]
     let { objects: decks } = await this.restlessRequest('decks', { filters }, { results_per_page: 1 })
-    let { issue_mode, ...deck } = decks[0]
-    return { issueMode: issue_mode, ...deck } as Deck.Summary
+    let { issue_mode, asset_specific_data: assetSpecificData, ...deck } = decks[0]
+    return { issueMode: issue_mode, assetSpecificData, ...deck } as Deck.Summary
   }
   deckDetails = async (deck: Deck.Summary, address?: string, transaction?: Wallet.Transaction): Promise<Deck.Full> => {
     type Balances = { [address: string]: number }

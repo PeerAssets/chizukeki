@@ -130,6 +130,11 @@ function DeckDetails({ deck }: { deck: Papi.Deck }){
       <Text styleNames='note bounded' ellipsizeMode='middle' numberOfLines={1} >
         issuer: {deck.issuer}
       </Text>
+      { deck.assetSpecificData && (
+        <Text styleNames='note bounded' ellipsizeMode='middle' numberOfLines={1} >
+          Asset Specific Data: {deck.assetSpecificData}
+        </Text>
+      )}
       <Text styleNames='note'>{
         Array.isArray(modes)
           ? 'modes: ' + modes.join(', ')

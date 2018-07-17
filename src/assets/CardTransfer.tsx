@@ -23,6 +23,7 @@ namespace CardTransfer {
     | 'deck_name'
     | 'sender'
     | 'receiver'
+    | 'asset_specific_data'
     >
 }
 
@@ -47,7 +48,12 @@ function CardTransfer({
       timestamp={timestamp}
       asset={deck_name}
       addresses={[ amount > 0 ? sender : receiver ]}>
-      { transaction && <TransactionDetails asset {...transaction}/> }
+      {transfer.asset_specific_data &&
+        <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
+          Asset Specific Data: {transfer.asset_specific_data}
+        </Text>
+      }
+      {transaction && <TransactionDetails asset {...transaction}/> }
     </Transaction>
   )
 }
