@@ -121,6 +121,7 @@ function FocusedHead({ asset, sync }: AssetSummary.Props){
 }
 
 function DeckDetails({ deck }: { deck: Papi.Deck }){
+  let modes = IssueModes.decode(deck.issueMode)
   return (
     <Body styleNames='details' style={{ alignItems: 'flex-start', flexDirection: 'column', width: '100%' }}>
       <Text styleNames='note bounded' ellipsizeMode='middle' numberOfLines={1} >
@@ -129,7 +130,11 @@ function DeckDetails({ deck }: { deck: Papi.Deck }){
       <Text styleNames='note bounded' ellipsizeMode='middle' numberOfLines={1} >
         issuer: {deck.issuer}
       </Text>
-      <Text styleNames='note'>mode: {IssueModes.decode(deck.issueMode)}</Text>
+      <Text styleNames='note'>{
+        Array.isArray(modes)
+          ? 'modes: ' + modes.join(', ')
+          : `mode: ${modes}`
+      }</Text>
     </Body>
   )
 }

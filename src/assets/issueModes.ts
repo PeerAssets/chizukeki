@@ -1,3 +1,4 @@
+import { reverse } from 'ramda'
 /*
   https://github.com/PeerAssets/rfcs/blob/master/0001-peerassets-transaction-specification.proto#L18-L31
 */
@@ -44,6 +45,17 @@ enum IssueMode {
   SINGLET      = 'SINGLET',
 }
 
+const _Modes = [
+  // IssueModeEncoding.NONE, not included 
+  IssueModeEncoding.CUSTOM,
+  IssueModeEncoding.ONCE,
+  IssueModeEncoding.MULTI,
+  IssueModeEncoding.MONO,
+  IssueModeEncoding.UNFLUSHABLE,
+  IssueModeEncoding.SUBSCRIPTION,
+  IssueModeEncoding.SINGLET,
+]
+
 namespace IssueMode {
   export type Encoding = IssueModeEncoding
   export const Encoding = IssueModeEncoding
@@ -72,10 +84,31 @@ namespace IssueMode {
   export function encode(modeName: IssueMode){
     return nameToEncodingMap[modeName]
   }
-  export function decode(modeEncoding: Encoding){
-    return encodingToNameMap[modeEncoding]
+  export function decode(modeEncoding: Encoding | number){
+    let modes: IssueMode | IssueMode[] = encodingToNameMap[modeEncoding]
+    console.log(modes)
+    if (!modes) {
+    
+      modes = reverse( // reverse twice so SUBSCRIPTION and SINGLET absorb their sub-modes
+        reverse(_Modes)
+          .filter(modeBits => {
+            let included = Boolean((modeBits & modeEncoding) === modeBits)
+            if (included) {
+              modeEncoding = modeEncoding ^ modeBits // remove bits from encoding for combos
+            }
+            console.log(modeEncoding)
+            return included
+          })
+          .map(mode => encodingToNameMap[mode])
+        )
+      if (!modes.length) {
+        modes = IssueMode.NONE
+      }
+    }
+    return modes
   }
 
 }
+Object.assign(window, { IssueModeEncoding })
 
 export default IssueMode
