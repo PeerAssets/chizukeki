@@ -21,11 +21,17 @@ function AssetAction({ assetAction }: { assetAction?: string }){
     null
 }
 
+type TransactionDetailsProps = Pick<WalletTransaction.Data, 'id'>
+  & Partial<WalletTransaction.Data>
+  & { asset?: boolean }
+  & { children?: React.ReactNode }
+
 function TransactionDetails({
-  confirmations, id, assetAction, amount, fee, asset
-}: WalletTransaction.Data & { asset?: boolean }) {
+  confirmations, id, assetAction, amount, fee, asset, children
+}: TransactionDetailsProps) {
   return (
     <CardItem styleNames='footer' style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+      { children }
       <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
         id: {id}
       </Text>
@@ -33,15 +39,15 @@ function TransactionDetails({
         confirmations: {confirmations || 'pending'}
       </Text>
       {
-        !asset && <>
-          <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
+        !asset && amount && fee && [
+          <Text key='amount' styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
             amount: {amount}
-          </Text>
-          <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
+          </Text>,
+          <Text key='fee' styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
             fee: { amount < 0 ? -fee : fee }
-          </Text>
-          <AssetAction assetAction={assetAction}/>
-        </>
+          </Text>,
+          <AssetAction key='action' assetAction={assetAction}/>
+        ]
       }
     </CardItem>
   )

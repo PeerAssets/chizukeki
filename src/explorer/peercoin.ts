@@ -8,7 +8,7 @@ import { Wallet, walletMeta } from './common'
 
 let { getJSON, getText, stringifyQuery } = HTTP
 
-window['bitcore'] = bitcore
+// window['bitcore'] = bitcore
 
 
 namespace ApiCalls {

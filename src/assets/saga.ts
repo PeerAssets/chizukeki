@@ -23,6 +23,7 @@ function pendingCardTransfers(
   deck_name: string,
   amountsMap: SendAsset.Payload['amountsMap'],
   asset_specific_data: string,
+  transaction: CardTransferList.Pending[0]['transaction']
 ): CardTransferList.Pending {
   return Object.keys(amountsMap).map(receiver => ({
     txid,
@@ -31,7 +32,8 @@ function pendingCardTransfers(
     receiver,
     sender,
     amount: -amountsMap[receiver],
-    asset_specific_data
+    asset_specific_data,
+    transaction
   }))
 }
 
@@ -73,7 +75,8 @@ const sendAssets = fetchJSONRoutine<
         deck.id,
         deck.name,
         amountsMap,
-        assetSpecificData
+        assetSpecificData,
+        sent
       )
     }
   }

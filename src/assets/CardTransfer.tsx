@@ -10,9 +10,10 @@ import { Secondary } from '../generics/Layout'
 import RoutineButton from '../generics/routine-button'
 
 import { CardTransfer as CardTransferData } from './papi'
-import Transaction from '../generics/transaction-like'
+import TransactionLike from '../generics/transaction-like'
 
 import { TransactionDetails } from '../wallet/Transaction'
+import { Wallet } from '../explorer/common'
 
 namespace CardTransfer {
   export type Data = CardTransferData
@@ -24,7 +25,9 @@ namespace CardTransfer {
     | 'sender'
     | 'receiver'
     | 'asset_specific_data'
-    >
+    > & {
+      transaction: Pick<Wallet.PendingTransaction, 'id' | 'timestamp' | 'raw'>
+    }
 }
 
 // default infinity to put pending transactions first
@@ -44,17 +47,20 @@ function CardTransfer({
     ? transaction.timestamp
     : 'pending'
   return (
-    <Transaction {...{ amount: selfSend ? 0 : amount, timestamp, selfSend }}
+    <TransactionLike {...{ amount: selfSend ? 0 : amount, timestamp, selfSend }}
       timestamp={timestamp}
       asset={deck_name}
-      addresses={[ amount > 0 ? sender : receiver ]}>
-      {transfer.asset_specific_data &&
-        <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
-          Asset Specific Data: {transfer.asset_specific_data}
-        </Text>
-      }
-      {transaction && <TransactionDetails asset {...transaction}/> }
-    </Transaction>
+      addresses={[amount > 0 ? sender : receiver]}>
+      {transaction && (
+        <TransactionDetails asset {...transaction}>
+          {transfer.asset_specific_data &&
+            <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
+              Asset Specific Data: {transfer.asset_specific_data}
+            </Text>
+          }
+        </TransactionDetails>
+      )}
+    </TransactionLike>
   )
 }
 
@@ -88,12 +94,12 @@ function CardTransferList({
         enableEmptySections // silence error, shouldn't be necessary when react-native-web implements FlatList
         data={sortDesc(cardTransfers)}
         keyExtractor={t => t.transaction.id + (t.cardseq || t.receiver)}
-        renderItem={CardTransfer}/>
+        renderItem={CardTransfer} />
       <RoutineButton
         onPress={canLoadMore ? loadMore : () => { }}
         DEFAULT={canLoadMore ? 'Load More' : 'All Card Transfers Loaded'}
         STARTED='Loading'
-        dismiss={[{ stage: 'DONE', auto: true, onPressDismiss: canLoadMore ? loadMore : () => { } } ]}
+        dismiss={[{ stage: 'DONE', auto: true, onPressDismiss: canLoadMore ? loadMore : () => { } }]}
         styleNames={canLoadMore ? 'bordered block' : 'bordered block disabled'}
         stage={stage} />
     </Secondary>
