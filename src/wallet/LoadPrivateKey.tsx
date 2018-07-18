@@ -87,7 +87,7 @@ function deriveFormat(privateKey: string){
         format: undefined,
         address: undefined
       },
-      error: 'Could Not parse Key. Must be either HD, WIF, or raw Private Key'
+      error: 'Could Not parse Key. Must be either WIF or raw Private Key' //,HD, 
     }
   }
   return { data, error: undefined }
@@ -158,7 +158,7 @@ class LoadPrivateKey extends React.Component<LoadPrivateKeyProps, State> {
                     <Input 
                       key={1}
                       ref={ref}
-                      placeholder={`Paste WIF, HD Key, or Raw Private Key here`}
+                      placeholder={`Paste WIF or Raw Private Key here` /*, HD Key,*/ }
                       style={{ fontSize: 12, lineHeight: 14, minWidth: 200 }}
                       value={pKeyInput}
                       onChangeText={privateKey => this.processKeyChange(privateKey)}/>,
