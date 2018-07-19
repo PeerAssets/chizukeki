@@ -1,10 +1,11 @@
 import * as React from 'react'
-import { View, Image, Text, StyleSheet, ScrollView } from 'react-native'
+import { View, Image, Text, StyleSheet, ScrollView, ScrollViewProperties } from 'react-native'
 import { Provider } from "react-redux"
 import { PersistGate } from 'redux-persist/es/integration/react'
-import { ConnectedRouter } from 'react-router-redux'
+import { ConnectedRouter } from 'connected-react-router'
 
-import Router, { Route, Redirect } from './routing/router'
+import { Route, Redirect } from './routing/router'
+import { Switch, withRouter } from 'react-router-dom'
 import configureStore, { history } from "./store"
 
 import Nav from './Menu'
@@ -22,36 +23,32 @@ let { store, persistor } = configureStore()
 
 variables.iconFamily = 'FontAwesome'
 
-export default class App extends React.Component<{}> {
-  render() {
-    return (
-        <Provider store={store}>
-          <PersistGate persistor={persistor} loading={<Text>loading</Text>}>
+function App() {
+  return (
+    <Provider store={store}>
+      <PersistGate persistor={persistor} loading={<Text>loading</Text>}>
+        <StyleProvider style={theme(variables)}>
+          <Root style={styles.wrapper}>
             <ConnectedRouter history={history}>
-              <StyleProvider style={theme(variables)}>
-                <Root style={styles.wrapper}>
-                  {/*
-                TODO will background / logo be optional / configurable on deployment?
-                <Image source={require("./assets/logomask.png")}
-                  style={styles.background} />
-                */}
-                  <ScrollView contentContainerStyle={styles.container}>
-                    <Fallback>
-                      <Nav />
-                      <AuthenticatedRoute path="/" exact component={() => <Redirect to='/wallet' />} />
-                      <AuthenticatedRoute path="/wallet" exact component={Wallet} />
-                      <AuthenticatedRoute path="/assets" exact component={Assets} />
-                      <AuthenticatedRoute path="/assets/:id" exact component={Asset} />
-                      <Route path="/login" exact component={Login} />
-                    </Fallback>
-                  </ScrollView>
-                </Root>
-              </StyleProvider>
+              <ScrollView contentContainerStyle={styles.container}>
+                <Fallback>
+                  <Nav />
+                  <Switch>
+                    <AuthenticatedRoute path="/" exact component={() => <Redirect to='/wallet' />} />
+                    <AuthenticatedRoute path="/wallet" exact component={Wallet} />
+                    <AuthenticatedRoute path="/assets" exact component={Assets} />
+                    <AuthenticatedRoute path="/assets/:id" exact component={Asset} />
+                    <Route path="/login" exact component={Login} />
+                  </Switch>
+                </Fallback>
+              </ScrollView>
             </ConnectedRouter>
-          </PersistGate>
-        </Provider>
-    )
-  } }
+          </Root>
+        </StyleProvider>
+      </PersistGate>
+    </Provider>
+  )
+}
 
 
 const styles = StyleSheet.create({
@@ -77,3 +74,5 @@ const styles = StyleSheet.create({
     flexShrink: 0
   },
 })
+
+export default App

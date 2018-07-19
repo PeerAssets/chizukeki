@@ -3,6 +3,7 @@ import { View, ViewStyle } from 'react-native'
 import { connect } from 'react-redux'
 import { Redirect } from '../routing/router'
 import { State } from './redux'
+import { withRouter } from 'react-router'
 
 import Keys, { UnlockThenCopy } from './Keys'
 import { Link } from '../routing/router'
@@ -119,8 +120,8 @@ class Fallback extends React.Component<Props, { error: boolean }> {
 
 }
 
-export default connect(
+export default withRouter(connect(
   ({ wallet: { wallet } }: { wallet: State }) => (wallet || {}),
   dispatch => ({ logout: () => dispatch({ type: 'HARD_LOGOUT' }) })
-)(Fallback)
+)(Fallback) as any)
 

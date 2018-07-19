@@ -1,5 +1,5 @@
 import { createStore, Reducer, applyMiddleware, combineReducers } from 'redux';
-import { routerReducer, routerMiddleware } from 'react-router-redux'
+import { connectRouter, routerMiddleware } from 'connected-react-router'
 import createSagaMiddleware from 'redux-saga'
 
 
@@ -39,17 +39,18 @@ let persist = (key: string, reducer: Reducer<any>) => persistReducer({
 
 /* Persist to either device or localStorage
  * */
-const reducer = combineReducers({
-  router: routerReducer,
-  wallet: persist('wallet', Wallet.reducer),
-  assets: persist('assets', Assets.reducer),
-})
+const reducer = connectRouter(history)(
+  combineReducers({
+    wallet: persist('wallet', Wallet.reducer),
+    assets: persist('assets', Assets.reducer),
+  })
+)
 
 const saga = createSagaMiddleware()
 
 const middleware = configure.fromEnv().NODE_ENV !== 'PRODUCTION' ?
-  applyMiddleware(saga, logger, routerMiddleware(history)) :
-  applyMiddleware(saga, routerMiddleware(history))
+  applyMiddleware(routerMiddleware(history), saga, logger) :
+  applyMiddleware(routerMiddleware(history), saga)
 
 export default function configureStore() {
   let store = createStore(
