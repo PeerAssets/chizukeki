@@ -39,7 +39,7 @@ function TransactionDetails({
         confirmations: {confirmations || 'pending'}
       </Text>
       {
-        !asset && amount && fee && [
+        !asset && amount !== undefined && fee !== undefined && [
           <Text key='amount' styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
             amount: {amount}
           </Text>,
