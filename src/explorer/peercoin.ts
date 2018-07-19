@@ -64,6 +64,7 @@ namespace RawTransaction {
   export type Relative = RawTransaction & {
     block: number,
     fee: number,
+    type: 'CREDIT' | 'DEBIT' | 'SELF_SEND',
     inputTotal: number,
     addresses: Array<string>
   }
