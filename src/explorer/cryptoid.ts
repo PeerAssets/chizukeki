@@ -53,6 +53,7 @@ namespace normalize {
       }
       let amount = Satoshis.toAmount(change)
       nTransactions.push({
+        type: 'DEBIT',
         id,
         block: NaN,
         fee: NaN, // todo cryptoid is a WIP

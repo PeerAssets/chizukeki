@@ -27,12 +27,13 @@ namespace Wallet {
       vout: Array<UTXO>,
       vin: Array<any>,
     },
+    type: 'CREDIT' | 'DEBIT' | 'SELF_SEND',
     addresses: Array<string>,
     assetAction?: 'DeckSpawn' | 'CardTransfer'
   }
   export type PendingTransaction = Pick<
     Transaction,
-    'id' | 'amount' | 'timestamp' | 'raw' | 'fee' | 'addresses'
+    'type' | 'id' | 'amount' | 'timestamp' | 'raw' | 'fee' | 'addresses'
   >
   export function empty(address: string, meta?: { lastSeenBlock?: number }): Wallet {
     return Object.assign(

@@ -60,7 +60,7 @@ interface TransactionProps extends WalletTransaction.Data {
 
 class WalletTransaction extends React.PureComponent<TransactionProps> {
   render() {
-    let { address, hide, amount, ...item } = this.props
+    let { type, address, hide, amount, ...item } = this.props
     // include fee in debit display
     let totalAmount = (amount <= 0) ?
       Satoshis.toAmount(Satoshis.fromAmount(amount) - Satoshis.fromAmount(item.fee)) :
@@ -70,11 +70,7 @@ class WalletTransaction extends React.PureComponent<TransactionProps> {
     }
     return (
       <Transaction
-        type={
-          item.addresses.length === 0 ? 'SELF_SEND' : /* the user's address is removed from outputs because self send is viewed as a debit */ 
-          item.addresses.includes(address) ? 'CREDIT' : 
-          'DEBIT'
-        }
+        type={type}
         amount={totalAmount}
         {...item}
         asset={<Text>PPC <AssetAction assetAction={item.assetAction}/></Text>}>

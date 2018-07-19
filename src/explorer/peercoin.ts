@@ -63,7 +63,6 @@ namespace RawTransaction {
   }
   export type Relative = RawTransaction & {
     block: number,
-    type: 'CREDIT' | 'DEBIT' | 'UNINVOLVED',
     fee: number,
     inputTotal: number,
     addresses: Array<string>
@@ -153,6 +152,7 @@ namespace normalize {
     let assetAction = bitcore.assets.assetActionType(new bitcore.Transaction(raw.hex))
     return {
       id,
+      type,
       block: raw.block,
       confirmations,
       addresses,
@@ -174,7 +174,7 @@ namespace normalize {
     for (let raw of txs.reverse()){
       let tx = normalize.transaction(address, raw)
       tx.balance = balance
-      nTransactions.push(tx)
+      nTransactions.push(tx as Wallet.Transaction)
       balance -= Satoshis.toAmount(tx.amount)
     }
     return nTransactions
@@ -286,6 +286,7 @@ class PeercoinExplorer {
     }))
     return {
       amount,
+      type: toAddress === changeAddress ? 'SELF_SEND' : 'DEBIT',
       fee: Satoshis.toAmount(fee),
       addresses: [ toAddress ],
       ...sent
@@ -306,16 +307,18 @@ class PeercoinExplorer {
     if(isError(info)){
       return info
     }
-    let type: 'CREDIT' | 'DEBIT' | 'UNINVOLVED' = (!address) ?
-      'UNINVOLVED' : (
+    let type: 'CREDIT' | 'DEBIT' | 'SELF_SEND' =
       info.inputs.filter(i => i.addresses === address).length ?
         'DEBIT' :
         'CREDIT'
-      )
+
     let addresses = dropRepeats( type === 'CREDIT' ?
       info.inputs.map(o => o.addresses).filter(a => a !== address) :
       info.outputs.map(o => o.addresses).filter(a => a !== address)
     )
+    if ((type === 'DEBIT') && !addresses.length){
+      type = 'SELF_SEND'
+    }
       
     let inputTotal = info.inputs.reduce((total, i) => plus(total, i.amount), 0)
     let fee = Satoshis.btc.toAmount(minus(inputTotal, info.total))

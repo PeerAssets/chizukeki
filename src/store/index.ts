@@ -27,6 +27,7 @@ const migrations: any = {
   3: logoutMigration,
   4: logoutMigration,
   5: logoutMigration,
+  6: logoutMigration,
 }
 
 let persist = (key: string, reducer: Reducer<any>) => persistReducer({

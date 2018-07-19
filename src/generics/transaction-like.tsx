@@ -28,6 +28,7 @@ class Transaction extends React.Component<Props, { showDetails: boolean }> {
           icon: 'arrow-circle-o-up',
           styleNames: 'dark',
           sign: '-',
+          direction: 'to',
           selfSend: false
         }
       case 'CREDIT':
@@ -35,6 +36,7 @@ class Transaction extends React.Component<Props, { showDetails: boolean }> {
           icon: 'arrow-circle-o-down',
           styleNames: 'success',
           sign: '+',
+          direction: 'from',
           selfSend: false
         }
       case 'SELF_SEND':
@@ -49,7 +51,7 @@ class Transaction extends React.Component<Props, { showDetails: boolean }> {
   render() {
     let { amount, asset, timestamp, addresses, children } = this.props
     let io = (inbound, outbound) => amount > 0 ? inbound : outbound
-    let { styleNames, icon, sign, selfSend } = this.typeSpecific()
+    let { styleNames, icon, sign, selfSend, direction } = this.typeSpecific()
     return (
       <Card>
         <CardItem style={{ display: 'flex', flexDirection: 'row' }}>
@@ -80,7 +82,7 @@ class Transaction extends React.Component<Props, { showDetails: boolean }> {
         <CardItem style={{ paddingTop: 0, maxWidth: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
           { selfSend && <Address>self send</Address> }
           {addresses.map((address, i) => (
-            <Address key={i}>{io('from', 'to')} {address}</Address>
+            <Address key={i}>{direction} {address}</Address>
           ))}
         </CardItem>
         { this.state.showDetails ? children : null}
