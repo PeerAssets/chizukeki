@@ -3,7 +3,7 @@ import { Button, Card, Left, CardItem, Body, Text, H2, Icon, Right } from 'nativ
 import moment from 'moment'
 
 type Props = {
-  selfSend: boolean,
+  type: 'DEBIT' | 'CREDIT' | 'SELF_SEND',
   amount: number,
   timestamp: Date | string,
   addresses: Array<string>,
@@ -21,22 +21,44 @@ class Transaction extends React.Component<Props, { showDetails: boolean }> {
     super(props)
     this.state = { showDetails: false }
   }
+  typeSpecific = () => {
+    switch (this.props.type) {
+      case 'DEBIT':
+        return {
+          icon: 'arrow-circle-o-up',
+          styleNames: 'dark',
+          sign: '-',
+          selfSend: false
+        }
+      case 'CREDIT':
+        return {
+          icon: 'arrow-circle-o-down',
+          styleNames: 'success',
+          sign: '+',
+          selfSend: false
+        }
+      case 'SELF_SEND':
+        return {
+          icon: 'minus-circle',
+          styleNames: 'warning',
+          sign: '',
+          selfSend: true
+        }
+    }
+  }
   render() {
-    let { selfSend, amount, asset, timestamp, addresses, children } = this.props
+    let { amount, asset, timestamp, addresses, children } = this.props
     let io = (inbound, outbound) => amount > 0 ? inbound : outbound
-    let textProps = { styleNames: selfSend ? 'warning' : io('success', 'dark') }
+    let { styleNames, icon, sign, selfSend } = this.typeSpecific()
     return (
       <Card>
         <CardItem style={{ display: 'flex', flexDirection: 'row' }}>
           <Left style={{ flex: 7 }}>
-            <Icon {...textProps} name={
-              selfSend ?
-                'minus-circle' :
-                `arrow-circle-o-${io('down', 'up')}`
-              } size={30} color={'black'} />
+            <Icon styleNames={styleNames} name={icon}
+                size={30} color={'black'} />
             <Body>
-              <Text {...textProps} style={{ lineHeight: 20, paddingRight: 7 }}>
-                {selfSend ? '' : io('+', '-')}
+              <Text styleNames={styleNames}  style={{ lineHeight: 20, paddingRight: 7 }}>
+                {sign}
                 {Math.abs(amount).toString()} {asset}
               </Text>
             </Body>
@@ -56,13 +78,10 @@ class Transaction extends React.Component<Props, { showDetails: boolean }> {
           </Right>
         </CardItem>
         <CardItem style={{ paddingTop: 0, maxWidth: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-          {
-            selfSend ?
-              <Address>self send</Address> : 
-              addresses.map((address, i) => (
-                <Address key={i}>{io('from', 'to')} {address}</Address>
-              ))
-          }
+          { selfSend && <Address>self send</Address> }
+          {addresses.map((address, i) => (
+            <Address key={i}>{io('from', 'to')} {address}</Address>
+          ))}
         </CardItem>
         { this.state.showDetails ? children : null}
       </Card>

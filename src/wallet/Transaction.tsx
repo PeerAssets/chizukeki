@@ -53,9 +53,14 @@ function TransactionDetails({
   )
 }
 
-class WalletTransaction extends React.PureComponent<WalletTransaction.Data & { hide?: boolean }> {
+interface TransactionProps extends WalletTransaction.Data {
+  hide?: boolean,
+  address: string
+}
+
+class WalletTransaction extends React.PureComponent<TransactionProps> {
   render() {
-    let { hide, amount, ...item } = this.props
+    let { address, hide, amount, ...item } = this.props
     // include fee in debit display
     let totalAmount = (amount <= 0) ?
       Satoshis.toAmount(Satoshis.fromAmount(amount) - Satoshis.fromAmount(item.fee)) :
@@ -65,7 +70,11 @@ class WalletTransaction extends React.PureComponent<WalletTransaction.Data & { h
     }
     return (
       <Transaction
-        selfSend={!Boolean(amount)}
+        type={
+          item.addresses.length === 0 ? 'SELF_SEND' : /* the user's address is removed from outputs because self send is viewed as a debit */ 
+          item.addresses.includes(address) ? 'CREDIT' : 
+          'DEBIT'
+        }
         amount={totalAmount}
         {...item}
         asset={<Text>PPC <AssetAction assetAction={item.assetAction}/></Text>}>
@@ -80,7 +89,7 @@ namespace TransactionList {
 }
 
 class TransactionList extends React.Component<
-  { transactions: TransactionList.Data },
+  { address: string, transactions: TransactionList.Data },
   { showAssets: boolean }
 > {
   toggleFilter = (showAssets = !this.state.showAssets) => {
@@ -97,7 +106,7 @@ class TransactionList extends React.Component<
   }
   render() {
     let showAssets = this.state.showAssets
-    let transactions = this.props.transactions
+    let { address, transactions } = this.props
     let style = {
       width: '100%',
       display: 'flex',
@@ -123,7 +132,7 @@ class TransactionList extends React.Component<
           data={transactions.map(item => item.assetAction ? { hide: !showAssets, ...item } : item)}
           keyExtractor={t => t.id}
           renderItem={({ item }) =>
-            <WalletTransaction key={item.id} {...item} />
+            <WalletTransaction address={address} key={item.id} {...item} />
           }/>
       </Secondary>
     )

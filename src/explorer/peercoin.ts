@@ -281,7 +281,9 @@ class PeercoinExplorer {
 
     let fee = transaction.getFee()
     // TODO need to update available unspent transactions after send locally?
-    let sent = await this._sendRawTransaction(transaction.fee(fee).sign(signature).serialize())
+    let sent = await this._sendRawTransaction(transaction.fee(fee).sign(signature).serialize({
+      disableDustOutputs: false
+    }))
     return {
       amount,
       fee: Satoshis.toAmount(fee),

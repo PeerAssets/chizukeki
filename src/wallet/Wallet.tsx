@@ -87,7 +87,7 @@ class Wallet extends React.Component<
           </Card>
           <SendTransaction {...sendTransaction} style={{ width: '100%', maxHeight: 265, }} />
         </Main>
-        <TransactionList transactions={transactions} />
+        <TransactionList address={address} transactions={transactions} />
       </Wrapper>
     )
   }

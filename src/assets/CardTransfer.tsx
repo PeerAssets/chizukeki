@@ -47,7 +47,9 @@ function CardTransfer({
     ? transaction.timestamp
     : 'pending'
   return (
-    <TransactionLike {...{ amount: selfSend ? 0 : amount, timestamp, selfSend }}
+    <TransactionLike 
+      amount={selfSend ? 0 : amount}
+      type={selfSend ? 'SELF_SEND' : amount > 0 ? 'CREDIT' : 'DEBIT'}
       timestamp={timestamp}
       asset={deck_name}
       addresses={[amount > 0 ? sender : receiver]}>

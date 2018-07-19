@@ -112,7 +112,7 @@ class SendTransaction extends React.Component<SendTransaction.Props, State> {
               action={this.send}
               Component={SendButton}
               componentProps={{
-                disabled: (!isFilled(this.state)) || (this.state.amount > balance),
+                disabled: false, //(!isFilled(this.state)) || (this.state.amount > balance),
                 stage: this.props.stage,
                 DEFAULT: (this.state.amount || -1) > balance ? 'Insufficient Funds!' : 'Send Transaction'
               }}
