@@ -41,7 +41,7 @@ module.exports = {
       title: 'PeerAssets Wallet',
       chunksSortMode: 'dependency',
       template: path.resolve(__dirname, '../index.ejs')
-    }),
+    })
   ],
 
   module: {

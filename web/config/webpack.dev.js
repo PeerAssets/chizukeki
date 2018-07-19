@@ -9,6 +9,7 @@ module.exports = {
     publicPath: '/'
   },
   devServer: {
+    // contentBase: output.path,
     hot: true,
     historyApiFallback: true
   },

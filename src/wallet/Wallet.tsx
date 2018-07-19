@@ -1,70 +1,16 @@
 import * as React from 'react'
 import moment from 'moment'
 import { View, Clipboard } from 'react-native'
-import PrivateKey from './LoadPrivateKey'
 import TransactionList from './Transaction'
 import SendTransaction from './SendTransaction'
 import { Button, CardItem, Body, Text, Card, connectStyle, H2, Icon, Left, Right } from 'native-base'
 
 import { Wrapper, Main } from '../generics/Layout'
 import SyncButton from '../generics/sync-button'
-import Modal from '../generics/modal/modal'
 
 import { Wallet as WalletData } from '../explorer'
 
-import { WrapActionable } from './UnlockModal'
-
-class UnlockThenCopy extends React.Component<{ keys: Wallet.Keys }, { privateKey: string, alerting: boolean }> {
-  state = { privateKey: '', alerting: false }
-  cache = (privateKey: string) => this.setState({ privateKey })
-  copy = () => {
-    let keys = this.props.keys
-    let privateKey = Wallet.Keys.areLocked(keys) ? 
-      this.state.privateKey :
-      keys.private
-    let success = Clipboard.setString(PrivateKey.toString(privateKey, keys.format))
-    this.setState({ privateKey: '' })
-    this.setState({ alerting: true })
-    setTimeout(() => {
-      this.setState({ alerting: false })
-    }, 2500)
-    return success
-  }
-  render() {
-    let alerting = this.state.alerting
-    return [
-      <Modal key='modal' open={Boolean(this.state.privateKey)} onClose={() => this.setState({ privateKey: '' })}>
-        <Body style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 175 }}>
-          <Text> Unlocked! </Text>
-          <Button styleNames='iconLeft success' style={{ ...styles.column, maxHeight: 50 }} onPress={this.copy}>
-            <Text> Copy Key to Clipboard </Text>
-          </Button>
-        </Body>
-      </Modal>,
-      <WrapActionable.IfLocked
-        key='button'
-        keys={this.props.keys}
-        actionProp='onPress'
-        action={Wallet.Keys.areLocked(this.props.keys) ? this.cache : this.copy}
-        Component={alerting ? 
-          ({ onPress }) => (
-            <Button styleNames='iconLeft success' style={styles.column}
-                onPress={() => this.setState({ alerting: false })}>
-              <Icon name='check' />
-              <Text>Key Copied!</Text>
-            </Button>
-          ) :
-          ({ onPress }) => (
-            <Button styleNames='iconLeft light' style={styles.column} onPress={onPress}>
-              <Icon name='eject' />
-              <Text>Export Key</Text>
-            </Button>
-          )
-        }
-      />
-    ]
-  }
-}
+import WalletKeys, { UnlockThenCopy } from './Keys'
 
 function Balance({ balance, ...props }) {
   return (
@@ -74,6 +20,7 @@ function Balance({ balance, ...props }) {
     </View>
   )
 }
+
 function Address({ address, ...props }) {
   return (
     <View {...props}>
@@ -146,24 +93,12 @@ class Wallet extends React.Component<
   }
 }
 
-type _Keys = _Keys.Locked | _Keys.Unlocked
-namespace _Keys {
-  type WithFormat = {
-    format: PrivateKey.Data['format'],
-  }
-  export type Locked = WithFormat & { locked: string }
-  export type Unlocked = WithFormat & { private: string }
-  export function areLocked(keys: _Keys): keys is Locked {
-    return keys.hasOwnProperty('locked')
-  }
-}
-
 namespace Wallet {
   export type Transaction = WalletData.Transaction
   export type PendingTransaction = WalletData.PendingTransaction
 
-  export type Keys = _Keys
-  export const Keys = _Keys
+  export type Keys = WalletKeys
+  export const Keys = WalletKeys
   export type Loading = {
     address: string,
     keys: Keys

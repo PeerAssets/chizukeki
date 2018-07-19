@@ -38,6 +38,7 @@ function TransactionDetails({
       <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
         confirmations: {confirmations || 'pending'}
       </Text>
+      <></>
       {
         !asset && amount && fee && [
           <Text key='amount' styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>

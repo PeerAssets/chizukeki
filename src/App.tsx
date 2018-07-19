@@ -8,6 +8,7 @@ import Router, { Route, Redirect } from './routing/router'
 import configureStore, { history } from "./store"
 
 import Nav from './Menu'
+import Fallback from './wallet/Fallback'
 import Wallet from './wallet/Container'
 import Login from './wallet/LoginContainer'
 import AuthenticatedRoute from './wallet/AuthenticatedRoute'
@@ -35,12 +36,14 @@ export default class App extends React.Component<{}> {
                   style={styles.background} />
                 */}
                   <ScrollView contentContainerStyle={styles.container}>
-                    <Nav />
-                    <AuthenticatedRoute path="/" exact component={() => <Redirect to='/wallet' />} />
-                    <AuthenticatedRoute path="/wallet" exact component={Wallet} />
-                    <AuthenticatedRoute path="/assets" exact component={Assets} />
-                    <AuthenticatedRoute path="/assets/:id" exact component={Asset} />
-                    <Route path="/login" exact component={Login} />
+                    <Fallback>
+                      <Nav />
+                      <AuthenticatedRoute path="/" exact component={() => <Redirect to='/wallet' />} />
+                      <AuthenticatedRoute path="/wallet" exact component={Wallet} />
+                      <AuthenticatedRoute path="/assets" exact component={Assets} />
+                      <AuthenticatedRoute path="/assets/:id" exact component={Asset} />
+                      <Route path="/login" exact component={Login} />
+                    </Fallback>
                   </ScrollView>
                 </Root>
               </StyleProvider>
