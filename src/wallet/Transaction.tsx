@@ -27,7 +27,7 @@ type TransactionDetailsProps = Pick<WalletTransaction.Data, 'id'>
   & { children?: React.ReactNode }
 
 function TransactionDetails({
-  confirmations, id, assetAction, amount, fee, asset, children
+  type, confirmations, id, assetAction, amount, fee, asset, children
 }: TransactionDetailsProps) {
   return (
     <CardItem styleNames='footer' style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
@@ -44,7 +44,7 @@ function TransactionDetails({
             amount: {amount}
           </Text>,
           <Text key='fee' styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
-            fee: { amount < 0 ? -fee : fee }
+            fee: { type === 'CREDIT' ? fee : -fee }
           </Text>,
           <AssetAction key='action' assetAction={assetAction}/>
         ]
@@ -74,7 +74,7 @@ class WalletTransaction extends React.PureComponent<TransactionProps> {
         amount={totalAmount}
         {...item}
         asset={<Text>PPC <AssetAction assetAction={item.assetAction}/></Text>}>
-        <TransactionDetails amount={amount} {...item} />
+        <TransactionDetails type={type} amount={amount} {...item} />
       </Transaction>
     )
   }
