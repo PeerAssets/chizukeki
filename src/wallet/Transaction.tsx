@@ -62,7 +62,7 @@ class WalletTransaction extends React.PureComponent<TransactionProps> {
   render() {
     let { type, address, hide, amount, ...item } = this.props
     // include fee in debit display
-    let totalAmount = (amount <= 0) ?
+    let totalAmount = type === 'DEBIT' ?
       Satoshis.toAmount(Satoshis.fromAmount(amount) - Satoshis.fromAmount(item.fee)) :
       amount
     if (hide) {

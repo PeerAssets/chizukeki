@@ -50,7 +50,6 @@ class Transaction extends React.Component<Props, { showDetails: boolean }> {
   }
   render() {
     let { amount, asset, timestamp, addresses, children } = this.props
-    let io = (inbound, outbound) => amount > 0 ? inbound : outbound
     let { styleNames, icon, sign, selfSend, direction } = this.typeSpecific()
     return (
       <Card>
