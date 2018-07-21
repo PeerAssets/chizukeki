@@ -81,7 +81,7 @@ namespace Configuration {
     let ASSETS = {
       deckSpawnTagHash: getDeckSpawnTagHash(NETWORK, DEPLOYMENT_MODE),
       minTagFee: 0.01,
-      transferPPCAmount: 0.01
+      transferPPCAmount: 0.00
     }
     let PUBLIC_PATH = process.env.PUBLIC_PATH || '/'
     let KEY_GENERATOR = keyGenerator.fromEnv()

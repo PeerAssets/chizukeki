@@ -59,7 +59,9 @@ const sendAssets = fetchJSONRoutine<
     let { minTagFee: amount } = bitcore.assets.configuration
     let signature = new bitcore.PrivateKey(privateKey)
     // setting fee explicitly might be unneeded
-    let hex = transaction.fee(fee).sign(signature).serialize()
+    let hex = transaction.fee(fee).sign(signature).serialize({
+      disableDustOutputs: true
+    })
     let sent = await peercoin._sendRawTransaction(hex)
     return {
       type: 'DEBIT' as 'DEBIT',

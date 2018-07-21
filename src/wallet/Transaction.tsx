@@ -31,7 +31,7 @@ function TransactionDetails({
 }: TransactionDetailsProps) {
   return (
     <CardItem styleNames='footer' style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-      { children }
+      {children}
       <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
         id: {id}
       </Text>
@@ -39,7 +39,7 @@ function TransactionDetails({
         confirmations: {confirmations || 'pending'}
       </Text>
       {
-        !asset && amount !== undefined && fee !== undefined && [
+        (!asset && amount !== undefined && fee !== undefined) && [
           <Text key='amount' styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
             amount: {amount}
           </Text>,

@@ -55,11 +55,11 @@ function CardTransfer({
       addresses={[amount > 0 ? sender : receiver]}>
       {transaction && (
         <TransactionDetails asset {...transaction}>
-          {transfer.asset_specific_data &&
+          {transfer.asset_specific_data ?
             <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
               Asset Specific Data: {transfer.asset_specific_data}
             </Text>
-          }
+           : null }
         </TransactionDetails>
       )}
     </TransactionLike>
