@@ -18,6 +18,7 @@ import { Wallet } from '../explorer/common'
 namespace CardTransfer {
   export type Data = CardTransferData
   export type Pending = Pick<Data,
+    | 'type'
     | 'amount'
     | 'txid'
     | 'deck_id'
@@ -54,7 +55,7 @@ function CardTransfer({
       asset={deck_name}
       addresses={[amount > 0 ? sender : receiver]}>
       {transaction && (
-        <TransactionDetails asset {...transaction}>
+        <TransactionDetails asset {...transaction} assetAction={transfer.type}>
           {transfer.asset_specific_data ?
             <Text styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
               Asset Specific Data: {transfer.asset_specific_data}

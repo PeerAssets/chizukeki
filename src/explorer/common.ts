@@ -29,7 +29,7 @@ namespace Wallet {
     },
     type: 'CREDIT' | 'DEBIT' | 'SELF_SEND',
     addresses: Array<string>,
-    assetAction?: 'DeckSpawn' | 'CardTransfer'
+    assetAction?: 'DeckSpawn' | 'CardTransfer' | 'CardBurn' | 'CardIssue'
   }
   export type PendingTransaction = Pick<
     Transaction,

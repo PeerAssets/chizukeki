@@ -21,6 +21,7 @@ function pendingCardTransfers(
   txid: string,
   deck_id: string,
   deck_name: string,
+  deck_issuer: string,
   amountsMap: SendAsset.Payload['amountsMap'],
   asset_specific_data: string,
   transaction: CardTransferList.Pending[0]['transaction']
@@ -31,6 +32,9 @@ function pendingCardTransfers(
     deck_name,
     receiver,
     sender,
+    type: receiver === deck_issuer ? 'CardBurn' as 'CardBurn' :
+      sender === deck_issuer ? 'CardIssue'  as 'CardIssue' :
+      'CardTransfer' as 'CardTransfer',
     amount: -amountsMap[receiver],
     asset_specific_data,
     transaction
@@ -77,6 +81,7 @@ const sendAssets = fetchJSONRoutine<
         sent.id,
         deck.id,
         deck.name,
+        deck.issuer,
         amountsMap,
         assetSpecificData,
         sent
@@ -182,7 +187,8 @@ const syncAsset = fetchJSONRoutine.withPolling<
     let _canLoadMoreCards = cardTransfers.length === 10
     balance.type = (balance.value === undefined) ?
       'UNISSUED' :
-      (balance.value > 0 ? 'RECEIVED' : 'ISSUED')
+      (asset.deck.issuer === address ? 'ISSUED' : 'RECEIVED')
+    console.log(asset.deck.issuer, )
     cardTransfers = cardTransfers.map(t => (
       t.deck_name = deck.name,
       t

@@ -45,9 +45,11 @@ function TransactionDetails({
           </Text>,
           <Text key='fee' styleNames='bounded note' ellipsizeMode='middle' numberOfLines={1}>
             fee: { type === 'CREDIT' ? fee : -fee }
-          </Text>,
-          <AssetAction key='action' assetAction={assetAction}/>
+          </Text>
         ]
+      }
+      {
+        assetAction ? <AssetAction key='action' assetAction={assetAction}/> : null
       }
     </CardItem>
   )
