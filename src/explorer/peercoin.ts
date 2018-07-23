@@ -227,7 +227,7 @@ async function defaultOnError<T>(p: Promise<T>, def: T){
 }
 
 class PeercoinExplorer {
-  explorerUrl = `https://explorer.peercoin.net${ configure.fromEnv().NETWORK === 'TESTNET' ? ':8000' : '' }`
+  explorerUrl = `https://${ configure.fromEnv().NETWORK === 'TESTNET' ? 'testnet-' : '' }explorer.peercoin.net`
   rawApiRequest(call: ApiCalls.Coind, query: object){
     return getText(`${this.explorerUrl}/api/${call}?${stringifyQuery(query)}`)
   }
