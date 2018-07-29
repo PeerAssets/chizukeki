@@ -244,7 +244,7 @@ class PeercoinExplorer {
 
   listUnspent = async (address: string) => {
     let { unspent_outputs } = await throwing(this.extendedRequest<Unspent>('listunspent', address))
-    return unspent_outputs.map(normalize.unspentOutput)
+    return unspent_outputs.map(normalize.unspentOutput).filter(u => u.amount)
   }
 
   getRawTransaction = (txid: string) => this.apiRequest<RawTransaction>('getrawtransaction', { txid, decrypt: 1 })
@@ -276,7 +276,7 @@ class PeercoinExplorer {
   ): Promise<Wallet.PendingTransaction> => {
     let signature = new bitcore.PrivateKey(privateKey)
     let transaction = new bitcore.Transaction()
-      .from(unspentOutputs.map(Satoshis.toBitcoreUtxo))
+      .from(unspentOutputs.filter(u => u.amount).map(Satoshis.toBitcoreUtxo))
       .to(toAddress, Satoshis.fromAmount(amount))
       .change(changeAddress)
 

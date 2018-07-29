@@ -188,7 +188,6 @@ const syncAsset = fetchJSONRoutine.withPolling<
     balance.type = (balance.value === undefined) ?
       'UNISSUED' :
       (asset.deck.issuer === address ? 'ISSUED' : 'RECEIVED')
-    console.log(asset.deck.issuer, )
     cardTransfers = cardTransfers.map(t => (
       t.deck_name = deck.name,
       t
