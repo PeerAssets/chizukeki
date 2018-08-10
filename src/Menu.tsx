@@ -17,25 +17,25 @@ let tabStyles = {
     display: "flex",
     paddingLeft: 15,
     paddingRight: 15,
-    backgroundColor: variables.btnInfoBg
+    backgroundColor: "rgb(0, 0, 0)"
   },
   linkText: {
     color: variables.btnInfoColor,
     textDecorationLine: "none"
   },
   linkTextSelected: {
-    color: variables.btnPrimaryColor,
+    color: "rgb(0, 0, 0)",
     textDecorationLine: "none"
   },
   selected: {
-    backgroundColor: variables.btnPrimaryBg
+    backgroundColor: "rgb(253,184, 34)"
   }
 };
 
 let navStyles = {
   ...tabStyles,
   container: {
-    backgroundColor: variables.btnInfoBg
+    backgroundColor: "black" // variables.btnInfoBg
   }
 };
 

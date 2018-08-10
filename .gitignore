@@ -1,6 +1,7 @@
 # Vim 
 .*.sw*
 ./dist/
+web/dist/icons-*/
 web/dist/bundle.js
 
 # ****************************
