@@ -2,6 +2,7 @@ var webpack = require('webpack');
 var path = require('path');
 var fs = require('fs');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+var FaviconsWebpackPlugin = require('favicons-webpack-plugin')
 
 const appDirectory = fs.realpathSync(process.cwd());
 const resolveApp = relativePath => path.resolve(appDirectory, relativePath);
@@ -41,7 +42,23 @@ module.exports = {
       title: 'PeerAssets Wallet',
       chunksSortMode: 'dependency',
       template: path.resolve(__dirname, '../index.ejs')
-    })
+    }),
+    new FaviconsWebpackPlugin({
+      logo: resolveApp('src/branding/logo-contained@6x.png'),
+      icons: {
+        favicons: true,
+
+        android: false,
+        appleIcon: false,
+        appleStartup: false,
+        coast: false,
+        firefox: false,
+        opengraph: false,
+        twitter: false,
+        yandex: false,
+        windows: false
+      }
+    }),
   ],
 
   module: {

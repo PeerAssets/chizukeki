@@ -26,6 +26,7 @@
     "color": "^3.0.0",
     "connected-react-router": "^4.3.0",
     "deepmerge": "^2.0.1",
+    "favicons-webpack-plugin": "^0.0.9",
     "file-loader": "^1.1.5",
     "google-protobuf": "^3.5.0",
     "history": "^4.7.2",
