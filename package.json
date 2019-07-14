@@ -32,7 +32,7 @@
     "history": "^4.7.2",
     "html-webpack-plugin": "^2.30.1",
     "jest": "21.2.1",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.13",
     "moment": "^2.20.1",
     "native-base": "git://github.com/micimize/NativeBase.git#034b010c76e1c422e8b9751d8e338ae217646a31",
     "number-precision": "^1.2.0",
